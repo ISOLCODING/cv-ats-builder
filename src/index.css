@@ -1,0 +1,300 @@
+/* ============================================================
+   index.css — CV ATS Builder
+   Pure Tailwind + minimal custom CSS (no class conflicts)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ─────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-slate-50 text-slate-800;
+  }
+  * { box-sizing: border-box; }
+}
+
+/* ── Component layer (design tokens) ─────────────────────── */
+@layer components {
+
+  /* Card */
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-slate-100 p-6;
+  }
+
+  /* Section header */
+  .section-header {
+    @apply flex items-center gap-3 pb-4 mb-5 border-b border-blue-50;
+  }
+  .section-icon {
+    @apply w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0;
+  }
+
+  /* Stepper circle */
+  .step-circle {
+    @apply w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200;
+  }
+
+  /* ── Form ──────────────────────────────────────────────── */
+  .form-label {
+    @apply block text-[13px] font-semibold text-slate-700 mb-1.5;
+  }
+  .form-input {
+    @apply w-full px-3.5 py-2.5 text-sm text-slate-800 bg-white
+           border border-slate-200 rounded-xl outline-none
+           transition-all duration-150 placeholder-slate-400;
+  }
+  .form-input:hover {
+    @apply border-blue-300;
+  }
+  .form-input:focus {
+    @apply border-blue-500 ring-2 ring-blue-100;
+  }
+  .form-input:disabled {
+    @apply bg-slate-50 text-slate-400 cursor-not-allowed opacity-60;
+  }
+  .form-input-error {
+    @apply border-red-400 ring-2 ring-red-100;
+  }
+  .form-error {
+    @apply flex items-center gap-1.5 text-xs text-red-500 font-medium mt-1;
+  }
+  .form-helper {
+    @apply text-xs text-slate-400 mt-1;
+  }
+
+  /* Checkbox */
+  .modern-check {
+    @apply w-4 h-4 rounded border-slate-300 text-blue-600
+           focus:ring-2 focus:ring-blue-200 cursor-pointer;
+  }
+
+  /* ── Buttons ───────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           font-semibold rounded-xl px-4 py-2 text-sm
+           transition-all duration-150 cursor-pointer
+           select-none whitespace-nowrap border-0 outline-none;
+  }
+  .btn:focus-visible { @apply ring-2 ring-blue-400 ring-offset-1; }
+  .btn:disabled      { @apply opacity-50 cursor-not-allowed pointer-events-none; }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white shadow-sm;
+  }
+  .btn-primary:hover  { @apply bg-blue-700 shadow-md -translate-y-px; }
+  .btn-primary:active { @apply translate-y-0; }
+
+  .btn-secondary {
+    @apply bg-blue-50 text-blue-700 border border-blue-200;
+  }
+  .btn-secondary:hover { @apply bg-blue-100 border-blue-300; }
+
+  .btn-outline {
+    @apply bg-transparent text-blue-600 border border-blue-300;
+  }
+  .btn-outline:hover { @apply bg-blue-50 border-blue-500; }
+
+  .btn-ghost {
+    @apply bg-transparent text-slate-600;
+  }
+  .btn-ghost:hover { @apply bg-slate-100 text-slate-900; }
+
+  .btn-danger {
+    @apply bg-red-50 text-red-600 border border-red-200;
+  }
+  .btn-danger:hover { @apply bg-red-100; }
+
+  .btn-sm   { @apply px-3 py-1.5 text-[13px] rounded-lg; }
+  .btn-lg   { @apply px-6 py-3 text-base rounded-2xl; }
+  .btn-icon { @apply p-2 w-9 h-9 rounded-lg; }
+
+  /* ── Badges ────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5
+           rounded-full text-[11px] font-bold;
+  }
+  .badge-blue   { @apply bg-blue-100 text-blue-700; }
+  .badge-green  { @apply bg-green-100 text-green-700; }
+  .badge-purple { @apply bg-violet-100 text-violet-700; }
+  .badge-amber  { @apply bg-amber-100 text-amber-700; }
+  .badge-gray   { @apply bg-slate-100 text-slate-600; }
+
+  /* ── Entry card ────────────────────────────────────────── */
+  .entry-card {
+    @apply p-4 border border-slate-100 rounded-xl bg-white
+           transition-all duration-150;
+  }
+  .entry-card:hover {
+    @apply border-blue-200 shadow-sm;
+  }
+
+  /* ── Skill tag ─────────────────────────────────────────── */
+  .skill-tag {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1
+           rounded-full text-xs font-semibold;
+  }
+
+  /* ── Tip / warning boxes ───────────────────────────────── */
+  .tip-box {
+    @apply p-4 bg-blue-50 border border-blue-200 border-l-4
+           border-l-blue-500 rounded-xl text-sm text-blue-800;
+  }
+  .warning-box {
+    @apply p-4 bg-amber-50 border border-amber-200 border-l-4
+           border-l-amber-500 rounded-xl text-sm text-amber-800;
+  }
+
+  /* ── Toast ─────────────────────────────────────────────── */
+  .toast-wrap {
+    @apply fixed bottom-6 right-6 z-[9999];
+    animation: slide-in-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .toast {
+    @apply flex items-center gap-3 px-4 py-3 bg-white
+           rounded-2xl shadow-xl border min-w-[280px] max-w-sm;
+  }
+  .toast-success { @apply border-green-200; }
+  .toast-error   { @apply border-red-200; }
+  .toast-info    { @apply border-blue-200; }
+
+  /* ── Gradient header ───────────────────────────────────── */
+  .gradient-blue {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+  }
+
+  /* ── Spinner ───────────────────────────────────────────── */
+  .spinner {
+    @apply inline-block w-4 h-4 border-2 border-current border-t-transparent
+           rounded-full;
+    animation: spin 0.6s linear infinite;
+  }
+
+  /* ── TipTap wrapper ────────────────────────────────────── */
+  .tiptap-wrapper {
+    @apply border border-slate-200 rounded-xl bg-white
+           transition-all duration-150 overflow-hidden;
+  }
+  .tiptap-wrapper:focus-within {
+    @apply border-blue-500 ring-2 ring-blue-100;
+  }
+  .tiptap-wrapper.error { @apply border-red-400 ring-2 ring-red-100; }
+
+  .tiptap-toolbar {
+    @apply flex items-center gap-1 px-2.5 py-2
+           border-b border-slate-100 bg-slate-50 flex-wrap;
+  }
+  .tiptap-btn {
+    @apply inline-flex items-center justify-center w-7 h-7
+           rounded-md bg-transparent text-slate-500
+           transition-all duration-100 cursor-pointer border-none;
+  }
+  .tiptap-btn:hover { @apply bg-blue-100 text-blue-700; }
+  .tiptap-btn.active { @apply bg-blue-600 text-white; }
+  .tiptap-btn:disabled { @apply opacity-30 cursor-default; }
+
+  .tiptap-divider { @apply w-px h-5 bg-slate-200 mx-0.5; }
+
+  .tiptap-content { @apply px-3.5 py-3 cursor-text; }
+
+  .tiptap-footer {
+    @apply flex items-center gap-3 px-3.5 py-1.5
+           border-t border-slate-100 bg-slate-50/70;
+  }
+  .char-bar {
+    @apply flex-1 h-1 bg-slate-200 rounded-full overflow-hidden;
+  }
+  .char-bar-fill {
+    @apply h-full bg-blue-500 rounded-full transition-all duration-200;
+  }
+  .char-bar-fill.near { @apply bg-amber-400; }
+  .char-bar-fill.over { @apply bg-red-500; }
+  .tiptap-count {
+    @apply text-[11px] text-slate-400 font-mono whitespace-nowrap;
+  }
+  .tiptap-count.near-limit { @apply text-amber-500; }
+  .tiptap-count.at-limit   { @apply text-red-500 font-bold; }
+
+} /* end @layer components */
+
+/* ── ProseMirror content ──────────────────────────────────── */
+.ProseMirror {
+  outline: none;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #1e293b;
+  min-height: inherit;
+}
+.ProseMirror p                  { margin: 0 0 0.375rem; }
+.ProseMirror p:last-child        { margin-bottom: 0; }
+.ProseMirror strong              { font-weight: 700; color: #0f172a; }
+.ProseMirror em                  { color: #334155; }
+.ProseMirror ul, .ProseMirror ol { padding-left: 1.375rem; margin: 0.25rem 0 0.5rem; }
+.ProseMirror li                 { margin-bottom: 0.125rem; }
+.ProseMirror ul                 { list-style-type: disc; }
+.ProseMirror ol                 { list-style-type: decimal; }
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #94a3b8;
+  pointer-events: none;
+  height: 0;
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up  { animation: fade-up  0.28s cubic-bezier(0.34,1.1,0.64,1) both; }
+.animate-scale-in { animation: scale-in 0.22s cubic-bezier(0.34,1.1,0.64,1) both; }
+.animate-fade-in  { animation: fade-up  0.2s ease both; }
+
+/* Stagger children */
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+
+/* ── Custom scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+
+/* Select arrow */
+select.form-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+  appearance: none;
+}
+
+/* ── Mobile ───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .card { @apply p-4 rounded-xl; }
+  .toast-wrap { @apply left-4 right-4 bottom-4; }
+  .toast { min-width: unset; @apply w-full; }
+}

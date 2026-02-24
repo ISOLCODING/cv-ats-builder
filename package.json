@@ -1,0 +1,48 @@
+{
+  "name": "my-cv-ats",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CV ATS Builder with React + Vite + Google Apps Script backend",
+  "private": true,
+  "scripts": {
+    "dev":          "vite",
+    "build":        "vite build",
+    "preview":      "vite preview",
+    "deploy":       "node scripts/deploy.js",
+    "copy-build":   "node scripts/copy-build.js",
+    "gas:push":     "clasp push --force",
+    "gas:pull":     "clasp pull",
+    "gas:open":     "clasp open",
+    "gas:logs":     "clasp logs --watch",
+    "gas:deploy":   "clasp deploy --description \"Deploy $(date +%Y-%m-%d)\""
+  },
+  "dependencies": {
+    "@tiptap/extension-bullet-list": "^3.20.0",
+    "@tiptap/extension-character-count": "^3.20.0",
+    "@tiptap/extension-list-item": "^3.20.0",
+    "@tiptap/extension-ordered-list": "^3.20.0",
+    "@tiptap/extension-placeholder": "^3.20.0",
+    "@tiptap/extension-text-align": "^3.20.0",
+    "@tiptap/extension-underline": "^3.20.0",
+    "@tiptap/pm": "^3.20.0",
+    "@tiptap/react": "^3.20.0",
+    "@tiptap/starter-kit": "^3.20.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "lucide-react": "^0.303.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.49.0",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.0.8",
+    "vite-plugin-singlefile": "^0.13.5"
+  }
+}
