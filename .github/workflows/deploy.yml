@@ -71,10 +71,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
 
-    # Skip jika secret belum diisi atau target build-only
-    if: |
-      github.event.inputs.deploy_target != 'build-only' &&
-      secrets.CLASPRC_JSON != ''
+    # Jalankan jika bukan target 'build-only'
+    # Logika skip jika secret kosong sudah ditangani di dalam steps agar tidak terjadi error parser
+    if: github.event_name == 'push' || github.event.inputs.deploy_target != 'build-only'
 
     steps:
       - name: 📥 Checkout code
