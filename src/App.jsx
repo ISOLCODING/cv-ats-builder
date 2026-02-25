@@ -90,8 +90,8 @@ export default function App() {
   const cvPreviewRef = useRef(null);
   const [exporting, setExporting]           = useState(false);
   const [exportPct, setExportPct]           = useState(0);
-  const [zoom, setZoom]                     = useState(0.62);
-  const [showMobile, setShowMobile]         = useState(false);
+  const [zoom, setZoom] = useState(0.8); // Default zoom lebih besar untuk mobile
+  const [activeTab, setActiveTab] = useState('form'); // 'form' | 'preview'
   const [showLoadModal, setShowLoadModal]   = useState(false);
 
   const {
@@ -204,28 +204,20 @@ export default function App() {
               disabled={exporting}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-blue-700 text-sm font-bold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-60"
             >
-              {exporting ? <><span className="spinner w-4 h-4 border-blue-600" />{exportPct}%</> : <><Download className="w-4 h-4" />Export PDF</>}
-            </button>
-
-            {/* Mobile preview toggle */}
-            <button
-              onClick={() => setShowMobile(!showMobile)}
-              className="lg:hidden p-2 rounded-xl text-white hover:bg-white/10 transition-all"
-            >
-              {showMobile ? <X className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+              {exporting ? <><span className="spinner w-4 h-4 border-blue-600" />{exportPct}%</> : <><Download className="w-4 h-4" />Export</>}
             </button>
           </div>
         </div>
       </header>
 
       {/* ── Main layout ────────────────────────────────────── */}
-      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-6 xl:gap-8 items-start">
+      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-4 md:py-6 pb-24 lg:pb-6">
+        <div className="flex flex-col lg:flex-row gap-6 xl:gap-8 items-start">
 
           {/* Left — Form panel */}
-          <div className={`flex-1 min-w-0 space-y-4 ${showMobile ? 'hidden lg:block' : 'block'}`}>
+          <div className={`flex-1 w-full min-w-0 space-y-4 ${activeTab === 'form' ? 'block' : 'hidden lg:block'}`}>
             {/* Stepper card */}
-            <div className="card py-5">
+            <div className="card py-4 sm:py-5 overflow-x-auto">
               <Stepper currentStep={currentStep} onStepClick={setCurrentStep} />
             </div>
 
@@ -236,10 +228,10 @@ export default function App() {
 
             {/* Dev mode banner */}
             {!isGASMode && (
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex gap-2.5 text-xs text-amber-700">
-                <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-500" />
-                <span>
-                  <strong>Development Mode:</strong> Fitur Save/Load ke cloud memerlukan deploy ke Google Apps Script.
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 text-xs text-amber-700 mx-1">
+                <Info className="w-5 h-5 flex-shrink-0 text-amber-500" />
+                <span className="leading-relaxed">
+                  <strong>Development Mode:</strong> Fitur Save/Load ke cloud memerlukan deploy ke Google Apps Script. 
                   Data saat ini tersimpan di localStorage browser Anda.
                 </span>
               </div>
@@ -247,76 +239,112 @@ export default function App() {
           </div>
 
           {/* Right — CV Preview panel */}
-          <div className={`w-auto flex-shrink-0 ${showMobile ? 'block w-full' : 'hidden lg:block'}`}>
-            <div className="sticky top-24 space-y-3" style={{ width: `${794 * zoom + 32}px`, maxWidth: '100vw' }}>
+          <div className={`w-full lg:w-auto flex-shrink-0 ${activeTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
+            <div className="sticky top-24 space-y-4">
               {/* Preview controls */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-blue-500" />
+                  <div className="p-1.5 rounded-lg bg-blue-100 text-blue-600">
+                    <FileText className="w-4 h-4" />
+                  </div>
                   <span className="text-sm font-bold text-slate-700">Live Preview</span>
                   <span className="badge badge-blue text-[10px]">A4</span>
                   {savedCVId && (
-                    <span className="badge badge-green text-[10px] flex items-center gap-1">
+                    <span className="badge badge-green text-[10px] hidden sm:flex items-center gap-1">
                       <CheckCircle2 className="w-2.5 h-2.5" /> Tersimpan
                     </span>
                   )}
                 </div>
-                {/* Zoom */}
-                <div className="flex items-center gap-0.5 bg-slate-100 rounded-xl p-1">
-                  <button onClick={() => setZoom(z => Math.max(0.4, z - 0.05))} className="btn btn-ghost btn-icon w-7 h-7 rounded-lg" title="Zoom out"><ZoomOut className="w-3.5 h-3.5" /></button>
-                  <span className="text-xs text-slate-500 px-2 font-mono w-10 text-center">{Math.round(zoom*100)}%</span>
-                  <button onClick={() => setZoom(z => Math.min(1.1, z + 0.05))} className="btn btn-ghost btn-icon w-7 h-7 rounded-lg" title="Zoom in"><ZoomIn className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setZoom(0.62)} className="btn btn-ghost btn-icon w-7 h-7 rounded-lg" title="Reset"><RefreshCw className="w-3 h-3" /></button>
+                {/* Zoom - Hidden on smaller mobile to save space, but zoom is still useful */}
+                <div className="flex items-center gap-0.5 bg-white border border-slate-200 shadow-sm rounded-xl p-1">
+                  <button onClick={() => setZoom(z => Math.max(0.3, z - 0.1))} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Zoom out"><ZoomOut className="w-3.5 h-3.5" /></button>
+                  <span className="text-[11px] text-slate-500 px-1 font-bold w-10 text-center">{Math.round(zoom * 100)}%</span>
+                  <button onClick={() => setZoom(z => Math.min(1.2, z + 0.1))} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Zoom in"><ZoomIn className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setZoom(0.8)} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Reset"><RefreshCw className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
 
               {/* Preview window */}
               <div
-                className="rounded-2xl border border-blue-100 shadow-lg bg-slate-200 overflow-auto"
-                style={{ maxHeight: 'calc(100vh - 175px)', padding: '12px' }}
+                className="rounded-2xl border border-slate-200 shadow-xl bg-slate-100/50 backdrop-blur-sm overflow-auto mx-auto"
+                style={{
+                  maxHeight: 'calc(100vh - 180px)',
+                  padding: '16px',
+                  width: activeTab === 'preview' ? '100%' : `${794 * zoom + 32}px`,
+                  maxWidth: '100%'
+                }}
               >
-                <div style={{
+                <div className="preview-container" style={{
                   width: `${794 * zoom}px`,
                   height: `${1123 * zoom}px`,
                   position: 'relative',
                   margin: '0 auto',
                 }}>
-                  <div style={{
+                  <div className="preview-scale-wrapper" style={{
                     transform: `scale(${zoom})`,
-                    transformOrigin: 'top left',
+                    transformOrigin: 'top center',
                     width: '794px',
-                    boxShadow: '0 4px 32px rgba(0,0,0,0.15)',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+                    backgroundColor: 'white',
                   }}>
                     <CVPreview ref={cvPreviewRef} />
                   </div>
                 </div>
               </div>
 
-              {/* Action buttons */}
-              <div className="flex gap-2">
-                <button
+              {/* Mobile quick actions when in preview tab */}
+              <div className="lg:hidden grid grid-cols-2 gap-3 pb-4">
+                <Button 
                   onClick={handleExport}
                   disabled={exporting}
-                  className="btn btn-primary flex-1 gap-2"
+                  variant="primary"
+                  className="w-full h-12 shadow-blue"
+                  leftIcon={exporting ? null : <Download className="w-5 h-5" />}
                 >
-                  {exporting
-                    ? <><span className="spinner w-4 h-4" />{exportPct}%</>
-                    : <><Download className="w-4 h-4" />Download PDF</>
-                  }
-                </button>
-                <button
+                  {exporting ? `${exportPct}%` : 'Download PDF'}
+                </Button>
+                <Button 
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="btn btn-secondary flex-1 gap-2"
+                  variant="secondary"
+                  className="w-full h-12"
+                  leftIcon={isSaving ? null : <Save className="w-5 h-5" />}
                 >
-                  {isSaving ? <><span className="spinner w-4 h-4" />Menyimpan…</> : <><Save className="w-4 h-4" />Simpan CV</>}
-                </button>
+                  {isSaving ? 'Saving...' : 'Simpan Cloud'}
+                </Button>
               </div>
             </div>
           </div>
 
         </div>
       </main>
+
+      {/* ── Mobile Navigation ──────────────────────────────── */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-200 z-50 lg:hidden px-6 py-3 flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <button
+          onClick={() => setActiveTab('form')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'form' ? 'text-blue-600 scale-110' : 'text-slate-400'}`}
+        >
+          <div className={`p-2 rounded-xl ${activeTab === 'form' ? 'bg-blue-100' : ''}`}>
+            <Menu className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider">Isi Data</span>
+        </button>
+
+        <div className="w-12 h-12 -mt-10 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/40 border-4 border-white text-white active:scale-95 transition-transform" onClick={handleExport}>
+          {exporting ? <span className="text-[10px] font-bold">{exportPct}%</span> : <Download className="w-6 h-6" />}
+        </div>
+
+        <button
+          onClick={() => setActiveTab('preview')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'preview' ? 'text-blue-600 scale-110' : 'text-slate-400'}`}
+        >
+          <div className={`p-2 rounded-xl ${activeTab === 'preview' ? 'bg-blue-100' : ''}`}>
+            <FileText className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider">Preview</span>
+        </button>
+      </nav>
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="mt-16 py-6 border-t border-blue-100 text-center">

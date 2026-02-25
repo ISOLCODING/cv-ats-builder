@@ -178,6 +178,57 @@
     animation: spin 0.6s linear infinite;
   }
 
+  /* ── Modern Premium Effects ─────────────────────────── */
+  .bg-mesh {
+      background-color: #f8fafc;
+      background-image:
+          radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(147, 197, 253, 0.05) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(30, 64, 175, 0.05) 0px, transparent 50%),
+          radial-gradient(at 0% 100%, rgba(96, 165, 250, 0.05) 0px, transparent 50%);
+  }
+
+  .glass {
+      @apply bg-white/70 backdrop-blur-md border border-white/40;
+  }
+
+  .shadow-blue {
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3), 0 8px 10px -6px rgba(37, 99, 235, 0.2);
+  }
+
+  .shadow-premium {
+      box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 0.03),
+          0 2px 4px rgba(0, 0, 0, 0.02),
+          0 12px 24px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Custom tooltips/badges */
+  .preview-scale-wrapper {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ATS Pulse */
+  .ats-pulse {
+      animation: pulse-ring 2s infinite;
+  }
+
+  @keyframes pulse-ring {
+      0% {
+          transform: scale(0.95);
+          opacity: 1;
+      }
+
+      50% {
+          transform: scale(1.05);
+          opacity: 0.8;
+      }
+
+      100% {
+          transform: scale(0.95);
+          opacity: 1;
+      }
+  }
   /* ── TipTap wrapper ────────────────────────────────────── */
   .tiptap-wrapper {
     @apply border border-slate-200 rounded-xl bg-white
@@ -292,9 +343,32 @@ select.form-input {
   appearance: none;
 }
 
-/* ── Mobile ───────────────────────────────────────────────── */
+/* ── Mobile Optimizations ─────────────────────────────────── */
 @media (max-width: 640px) {
-  .card { @apply p-4 rounded-xl; }
-  .toast-wrap { @apply left-4 right-4 bottom-4; }
+.card {
+        @apply p-4 rounded-2xl;
+    }
+
+    .toast-wrap {
+        @apply left-4 right-4 bottom-20;
+    }
   .toast { min-width: unset; @apply w-full; }
+  /* Hide scrollbars but allow scrolling */
+  .preview-window::-webkit-scrollbar {
+      display: none;
+  }
+
+  .preview-window {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+  }
+  }
+
+  /* 📱 Responsive Adjustments */
+  @media (max-width: 1024px) {
+      .preview-container {
+          transform: scale(calc(100vw / 820));
+          /* Auto scaling for narrow mobile */
+          transform-origin: top center;
+      }
 }
