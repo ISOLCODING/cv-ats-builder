@@ -16,8 +16,7 @@
 
 import { useCallback, useState } from 'react';
 
-// URL endpoint GAS — ganti dengan deployment URL Anda
-// Format: https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+// URL endpoint GAS (dari .env → VITE_GAS_ENDPOINT)
 const GAS_ENDPOINT = import.meta.env.VITE_GAS_ENDPOINT || '';
 
 /**

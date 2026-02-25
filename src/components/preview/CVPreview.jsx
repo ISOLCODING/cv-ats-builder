@@ -1,43 +1,72 @@
 // src/components/preview/CVPreview.jsx
 // ============================================================
-// Live CV Preview — ATS-friendly, single-column layout
-//
-// Design principles:
-// - Font: Arial/Helvetica (ATS-readable)
-// - Single column (no tables, no multi-col)
-// - No images, no decorative graphics
-// - Clear section headers
-// - Standard bullet formatting
+// Live CV Preview — ATS-friendly, Times New Roman 12pt
+// Margin: 2.54cm (1 inch) semua sisi, text-align justify
 // ============================================================
 
 import React, { forwardRef } from 'react';
 import useCVStore from '../../store/useCVStore';
 
-// Format date YYYY-MM → "Jan 2022"
+// ── Format date YYYY-MM → "Jan 2022" ────────────────────────
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const [year, month] = dateStr.split('-');
   if (!year) return dateStr;
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-  const monthName = month ? monthNames[parseInt(month) - 1] : '';
-  return monthName ? `${monthName} ${year}` : year;
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const m = month ? months[parseInt(month) - 1] : '';
+  return m ? `${m} ${year}` : year;
 }
 
-// Section Header Component
+// ── Render HTML dari TipTap ──────────────────────────────────
+function RichContent({ html }) {
+  if (!html?.trim()) return null;
+  const isHTML = /<[a-z][\s\S]*>/i.test(html);
+  if (!isHTML) {
+    return (
+      <p style={pStyle}>{html}</p>
+    );
+  }
+  return (
+    <div
+      dangerouslySetInnerHTML={{ __html: html }}
+      style={{ fontSize: 'inherit', lineHeight: 'inherit', color: 'inherit' }}
+      className="cv-rich"
+    />
+  );
+}
+
+// ── Base typography constants ────────────────────────────────
+const FONT = "'Times New Roman', Times, serif";
+const SIZE = '12pt';
+const COLOR = '#000000';
+const LINE_H = '1.5';
+
+// Teks biasa (justify)
+const pStyle = {
+  margin: '0 0 4px 0',
+  fontSize: SIZE,
+  fontFamily: FONT,
+  color: COLOR,
+  lineHeight: LINE_H,
+  textAlign: 'justify',
+};
+
+// ── Section Header ───────────────────────────────────────────
 function CVSection({ title, children }) {
   if (!children) return null;
   return (
-    <div style={{ marginBottom: '12px' }}>
+    <div style={{ marginBottom: '16px' }}>
       <h2 style={{
-        fontSize: '11pt',
+        fontSize: '12pt',
+        fontFamily: FONT,
         fontWeight: 'bold',
         textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        borderBottom: '2px solid #1e3a8a',
-        paddingBottom: '3px',
+        letterSpacing: '0.04em',
+        borderBottom: '1.5px solid #000',
+        paddingBottom: '2px',
         marginBottom: '8px',
         marginTop: '0',
-        color: '#1e3a8a',
+        color: '#000',
       }}>
         {title}
       </h2>
@@ -46,36 +75,49 @@ function CVSection({ title, children }) {
   );
 }
 
-// Personal Info Header
-function CVHeader({ personalInfo }) {
-  if (!personalInfo) return null;
-  const { name, email, phone, linkedin, location, website } = personalInfo;
+// ── Header: Nama & Kontak ────────────────────────────────────
+function CVHeader({ info }) {
+  if (!info) return null;
+  const { name, email, phone, linkedin, location, website } = info;
 
   const contacts = [
-    email && email,
-    phone && phone,
-    location && location,
-    linkedin && (linkedin.startsWith('http') ? linkedin.replace('https://www.', '').replace('https://', '') : linkedin),
-    website && (website.startsWith('http') ? website.replace('https://', '') : website),
+    email,
+    phone,
+    location,
+    linkedin && (linkedin.startsWith('http')
+      ? linkedin.replace('https://www.', '').replace('https://', '')
+      : linkedin),
+    website && (website.startsWith('http')
+      ? website.replace('https://', '')
+      : website),
   ].filter(Boolean);
 
   return (
-    <div style={{ textAlign: 'center', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+    <div style={{
+      textAlign: 'center',
+      marginBottom: '18px',
+      paddingBottom: '12px',
+      borderBottom: '1.5px solid #000',
+    }}>
       <h1 style={{
-        fontSize: '20pt',
+        fontSize: '16pt',
+        fontFamily: FONT,
         fontWeight: 'bold',
         margin: '0 0 6px 0',
-        color: '#0f172a',
-        letterSpacing: '0.02em',
+        color: '#000',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
       }}>
         {name || 'Nama Anda'}
       </h1>
       {contacts.length > 0 && (
         <p style={{
-          fontSize: '9pt',
-          color: '#475569',
+          fontSize: '10.5pt',
+          fontFamily: FONT,
+          color: '#222',
           margin: '0',
           lineHeight: '1.6',
+          textAlign: 'center',
         }}>
           {contacts.join('  |  ')}
         </p>
@@ -84,19 +126,17 @@ function CVHeader({ personalInfo }) {
   );
 }
 
-// Summary Section
+// ── Summary ──────────────────────────────────────────────────
 function CVSummary({ summary }) {
   if (!summary?.trim()) return null;
   return (
     <CVSection title="Professional Summary">
-      <p style={{ fontSize: '10pt', color: '#1e293b', lineHeight: '1.5', margin: '0' }}>
-        {summary}
-      </p>
+      <RichContent html={summary} />
     </CVSection>
   );
 }
 
-// Experience Section
+// ── Work Experience ──────────────────────────────────────────
 function CVExperience({ experiences }) {
   if (!experiences?.length) return null;
   return (
@@ -104,44 +144,24 @@ function CVExperience({ experiences }) {
       {experiences.map((exp, i) => {
         const dateStr = exp.isCurrent
           ? `${formatDate(exp.startDate)} – Sekarang`
-          : `${formatDate(exp.startDate)} – ${formatDate(exp.endDate)}`;
-
-        // Split description by newline dan render sebagai bullet points
-        const descLines = exp.description
-          ? exp.description.split('\n').filter((l) => l.trim())
-          : [];
-
+          : `${formatDate(exp.startDate)}${exp.endDate ? ` – ${formatDate(exp.endDate)}` : ''}`;
         return (
-          <div key={exp.id || i} style={{ marginBottom: i < experiences.length - 1 ? '10px' : '0' }}>
-            {/* Posisi + tanggal dalam satu baris */}
+          <div key={exp.id || i} style={{ marginBottom: i < experiences.length - 1 ? '12px' : '0' }}>
+            {/* Posisi + tanggal */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <strong style={{ fontSize: '10.5pt', color: '#0f172a' }}>
+              <strong style={{ fontSize: SIZE, fontFamily: FONT, fontWeight: 'bold', color: COLOR }}>
                 {exp.position}
               </strong>
-              <span style={{ fontSize: '9pt', color: '#64748b', whiteSpace: 'nowrap', marginLeft: '8px' }}>
+              <span style={{ fontSize: '11pt', fontFamily: FONT, color: '#333', whiteSpace: 'nowrap', marginLeft: '8px' }}>
                 {dateStr}
               </span>
             </div>
-            {/* Nama perusahaan */}
-            <p style={{ fontSize: '10pt', color: '#334155', margin: '1px 0 4px 0', fontStyle: 'italic' }}>
+            {/* Perusahaan */}
+            <p style={{ fontSize: SIZE, fontFamily: FONT, color: '#222', margin: '1px 0 4px 0', fontStyle: 'italic' }}>
               {exp.company}
             </p>
             {/* Deskripsi */}
-            {descLines.length > 0 && (
-              <ul style={{
-                margin: '4px 0 0 0',
-                paddingLeft: '18px',
-                fontSize: '10pt',
-                color: '#1e293b',
-                lineHeight: '1.5',
-              }}>
-                {descLines.map((line, j) => {
-                  // Hapus bullet karakter yang sudah ada
-                  const cleanLine = line.replace(/^[\•\-\*]\s*/, '').trim();
-                  return cleanLine ? <li key={j}>{cleanLine}</li> : null;
-                })}
-              </ul>
-            )}
+            {exp.description && <RichContent html={exp.description} />}
           </div>
         );
       })}
@@ -149,64 +169,56 @@ function CVExperience({ experiences }) {
   );
 }
 
-// Education Section
+// ── Education ────────────────────────────────────────────────
 function CVEducation({ education }) {
   if (!education?.length) return null;
   return (
     <CVSection title="Education">
       {education.map((edu, i) => (
-        <div key={edu.id || i} style={{ marginBottom: i < education.length - 1 ? '8px' : '0' }}>
+        <div key={edu.id || i} style={{ marginBottom: i < education.length - 1 ? '10px' : '0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <strong style={{ fontSize: '10.5pt', color: '#0f172a' }}>
+            <strong style={{ fontSize: SIZE, fontFamily: FONT, color: COLOR }}>
               {edu.degree}{edu.field && `, ${edu.field}`}
             </strong>
-            <span style={{ fontSize: '9pt', color: '#64748b' }}>
+            <span style={{ fontSize: '11pt', fontFamily: FONT, color: '#333' }}>
               {formatDate(edu.startDate)}{edu.endDate && ` – ${formatDate(edu.endDate)}`}
             </span>
           </div>
-          <p style={{ fontSize: '10pt', color: '#334155', margin: '1px 0', fontStyle: 'italic' }}>
+          <p style={{ fontSize: SIZE, fontFamily: FONT, color: '#222', margin: '1px 0', fontStyle: 'italic' }}>
             {edu.institution}
           </p>
           {edu.gpa && (
-            <p style={{ fontSize: '9.5pt', color: '#475569', margin: '2px 0' }}>
-              IPK: {edu.gpa}
+            <p style={{ fontSize: '11pt', fontFamily: FONT, color: '#333', margin: '2px 0' }}>
+              IPK / GPA: <strong>{edu.gpa}</strong>
             </p>
           )}
-          {edu.description && (
-            <p style={{ fontSize: '9.5pt', color: '#475569', margin: '2px 0' }}>
-              {edu.description}
-            </p>
-          )}
+          {edu.description && <RichContent html={edu.description} />}
         </div>
       ))}
     </CVSection>
   );
 }
 
-// Skills Section
+// ── Skills ───────────────────────────────────────────────────
 function CVSkills({ skills }) {
   const { technical = [], softSkills = [], languages = [] } = skills || {};
   if (!technical.length && !softSkills.length && !languages.length) return null;
-
   return (
     <CVSection title="Skills">
-      <div style={{ fontSize: '10pt', color: '#1e293b', lineHeight: '1.6' }}>
+      <div style={{ fontSize: SIZE, fontFamily: FONT, color: COLOR, lineHeight: '1.7' }}>
         {technical.length > 0 && (
-          <p style={{ margin: '0 0 3px 0' }}>
-            <strong>Technical:</strong>{' '}
-            {technical.join(' • ')}
+          <p style={{ margin: '0 0 3px 0', textAlign: 'justify' }}>
+            <strong>Technical: </strong>{technical.join('  •  ')}
           </p>
         )}
         {softSkills.length > 0 && (
-          <p style={{ margin: '0 0 3px 0' }}>
-            <strong>Soft Skills:</strong>{' '}
-            {softSkills.join(' • ')}
+          <p style={{ margin: '0 0 3px 0', textAlign: 'justify' }}>
+            <strong>Soft Skills: </strong>{softSkills.join('  •  ')}
           </p>
         )}
         {languages.length > 0 && (
-          <p style={{ margin: '0' }}>
-            <strong>Bahasa:</strong>{' '}
-            {languages.join(' • ')}
+          <p style={{ margin: '0', textAlign: 'justify' }}>
+            <strong>Bahasa: </strong>{languages.join('  •  ')}
           </p>
         )}
       </div>
@@ -214,54 +226,84 @@ function CVSkills({ skills }) {
   );
 }
 
-// ── Main CVPreview Component ──────────────────────────────────
-
+// ── Main CVPreview ────────────────────────────────────────────
 const CVPreview = forwardRef(function CVPreview(_, ref) {
   const { cvData } = useCVStore();
   const { personalInfo, summary, experiences, education, skills } = cvData;
 
-  const isEmptyCV = !personalInfo.name && !summary && !experiences.length && !education.length;
+  const isEmpty =
+    !personalInfo?.name &&
+    !summary &&
+    !experiences?.length &&
+    !education?.length;
 
   return (
     <div
       ref={ref}
       id="cv-preview-content"
-      className="cv-preview-content"
       style={{
-        // Dimensi A4 dalam pixel (96dpi): 210mm × 297mm
+        // A4: 794px × 1123px @ 96dpi
         width: '794px',
         minHeight: '1123px',
         backgroundColor: '#ffffff',
-        padding: '48px 56px',
-        fontFamily: 'Arial, Helvetica, sans-serif',
-        fontSize: '10pt',
-        lineHeight: '1.5',
-        color: '#1e293b',
+        // Margin 2.54cm (1 inch) ≈ 96px pada 96dpi
+        padding: '96px 96px 96px 96px',
+        fontFamily: FONT,
+        fontSize: SIZE,
+        lineHeight: LINE_H,
+        color: COLOR,
         boxSizing: 'border-box',
-        // Shadow hanya tampil di browser, tidak di PDF
       }}
     >
-      {isEmptyCV ? (
-        // Placeholder saat CV masih kosong
+      {/* Scoped CSS untuk rich content dari TipTap */}
+      <style>{`
+        #cv-preview-content .cv-rich p {
+          margin: 0 0 3px 0;
+          font-size: 12pt;
+          font-family: 'Times New Roman', Times, serif;
+          color: #000;
+          line-height: 1.5;
+          text-align: justify;
+        }
+        #cv-preview-content .cv-rich ul,
+        #cv-preview-content .cv-rich ol {
+          margin: 2px 0 4px 0;
+          padding-left: 20px;
+          font-size: 12pt;
+          font-family: 'Times New Roman', Times, serif;
+          color: #000;
+          line-height: 1.5;
+        }
+        #cv-preview-content .cv-rich li {
+          margin-bottom: 2px;
+          text-align: justify;
+        }
+        #cv-preview-content .cv-rich ul  { list-style-type: disc; }
+        #cv-preview-content .cv-rich ol  { list-style-type: decimal; }
+        #cv-preview-content .cv-rich strong { font-weight: bold; }
+        #cv-preview-content .cv-rich em     { font-style: italic; }
+        #cv-preview-content .cv-rich u      { text-decoration: underline; }
+        #cv-preview-content .cv-rich *:last-child { margin-bottom: 0; }
+      `}</style>
+
+      {isEmpty ? (
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '400px',
-          color: '#94a3b8',
-          textAlign: 'center',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          height: '500px', color: '#94a3b8', textAlign: 'center',
+          fontFamily: FONT,
         }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
-          <p style={{ fontSize: '14pt', fontWeight: 'bold', margin: '0 0 8px 0' }}>CV Anda akan tampil di sini</p>
-          <p style={{ fontSize: '10pt', margin: '0' }}>Mulai isi form di sebelah kiri untuk melihat preview</p>
+          <p style={{ fontSize: '14pt', fontWeight: 'bold', margin: '0 0 8px 0' }}>
+            CV Anda akan tampil di sini
+          </p>
+          <p style={{ fontSize: '11pt', margin: '0', color: '#aaa' }}>
+            Mulai isi form di sebelah kiri untuk melihat preview
+          </p>
         </div>
       ) : (
         <>
-          {/* Header: Nama & Kontak */}
-          <CVHeader personalInfo={personalInfo} />
-          
-          {/* Sections berurutan */}
+            <CVHeader info={personalInfo} />
           <CVSummary summary={summary} />
           <CVSkills skills={skills} />
           <CVExperience experiences={experiences} />

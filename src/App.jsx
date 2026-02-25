@@ -124,16 +124,22 @@ export default function App() {
 
   // ── Export PDF ──────────────────────────────────────────
   const handleExport = useCallback(async () => {
-    const el = document.getElementById('cv-preview-content');
-    if (!el) return showToast('error', 'Preview CV tidak ditemukan');
+    if (!cvData?.personalInfo?.name) {
+      return showToast('error', 'Isi nama terlebih dahulu sebelum export');
+    }
     setExporting(true); setExportPct(0);
     try {
-      const name = cvData.personalInfo.name?.replace(/\s+/g,'_') || 'CV';
-      await exportCVtoPDF(el, name, setExportPct);
-      showToast('success', `📄 PDF berhasil didownload!`);
-    } catch (e) { showToast('error', `Gagal export: ${e.message}`); }
-    finally { setExporting(false); setExportPct(0); }
-  }, [cvData.personalInfo.name, showToast]);
+      const name = cvData.personalInfo.name.replace(/\s+/g, '_');
+      // Arg ke-1 (element) tidak dipakai lagi — react-pdf render dari data langsung
+      await exportCVtoPDF(null, name, setExportPct, cvData);
+      showToast('success', '📄 PDF berhasil didownload! (ATS-ready ✅)');
+    } catch (e) {
+      showToast('error', `Gagal export: ${e.message}`);
+    } finally {
+      setExporting(false);
+      setExportPct(0);
+    }
+  }, [cvData, showToast]);
 
   const renderForm = () => {
     switch (currentStep) {
