@@ -1,31 +1,41 @@
 // vite.config.js
-// Build konfigurasi untuk menghasilkan single-file HTML (inline JS + CSS)
-// agar bisa diinjeksi ke gas/index.html untuk deployment Google Apps Script
+// Dual build mode:
+//   VITE_BUILD_TARGET=pages  → build normal (GitHub Pages)
+//   default                  → single-file bundle (Google Apps Script)
 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
+const isPages = process.env.VITE_BUILD_TARGET === 'pages';
+
 export default defineConfig({
+  // Base path untuk GitHub Pages: /cv-ats-builder/
+  // Mode GAS tidak butuh base path
+  base: isPages ? '/cv-ats-builder/' : '/',
+
   plugins: [
     react(),
-    viteSingleFile(), // Inline semua JS & CSS ke satu file HTML
+    // viteSingleFile hanya untuk mode GAS
+    ...(!isPages ? [viteSingleFile()] : []),
   ],
+
   build: {
-    outDir: 'dist',
-    // Target: ES2017 untuk kompatibilitas browser modern
+    outDir: isPages ? 'dist-pages' : 'dist',
     target: 'es2017',
-    // Disable chunk splitting — semua jadi satu bundle
-    rollupOptions: {
-      output: {
-        inlineDynamicImports: true,
-      },
-    },
-    // Pastikan assets di-inline, bukan di-copy
-    assetsInlineLimit: 100000000,
-    cssCodeSplit: false,
+    // Mode GAS: semua inline jadi 1 file
+    // Mode Pages: build normal dengan chunk splitting
+    rollupOptions: isPages
+      ? {}
+      : {
+          output: {
+            inlineDynamicImports: true,
+          },
+        },
+    assetsInlineLimit: isPages ? 4096 : 100000000,
+    cssCodeSplit: isPages ? true : false,
   },
-  // Resolve alias untuk import lebih bersih
+
   resolve: {
     alias: {
       '@': '/src',
