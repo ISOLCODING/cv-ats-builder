@@ -71,22 +71,34 @@ async function callGASViaFetch(payload) {
     );
   }
 
-  const response = await fetch(GAS_ENDPOINT, {
-    method: 'POST',
-    mode: 'no-cors', // GAS tidak support CORS di semua case
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+  console.log('📡 Calling GAS Fetch:', payload.action);
 
-  // Note: dengan mode: 'no-cors', response tidak bisa dibaca
-  // Untuk production, gunakan mode embedded (google.script.run)
-  if (!response.ok) {
-    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+  try {
+    const response = await fetch(GAS_ENDPOINT, {
+      method: 'POST',
+      mode: 'cors', // Ubah ke 'cors' agar bisa baca response JSON
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8', // GAS lebih suka text/plain untuk bypass preflight
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // Cek jika response sukses (HTTP 200-299)
+    if (!response.ok) {
+      throw new Error(`GAS HTTP Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('❌ GAS Fetch Error:', error);
+    
+    // Fallback message jika CORS error atau network error
+    if (error.message.includes('fetch')) {
+      throw new Error('Gagal menghubungi server (CORS/Network error). Pastikan GAS Web App di-publish ke "Anyone".');
+    }
+    throw error;
   }
-
-  return response.json();
 }
 
 /**
