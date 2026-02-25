@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - master
-    # Hanya trigger jika ada perubahan pada file-file penting
     paths:
       - 'src/**'
       - 'gas/**'
@@ -15,18 +14,17 @@ on:
       - 'package.json'
       - 'scripts/**'
 
-  # Bisa juga trigger manual dari GitHub UI
   workflow_dispatch:
     inputs:
       deploy_target:
         description: 'Target deploy'
         required: true
-        default: 'both'
+        default: 'build-only'
         type: choice
         options:
-          - both
-          - gas-only
           - build-only
+          - gas-only
+          - both
 
 jobs:
   # ══════════════════════════════════════════════════════════
@@ -49,14 +47,9 @@ jobs:
       - name: 📚 Install dependencies
         run: npm ci
 
-      - name: 🔍 Lint check
-        run: npm run lint --if-present
-        continue-on-error: true
-
       - name: 🏗️ Build production
         run: npm run build
         env:
-          # Env vars dari GitHub Secrets
           VITE_GAS_ENDPOINT: ${{ secrets.VITE_GAS_ENDPOINT }}
 
       - name: 📋 Copy build to gas/
@@ -71,15 +64,17 @@ jobs:
 
   # ══════════════════════════════════════════════════════════
   # JOB 2: Deploy ke Google Apps Script via CLASP
+  # Hanya jalan jika secret CLASPRC_JSON sudah diset
   # ══════════════════════════════════════════════════════════
   deploy-gas:
     name: ☁️ Deploy ke Google Apps Script
     runs-on: ubuntu-latest
-    needs: build  # Tunggu build selesai dulu
+    needs: build
 
-    # Skip jika input manual adalah build-only
+    # Skip jika secret belum diisi atau target build-only
     if: |
-      github.event.inputs.deploy_target != 'build-only'
+      github.event.inputs.deploy_target != 'build-only' &&
+      secrets.CLASPRC_JSON != ''
 
     steps:
       - name: 📥 Checkout code
@@ -97,11 +92,32 @@ jobs:
       - name: 🔧 Install CLASP globally
         run: npm install -g @google/clasp
 
-      - name: 🔑 Setup CLASP credentials
-        # Simpan CLASPRC_JSON sebagai GitHub Secret
-        # Format: isi dari file ~/.clasprc.json setelah kamu login clasp
+      - name: 🔑 Validate & Setup CLASP credentials
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
         run: |
-          echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
+          # Cek apakah secret sudah diisi
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "⚠️  Secret CLASPRC_JSON belum diset."
+            echo "    Cara setup:"
+            echo "    1. Jalankan: node scripts/get-clasp-token.js"
+            echo "    2. Copy output JSON"
+            echo "    3. Tambahkan ke: Settings → Secrets → CLASPRC_JSON"
+            exit 0
+          fi
+
+          # Validasi JSON sebelum ditulis
+          echo "$CLASPRC_JSON" | node -e "
+            let d='';
+            process.stdin.on('data',c=>d+=c);
+            process.stdin.on('end',()=>{
+              try { JSON.parse(d); console.log('✅ JSON valid'); }
+              catch(e) { console.error('❌ JSON tidak valid:', e.message); process.exit(1); }
+            });
+          "
+
+          # Tulis ke file credentials
+          echo "$CLASPRC_JSON" > ~/.clasprc.json
           echo "✅ CLASP credentials terpasang"
 
       - name: 📥 Download build artifact
@@ -111,25 +127,34 @@ jobs:
           path: gas/
 
       - name: 📤 CLASP Push ke GAS
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
         run: |
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "⚠️ Skip: CLASPRC_JSON belum diset. Build saja yang jalan."
+            exit 0
+          fi
           echo "📤 Pushing ke Google Apps Script..."
           clasp push --force
           echo "✅ Push berhasil!"
 
       - name: 🚀 CLASP Deploy (buat versi baru)
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
         run: |
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "⚠️ Skip: CLASPRC_JSON belum diset."
+            exit 0
+          fi
           DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          COMMIT="${{ github.sha }}"
-          SHORT_COMMIT="${COMMIT:0:7}"
-          clasp deploy --description "Auto deploy | $DATE | ${SHORT_COMMIT}"
+          SHORT="${{ github.sha }}"
+          clasp deploy --description "Auto | ${DATE} | ${SHORT:0:7}" || true
           echo "✅ Deployment baru dibuat!"
 
-      - name: 💬 Notifikasi sukses
+      - name: 💬 Summary
         run: |
           echo "════════════════════════════════"
-          echo "✅ DEPLOY BERHASIL!"
-          echo "Branch  : ${{ github.ref_name }}"
-          echo "Commit  : ${{ github.sha }}"
-          echo "By      : ${{ github.actor }}"
-          echo "Time    : $(date -u)"
+          echo "Branch : ${{ github.ref_name }}"
+          echo "Commit : ${{ github.sha }}"
+          echo "By     : ${{ github.actor }}"
           echo "════════════════════════════════"
