@@ -56,7 +56,7 @@ function parseBlock(node, base, key) {
       if (!content) return null;
       return ce(
         Text,
-        { key, style: { ...base, marginBottom: 3 } },
+        { key, style: { ...base, marginBottom: 2 } }, // Dikurangi dari 3
         ...(inlines.length ? inlines : [content])
       );
     }
@@ -65,13 +65,13 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 3 } },
+        { key, style: { marginBottom: 2 } }, // Dikurangi dari 3
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();
           return ce(
             View,
-            { key: j, style: { flexDirection: 'row', marginBottom: 1.5 } },
+            { key: j, style: { flexDirection: 'row', marginBottom: 1 } },
             ce(Text, { style: { ...base, width: 14, flexShrink: 0 } }, '\u2022'),
             ce(
               Text,
@@ -87,13 +87,13 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 3 } },
+        { key, style: { marginBottom: 2 } }, // Dikurangi dari 3
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();
           return ce(
             View,
-            { key: j, style: { flexDirection: 'row', marginBottom: 1.5 } },
+            { key: j, style: { flexDirection: 'row', marginBottom: 1 } },
             ce(Text, { style: { ...base, width: 16, flexShrink: 0 } }, `${j + 1}.`),
             ce(
               Text,

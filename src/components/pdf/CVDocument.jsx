@@ -11,6 +11,7 @@ import {
   Text,
   View,
   StyleSheet,
+  Image,
 } from '@react-pdf/renderer';
 import { htmlToReactPdf } from '../../utils/htmlToReactPdf';
 
@@ -25,8 +26,9 @@ const SIZE_SECTION = 11.5;       // pt (judul section)
 const COLOR_BLACK  = '#000000';
 const COLOR_DARK   = '#1a1a1a';
 const COLOR_GRAY   = '#333333';
-const LINE_HEIGHT  = 1.5;
-const MARGIN_1INCH = 72;         // 1 inch = 72pt dalam react-pdf
+const LINE_HEIGHT = 1.25;      // Dikurangi dari 1.5 agar lebih padat
+const MARGIN_1INCH = 54;         // Margin sedikit lebih kecil (0.75 inch = 54pt)
+const MARGIN_SECTION = 10;       // Margin antar section
 
 // ── StyleSheet ────────────────────────────────────────────────
 const S = StyleSheet.create({
@@ -44,31 +46,44 @@ const S = StyleSheet.create({
 
   // ── Header ──────────────────────────────────────────────────
   header: {
-    textAlign:     'center',
-    marginBottom:  14,
-    paddingBottom: 10,
-    borderBottom:  '1.5pt solid #000000',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingBottom: 6,
+    borderBottom: '1.2pt solid #000000',
+  },
+  headerInfo: {
+    flex: 1,
+    textAlign: 'left',
   },
   headerName: {
-    fontFamily:   FONT_BOLD,
-    fontSize:     SIZE_HEADER,
-    color:        COLOR_BLACK,
+    fontFamily: FONT_BOLD,
+    fontSize: SIZE_HEADER,
+    color: COLOR_BLACK,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
-    marginBottom:  5,
-    textAlign:    'center',
+    marginBottom: 3,
   },
   headerContacts: {
-    fontFamily:  FONT_REGULAR,
-    fontSize:    10,
-    color:       COLOR_GRAY,
-    textAlign:   'center',
-    lineHeight:  1.6,
+    fontFamily: FONT_REGULAR,
+    fontSize: 9,
+    color: COLOR_GRAY,
+    lineHeight: 1.4,
+  },
+  qrContainer: {
+    width: 50,
+    height: 50,
+    marginLeft: 15,
+  },
+  qrImage: {
+    width: '100%',
+    height: '100%',
   },
 
   // ── Section ─────────────────────────────────────────────────
   section: {
-    marginBottom: 14,
+    marginBottom: MARGIN_SECTION,
   },
   sectionTitle: {
     fontFamily:   FONT_BOLD,
@@ -76,9 +91,9 @@ const S = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     color:        COLOR_BLACK,
-    borderBottom: '1.5pt solid #000000',
-    paddingBottom: 2,
-    marginBottom:  7,
+    borderBottom: '1.2pt solid #000000',
+    paddingBottom: 1,
+    marginBottom: 5,
   },
 
   // ── Experience / Education row ───────────────────────────────
@@ -108,7 +123,7 @@ const S = StyleSheet.create({
     marginBottom: 4,
   },
   itemBlock: {
-    marginBottom: 11,
+    marginBottom: 6,
   },
 
   // ── Body teks ───────────────────────────────────────────────
@@ -196,25 +211,30 @@ function RichText({ html }) {
 // ── Header Section ─────────────────────────────────────────────
 function Header({ info }) {
   if (!info) return null;
-  const { name, email, phone, location, linkedin, website } = info;
+  const { name, email, phone, location, linkedin, website, qrCodeData } = info;
 
-  const contacts = [
-    email, phone, location,
+  const contactsLine1 = [email, phone, location].filter(Boolean).join('  |  ');
+  const contactsLine2 = [
     linkedin && (linkedin.startsWith('http')
       ? linkedin.replace('https://www.', '').replace('https://', '')
       : linkedin),
     website && (website.startsWith('http')
       ? website.replace('https://', '')
       : website),
-  ].filter(Boolean);
+  ].filter(Boolean).join('  |  ');
 
   return (
     <View style={S.header}>
-      <Text style={S.headerName}>{name || 'Nama Anda'}</Text>
-      {contacts.length > 0 && (
-        <Text style={S.headerContacts}>
-          {contacts.join('  |  ')}
-        </Text>
+      <View style={S.headerInfo}>
+        <Text style={S.headerName}>{name || 'Nama Anda'}</Text>
+        <Text style={S.headerContacts}>{contactsLine1}</Text>
+        {contactsLine2 && <Text style={S.headerContacts}>{contactsLine2}</Text>}
+      </View>
+
+      {qrCodeData && (
+        <View style={S.qrContainer}>
+          <Image src={qrCodeData} style={S.qrImage} />
+        </View>
       )}
     </View>
   );
@@ -296,19 +316,19 @@ function Skills({ skills }) {
       {technical.length > 0 && (
         <View style={S.skillRow}>
           <Text style={S.skillLabel}>Technical: </Text>
-          <Text style={S.skillValue}>{technical.join('  •  ')}</Text>
+          <Text style={S.skillValue}>{technical.join(', ')}</Text>
         </View>
       )}
       {softSkills.length > 0 && (
         <View style={S.skillRow}>
           <Text style={S.skillLabel}>Soft Skills: </Text>
-          <Text style={S.skillValue}>{softSkills.join('  •  ')}</Text>
+          <Text style={S.skillValue}>{softSkills.join(', ')}</Text>
         </View>
       )}
       {languages.length > 0 && (
         <View style={S.skillRow}>
           <Text style={S.skillLabel}>Bahasa: </Text>
-          <Text style={S.skillValue}>{languages.join('  •  ')}</Text>
+          <Text style={S.skillValue}>{languages.join(', ')}</Text>
         </View>
       )}
     </View>
