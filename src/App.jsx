@@ -1,9 +1,9 @@
 // src/App.jsx — Modern Blue UI
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   FileText, Download, Save, Upload, RefreshCw, X,
   Zap, CheckCircle2, AlertTriangle, Info, ZoomIn, ZoomOut,
-  Trash2, Menu,
+  Trash2, Menu, History, LayoutDashboard, Mail, Target, Eye, Layers
 } from 'lucide-react';
 import Stepper    from './components/ui/Stepper';
 import Button     from './components/ui/Button';
@@ -12,10 +12,15 @@ import ExperienceForm   from './components/form/ExperienceForm';
 import EducationForm    from './components/form/EducationForm';
 import SkillsForm       from './components/form/SkillsForm';
 import SummaryForm      from './components/form/SummaryForm';
+import CoverLetterGenerator from './components/features/CoverLetterGenerator';
+import ATSChecker from './components/features/ATSChecker';
+import EmailSender from './components/features/EmailSender';
+import HistoryDashboard from './components/features/HistoryDashboard';
 import CVPreview        from './components/preview/CVPreview';
+import LetterPreview from './components/preview/LetterPreview';
 import useCVStore       from './store/useCVStore';
 import { useGAS }       from './hooks/useGAS';
-import { exportCVtoPDF } from './utils/exportPDF';
+import { exportCVtoPDF, exportLetterToPDF } from './utils/exportPDF';
 
 // ── Toast ─────────────────────────────────────────────────────
 function Toast({ toast, onClose }) {
@@ -90,13 +95,15 @@ export default function App() {
   const cvPreviewRef = useRef(null);
   const [exporting, setExporting]           = useState(false);
   const [exportPct, setExportPct]           = useState(0);
-  const [zoom, setZoom] = useState(0.8); // Default zoom lebih besar untuk mobile
-  const [activeTab, setActiveTab] = useState('form'); // 'form' | 'preview'
+  const [zoom, setZoom] = useState(0.8);
+  const [activeTab, setActiveTab] = useState('form'); // 'form' | 'preview' | 'history'
+  const [previewType, setPreviewType] = useState('cv'); // 'cv' | 'letter'
   const [showLoadModal, setShowLoadModal]   = useState(false);
 
   const {
     currentStep, nextStep, prevStep, setCurrentStep,
     cvData, setCVData, resetCVData, savedCVId, setSavedCVId,
+    coverLetter,
     isSaving, setIsSaving, toast, showToast, clearToast,
   } = useCVStore();
 
@@ -130,24 +137,45 @@ export default function App() {
     setExporting(true); setExportPct(0);
     try {
       const name = cvData.personalInfo.name.replace(/\s+/g, '_');
-      // Arg ke-1 (element) tidak dipakai lagi — react-pdf render dari data langsung
-      await exportCVtoPDF(null, name, setExportPct, cvData);
-      showToast('success', '📄 PDF berhasil didownload! (ATS-ready ✅)');
+      if (previewType === 'cv') {
+        await exportCVtoPDF(null, name, setExportPct, cvData);
+        showToast('success', '📄 CV PDF berhasil didownload!');
+      } else {
+        await exportLetterToPDF(
+          coverLetter.content,
+          cvData.personalInfo,
+          coverLetter.jobPosition,
+          cvData.education,
+          setExportPct
+        );
+        showToast('success', '📄 Surat Lamaran PDF berhasil didownload!');
+      }
     } catch (e) {
       showToast('error', `Gagal export: ${e.message}`);
     } finally {
       setExporting(false);
       setExportPct(0);
     }
-  }, [cvData, showToast]);
+  }, [cvData, previewType, coverLetter, showToast]);
+
+  useEffect(() => {
+    if (currentStep === 8) {
+      setPreviewType('all');
+    }
+  }, [currentStep]);
 
   const renderForm = () => {
+    if (activeTab === 'history') return <HistoryDashboard />;
+
     switch (currentStep) {
       case 1: return <PersonalInfoForm onNext={nextStep} />;
       case 2: return <ExperienceForm   onNext={nextStep} onBack={prevStep} />;
       case 3: return <EducationForm    onNext={nextStep} onBack={prevStep} />;
       case 4: return <SkillsForm       onNext={nextStep} onBack={prevStep} />;
-      case 5: return <SummaryForm      onBack={prevStep} />;
+      case 5: return <SummaryForm onNext={nextStep} onBack={prevStep} />;
+      case 6: return <CoverLetterGenerator onNext={nextStep} onBack={prevStep} onReady={setPreviewType} />;
+      case 7: return <ATSChecker onNext={nextStep} onBack={prevStep} />;
+      case 8: return <EmailSender onBack={prevStep} />;
       default: return null;
     }
   };
@@ -163,7 +191,7 @@ export default function App() {
       <header className="gradient-blue sticky top-0 z-40" style={{ boxShadow: '0 4px 24px rgba(37,99,235,0.25)' }}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           {/* Logo */}
-          <div className="flex items-center gap-3 mr-auto">
+          <div className="flex items-center gap-3 mr-auto cursor-pointer" onClick={() => { setActiveTab('form'); setCurrentStep(1); }}>
             <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
               <Zap className="w-4.5 h-4.5 text-white" />
             </div>
@@ -173,6 +201,22 @@ export default function App() {
             </div>
           </div>
 
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center bg-white/10 rounded-2xl p-1 border border-white/20 mr-4">
+            <button
+              onClick={() => setActiveTab('form')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl transition-all text-xs font-bold ${activeTab === 'form' ? 'bg-white text-blue-700 shadow-sm' : 'text-white/70 hover:text-white'}`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" /> Editor
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl transition-all text-xs font-bold ${activeTab === 'history' ? 'bg-white text-blue-700 shadow-sm' : 'text-white/70 hover:text-white'}`}
+            >
+              <History className="w-3.5 h-3.5" /> History
+            </button>
+          </nav>
+
           {/* Actions */}
           <div className="flex items-center gap-1.5">
             <button
@@ -180,14 +224,6 @@ export default function App() {
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
             >
               <Upload className="w-4 h-4" /> Load CV
-            </button>
-
-            <button
-              onClick={() => { if (window.confirm('Reset semua data?')) { resetCVData(); showToast('info','CV direset'); }}}
-              className="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all"
-              title="Reset CV"
-            >
-              <Trash2 className="w-4 h-4" />
             </button>
 
             <button
@@ -242,25 +278,44 @@ export default function App() {
           <div className={`w-full lg:w-auto flex-shrink-0 ${activeTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
             <div className="sticky top-24 space-y-4">
               {/* Preview controls */}
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-blue-100 text-blue-600">
-                    <FileText className="w-4 h-4" />
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-blue-100 text-blue-600">
+                      <Eye className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-bold text-slate-700 uppercase tracking-wider">Live Preview</span>
+                    <span className="badge badge-blue text-[10px]">A4</span>
                   </div>
-                  <span className="text-sm font-bold text-slate-700">Live Preview</span>
-                  <span className="badge badge-blue text-[10px]">A4</span>
-                  {savedCVId && (
-                    <span className="badge badge-green text-[10px] hidden sm:flex items-center gap-1">
-                      <CheckCircle2 className="w-2.5 h-2.5" /> Tersimpan
-                    </span>
-                  )}
+
+                  <div className="flex items-center gap-0.5 bg-white border border-slate-200 shadow-sm rounded-xl p-1">
+                    <button onClick={() => setZoom(z => Math.max(0.3, z - 0.1))} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Zoom out"><ZoomOut className="w-3.5 h-3.5" /></button>
+                    <span className="text-[11px] text-slate-500 px-1 font-bold w-10 text-center">{Math.round(zoom * 100)}%</span>
+                    <button onClick={() => setZoom(z => Math.min(1.2, z + 0.1))} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Zoom in"><ZoomIn className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setZoom(0.8)} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Reset"><RefreshCw className="w-3.5 h-3.5" /></button>
+                  </div>
                 </div>
-                {/* Zoom - Hidden on smaller mobile to save space, but zoom is still useful */}
-                <div className="flex items-center gap-0.5 bg-white border border-slate-200 shadow-sm rounded-xl p-1">
-                  <button onClick={() => setZoom(z => Math.max(0.3, z - 0.1))} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Zoom out"><ZoomOut className="w-3.5 h-3.5" /></button>
-                  <span className="text-[11px] text-slate-500 px-1 font-bold w-10 text-center">{Math.round(zoom * 100)}%</span>
-                  <button onClick={() => setZoom(z => Math.min(1.2, z + 0.1))} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Zoom in"><ZoomIn className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setZoom(0.8)} className="btn btn-ghost btn-icon w-8 h-8 rounded-lg" title="Reset"><RefreshCw className="w-3.5 h-3.5" /></button>
+
+                {/* Doc Toggle */}
+                <div className="bg-slate-200/50 p-1.5 rounded-2xl flex items-center gap-1 mx-1">
+                  <button
+                    onClick={() => setPreviewType('cv')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${previewType === 'cv' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    <FileText className="w-3.5 h-3.5" /> Preview CV
+                  </button>
+                  <button
+                    onClick={() => setPreviewType('letter')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${previewType === 'letter' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    <Mail className="w-3.5 h-3.5" /> Surat Lamaran
+                  </button>
+                  <button
+                    onClick={() => setPreviewType('all')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${previewType === 'all' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    <Layers className="w-3.5 h-3.5" /> Semua
+                  </button>
                 </div>
               </div>
 
@@ -276,18 +331,29 @@ export default function App() {
               >
                 <div className="preview-container" style={{
                   width: `${794 * zoom}px`,
-                  height: `${1123 * zoom}px`,
+                  minHeight: `${1123 * zoom}px`,
                   position: 'relative',
                   margin: '0 auto',
                 }}>
-                  <div className="preview-scale-wrapper" style={{
+                  <div className="preview-scale-wrapper flex flex-col gap-8" style={{
                     transform: `scale(${zoom})`,
                     transformOrigin: 'top center',
                     width: '794px',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
-                    backgroundColor: 'white',
                   }}>
-                    <CVPreview ref={cvPreviewRef} />
+                    {previewType === 'all' ? (
+                      <>
+                        <div style={{ backgroundColor: 'white', boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}>
+                          <LetterPreview />
+                        </div>
+                        <div style={{ backgroundColor: 'white', boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}>
+                          <CVPreview ref={cvPreviewRef} />
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ backgroundColor: 'white', boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}>
+                        {previewType === 'cv' ? <CVPreview ref={cvPreviewRef} /> : <LetterPreview />}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

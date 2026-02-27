@@ -1,6 +1,6 @@
 // src/components/ui/Stepper.jsx
 import React from 'react';
-import { Check, User, Briefcase, GraduationCap, Cpu, FileText } from 'lucide-react';
+import { Check, User, Briefcase, GraduationCap, Cpu, FileText, Mail, Target, Send } from 'lucide-react';
 
 const STEPS = [
   { id: 1, label: 'Personal',    short: 'Info',    icon: User },
@@ -8,6 +8,9 @@ const STEPS = [
   { id: 3, label: 'Pendidikan',  short: 'Edu',     icon: GraduationCap },
   { id: 4, label: 'Skills',      short: 'Skills',  icon: Cpu },
   { id: 5, label: 'Summary',     short: 'CV',      icon: FileText },
+  { id: 6, label: 'Surat', short: 'Surat', icon: Mail },
+  { id: 7, label: 'ATS', short: 'ATS', icon: Target },
+  { id: 8, label: 'Kirim', short: 'Send', icon: Send },
 ];
 
 export default function Stepper({ currentStep, onStepClick }) {

@@ -78,49 +78,57 @@ function CVSection({ title, children }) {
 // ── Header: Nama & Kontak ────────────────────────────────────
 function CVHeader({ info }) {
   if (!info) return null;
-  const { name, email, phone, linkedin, location, website } = info;
+  const { name, email, phone, linkedin, location, website, qrCodeData } = info;
 
-  const contacts = [
-    email,
-    phone,
-    location,
+  const contactsLine1 = [email, phone, location].filter(Boolean).join('  |  ');
+  const contactsLine2 = [
     linkedin && (linkedin.startsWith('http')
       ? linkedin.replace('https://www.', '').replace('https://', '')
       : linkedin),
     website && (website.startsWith('http')
       ? website.replace('https://', '')
       : website),
-  ].filter(Boolean);
+  ].filter(Boolean).join('  |  ');
 
   return (
     <div style={{
-      textAlign: 'center',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: '18px',
       paddingBottom: '12px',
       borderBottom: '1.5px solid #000',
     }}>
-      <h1 style={{
-        fontSize: '16pt',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        margin: '0 0 6px 0',
-        color: '#000',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-      }}>
-        {name || 'Nama Anda'}
-      </h1>
-      {contacts.length > 0 && (
-        <p style={{
-          fontSize: '10.5pt',
+      <div style={{ flex: 1, textAlign: 'left' }}>
+        <h1 style={{
+          fontSize: '16pt',
           fontFamily: FONT,
-          color: '#222',
-          margin: '0',
-          lineHeight: '1.6',
-          textAlign: 'center',
+          fontWeight: 'bold',
+          margin: '0 0 4px 0',
+          color: '#000',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
         }}>
-          {contacts.join('  |  ')}
+          {name || 'Nama Anda'}
+        </h1>
+        <p style={{ fontSize: '10pt', color: '#222', margin: '0', lineHeight: '1.4' }}>
+          {contactsLine1}
         </p>
+        {contactsLine2 && (
+          <p style={{ fontSize: '10pt', color: '#222', margin: '0', lineHeight: '1.4' }}>
+            {contactsLine2}
+          </p>
+        )}
+      </div>
+
+      {qrCodeData && (
+        <div style={{ marginLeft: '15px' }}>
+          <img
+            src={qrCodeData}
+            alt="QR Code"
+            style={{ width: '60px', height: '60px' }}
+          />
+        </div>
       )}
     </div>
   );
@@ -208,17 +216,17 @@ function CVSkills({ skills }) {
       <div style={{ fontSize: SIZE, fontFamily: FONT, color: COLOR, lineHeight: '1.7' }}>
         {technical.length > 0 && (
           <p style={{ margin: '0 0 3px 0', textAlign: 'justify' }}>
-            <strong>Technical: </strong>{technical.join('  •  ')}
+            <strong>Technical: </strong>{technical.join(', ')}
           </p>
         )}
         {softSkills.length > 0 && (
           <p style={{ margin: '0 0 3px 0', textAlign: 'justify' }}>
-            <strong>Soft Skills: </strong>{softSkills.join('  •  ')}
+            <strong>Soft Skills: </strong>{softSkills.join(', ')}
           </p>
         )}
         {languages.length > 0 && (
           <p style={{ margin: '0', textAlign: 'justify' }}>
-            <strong>Bahasa: </strong>{languages.join('  •  ')}
+            <strong>Bahasa: </strong>{languages.join(', ')}
           </p>
         )}
       </div>

@@ -1,15 +1,17 @@
 // src/components/form/SummaryForm.jsx
 // Step 5 — Professional Summary + ATS Checker (Modern Blue UI + TipTap)
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   FileText, Target, CheckCircle2, XCircle, AlertCircle,
-  Lightbulb, RefreshCw, ChevronLeft, Zap, BarChart3
+  Lightbulb, RefreshCw, ChevronLeft, Zap, BarChart3,
+  Sparkles
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
 import useCVStore from '../../store/useCVStore';
 import { calculateATSScore, getScoreLabel } from '../../utils/atsScore';
+import { optimizeCV } from '../../services/gemini';
 
 // ── ATS Score animated ring ────────────────────────────────────
 function ScoreRing({ score }) {
@@ -98,11 +100,13 @@ function KeywordChip({ word, matched }) {
 }
 
 // ── Main ───────────────────────────────────────────────────────
-export default function SummaryForm({ onBack }) {
+export default function SummaryForm({ onBack, onNext }) {
   const {
     cvData, updateSummary, jobDescription, setJobDescription,
-    atsResult, setATSResult,
+    atsResult, setATSResult, updateSkills, showToast
   } = useCVStore();
+
+  const [optimizing, setOptimizing] = useState(false);
 
   // ATS analysis (debounced)
   const runATS = useCallback(() => {
@@ -115,6 +119,36 @@ export default function SummaryForm({ onBack }) {
     const t = setTimeout(runATS, 700);
     return () => clearTimeout(t);
   }, [runATS]);
+
+  const handleOptimize = async () => {
+    if (!jobDescription.trim()) {
+      return showToast('error', 'Masukkan Job Description terlebih dahulu');
+    }
+
+    setOptimizing(true);
+    try {
+      const { optimizedSummary, suggestedSkills } = await optimizeCV({ cvData, jobDescription });
+
+      // Update Summary
+      updateSummary(optimizedSummary);
+
+      // Update Technical Skills (Merge & Unique)
+      const currentTechnical = cvData.skills.technical || [];
+      const merged = [...new Set([...currentTechnical, ...suggestedSkills])];
+
+      updateSkills({
+        ...cvData.skills,
+        technical: merged
+      });
+
+      showToast('success', 'CV berhasil dioptimalkan dengan AI!');
+      runATS(); // Update local ATS score
+    } catch (error) {
+      showToast('error', 'Gagal optimasi: ' + error.message);
+    } finally {
+      setOptimizing(false);
+    }
+  };
 
   const hasJD  = jobDescription?.trim().length > 30;
   const hasATS = hasJD && atsResult?.totalKeywords > 0;
@@ -141,7 +175,7 @@ export default function SummaryForm({ onBack }) {
         placeholder="Tulis ringkasan profesional Anda: siapa Anda, apa keahlian utama, dan nilai apa yang Anda bawa. Idealnya 3–5 kalimat padat."
         minHeight={180}
         maxLength={1200}
-        helper="Gunakan bold untuk highlight skill kunci. Hindari kata sifat subjektif (rajin, jujur). Fokus pada pencapaian terukur."
+        helper="Gunakan bold untuk highlight skill kunci. Hindari kata sifat subjektif (rajin, jujur). Fokus pada pencahaian terukur."
       />
 
       {/* Template suggestions */}
@@ -194,38 +228,62 @@ export default function SummaryForm({ onBack }) {
         {hasATS && (
           <div className="animate-fade-up space-y-4">
             {/* Score summary */}
-            <div className="flex flex-col sm:flex-row items-center gap-5 p-5 bg-gradient-to-br from-blue-50 to-slate-50 rounded-2xl border border-blue-100">
-              <ScoreRing score={atsResult.score} />
-              <div className="flex-1 w-full">
-                {/* Stats row */}
-                <div className="grid grid-cols-3 gap-3 mb-3 text-center">
-                  <div className="p-2 bg-white rounded-xl shadow-sm">
-                    <p className="text-xl font-black text-slate-900">{atsResult.totalKeywords}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">Total Keyword JD</p>
+            <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 shadow-sm">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <ScoreRing score={atsResult.score} />
+
+                <div className="flex-1 w-full space-y-4">
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                      <h4 className="text-lg font-bold text-slate-800">Analisis Keyword</h4>
+                      <p className="text-xs text-slate-500">Skor Anda berdasarkan kecocokan keyword</p>
+                    </div>
+
+                    <Button
+                      onClick={handleOptimize}
+                      loading={optimizing}
+                      variant="primary"
+                      size="sm"
+                      className="bg-blue-600 text-white shadow-lg shadow-blue-200"
+                      leftIcon={<Sparkles className="w-4 h-4" />}
+                    >
+                      Optimasi CV dengan AI ✨
+                    </Button>
                   </div>
-                  <div className="p-2 bg-green-50 rounded-xl shadow-sm">
-                    <p className="text-xl font-black text-green-600">{atsResult.matchedKeywords.length}</p>
-                    <p className="text-[10px] text-green-600 font-medium">Match ✓</p>
-                  </div>
-                  <div className="p-2 bg-red-50 rounded-xl shadow-sm">
-                    <p className="text-xl font-black text-red-500">{atsResult.missingKeywords.length}</p>
-                    <p className="text-[10px] text-red-500 font-medium">Missing ✗</p>
+
+                  {/* Stats row */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="p-2.5 bg-white rounded-xl shadow-sm text-center">
+                      <p className="text-lg font-black text-slate-900">{atsResult.totalKeywords}</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase">Total</p>
+                    </div>
+                    <div className="p-2.5 bg-green-50 rounded-xl shadow-sm text-center border border-green-100">
+                      <p className="text-lg font-black text-green-600">{atsResult.matchedKeywords.length}</p>
+                      <p className="text-[10px] text-green-600 font-bold uppercase">Match</p>
+                    </div>
+                    <div className="p-2.5 bg-red-50 rounded-xl shadow-sm text-center border border-red-100">
+                      <p className="text-lg font-black text-red-500">{atsResult.missingKeywords.length}</p>
+                      <p className="text-[10px] text-red-500 font-bold uppercase">Missing</p>
+                    </div>
                   </div>
                 </div>
-                {/* Progress bar */}
-                <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${atsResult.score}%`,
-                      background: atsResult.score >= 80 ? '#22c55e' :
-                                  atsResult.score >= 60 ? '#3b82f6' :
-                                  atsResult.score >= 40 ? '#f59e0b' : '#ef4444',
-                    }}
-                  />
-                </div>
-                <p className="text-right text-xs text-slate-400 mt-1">{atsResult.score}% keyword match</p>
               </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="space-y-1">
+              <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${atsResult.score}%`,
+                    background: atsResult.score >= 80 ? '#22c55e' :
+                      atsResult.score >= 60 ? '#3b82f6' :
+                        atsResult.score >= 40 ? '#f59e0b' : '#ef4444',
+                  }}
+                />
+              </div>
+              <p className="text-right text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{atsResult.score}% keyword match</p>
             </div>
 
             {/* Keyword matched */}
@@ -300,14 +358,13 @@ export default function SummaryForm({ onBack }) {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between pt-4 border-t border-blue-50">
-        <Button variant="secondary" onClick={onBack} leftIcon={<ChevronLeft className="w-4 h-4" />}>
+      <div className="flex items-center justify-between pt-6 border-t border-slate-100 mt-8">
+        <Button variant="ghost" onClick={onBack} leftIcon={<ChevronLeft className="w-4 h-4" />}>
           Kembali
         </Button>
-        <div className="flex items-center gap-2 text-sm text-green-600 font-semibold">
-          <CheckCircle2 className="w-5 h-5" />
-          Semua langkah selesai!
-        </div>
+        <Button onClick={onNext} rightIcon={<Zap className="w-4 h-4" />}>
+          Lanjut Buat Surat Lamaran
+        </Button>
       </div>
     </div>
   );

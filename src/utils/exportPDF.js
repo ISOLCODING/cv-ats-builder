@@ -1,23 +1,34 @@
 // src/utils/exportPDF.js
-// ============================================================
-// PDF Export menggunakan @react-pdf/renderer
-// Output: PDF dengan TEKS ASLI (bukan gambar) — ATS-friendly ✅
-// ============================================================
-
 import React from 'react';
 import { pdf } from '@react-pdf/renderer';
 import { CVDocument } from '../components/pdf/CVDocument';
+import { LetterDocument } from '../components/pdf/LetterDocument';
 
 /**
- * exportCVtoPDF
- * Menggunakan @react-pdf/renderer — output berisi teks asli,
- * bukan screenshot, sehingga ATS bisa baca dengan sempurna.
- *
- * @param {HTMLElement|null} _element  — tidak dipakai (legacy param)
- * @param {string}           fileName  — nama file (tanpa .pdf)
- * @param {Function}         onProgress
- * @param {object}           cvData    — data CV dari store
+ * Generate CV PDF Blob
  */
+export async function generateCVBlob(cvData) {
+  const doc = React.createElement(CVDocument, { cvData });
+  const instance = pdf(doc);
+  return await instance.toBlob();
+}
+
+/**
+ * Generate Letter PDF Blob
+ */
+export async function generateLetterBlob(content, personalInfo, jobPosition, education, hrdName, company) {
+  const doc = React.createElement(LetterDocument, { 
+    content, 
+    personalInfo, 
+    jobPosition,
+    education,
+    hrdName,
+    company
+  });
+  const instance = pdf(doc);
+  return await instance.toBlob();
+}
+
 export async function exportCVtoPDF(_element, fileName, onProgress, cvData) {
   if (!cvData) {
     throw new Error('Data CV tidak tersedia.');
@@ -25,19 +36,12 @@ export async function exportCVtoPDF(_element, fileName, onProgress, cvData) {
 
   try {
     onProgress?.(10);
-
-    // ── Step 1: Buat PDF blob dari CVDocument ─────────────────
     const doc = React.createElement(CVDocument, { cvData });
-
     onProgress?.(30);
-
-    // pdf() dari react-pdf: render → Blob
     const instance = pdf(doc);
     const blob     = await instance.toBlob();
-
     onProgress?.(80);
 
-    // ── Step 2: Trigger download ──────────────────────────────
     const url  = URL.createObjectURL(blob);
     const safe = (fileName || 'CV')
       .replace(/[^a-zA-Z0-9_\- ]/g, '')
@@ -51,21 +55,55 @@ export async function exportCVtoPDF(_element, fileName, onProgress, cvData) {
     link.click();
     document.body.removeChild(link);
 
-    // Cleanup URL object
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-
     onProgress?.(100);
-    console.log(`✅ PDF exported (react-pdf): ${safe}_CV.pdf`);
-
   } catch (error) {
     console.error('❌ Export PDF gagal:', error);
     throw new Error('Gagal mengexport PDF: ' + error.message);
   }
 }
 
-/**
- * downloadAsText — fallback: download sebagai .txt (ATS safe)
- */
+export async function exportLetterToPDF(content, personalInfo, jobPosition, education, onProgress, hrdName, company) {
+  if (!content) {
+    throw new Error('Konten surat tidak tersedia.');
+  }
+
+  try {
+    onProgress?.(20);
+    const doc = React.createElement(LetterDocument, { 
+      content, 
+      personalInfo, 
+      jobPosition,
+      education,
+      hrdName,
+      company
+    });
+    
+    const instance = pdf(doc);
+    const blob = await instance.toBlob();
+    onProgress?.(80);
+
+    const url = URL.createObjectURL(blob);
+    const safe = (personalInfo?.name || 'Letter')
+      .replace(/[^a-zA-Z0-9_\- ]/g, '')
+      .replace(/\s+/g, '_')
+      .slice(0, 50);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${safe}_Surat_Lamaran.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    onProgress?.(100);
+  } catch (error) {
+    console.error('❌ Export Letter Failed:', error);
+    throw error;
+  }
+}
+
 export function downloadAsText(cvData, fileName) {
   const text = buildPlainText(cvData);
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });

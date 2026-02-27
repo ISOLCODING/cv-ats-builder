@@ -1,8 +1,9 @@
 // src/components/form/PersonalInfoForm.jsx
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { User, Mail, Phone, MapPin, Linkedin, Globe, ChevronRight, Sparkles } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Linkedin, Globe, ChevronRight, Sparkles, Trash, Image as ImageIcon, QrCode } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
+import QRCode from 'qrcode';
 
 function FieldWithIcon({ label, icon: Icon, required, error, children }) {
   return (
@@ -35,9 +36,26 @@ export default function PersonalInfoForm({ onNext }) {
   });
 
   useEffect(() => {
-    const sub = watch((data) => updatePersonalInfo(data));
+    const sub = watch(async (data) => {
+      // Jika portfolioUrl berubah, generate QR
+      if (data.portfolioUrl && data.portfolioUrl !== cvData.personalInfo.portfolioUrl) {
+        try {
+          const qrData = await QRCode.toDataURL(data.portfolioUrl, {
+            width: 200,
+            margin: 1,
+            color: { dark: '#000000', light: '#ffffff' }
+          });
+          updatePersonalInfo({ ...data, qrCodeData: qrData });
+        } catch (err) {
+          console.error('QR Gen error:', err);
+          updatePersonalInfo(data);
+        }
+      } else {
+        updatePersonalInfo(data);
+      }
+    });
     return () => sub.unsubscribe();
-  }, [watch, updatePersonalInfo]);
+  }, [watch, updatePersonalInfo, cvData.personalInfo.portfolioUrl]);
 
   const inputCls = (hasErr) =>
     `form-input pl-9 ${hasErr ? 'border-red-400 ring-2 ring-red-100' : ''}`;
@@ -116,6 +134,75 @@ export default function PersonalInfoForm({ onNext }) {
             {...register('website')}
           />
         </FieldWithIcon>
+
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <FieldWithIcon label="Portfolio (untuk QR Code)" icon={QrCode} error={errors.portfolioUrl?.message}>
+              <input
+                type="text"
+                placeholder="Contoh: https://linktr.ee/username"
+                className={inputCls(errors.portfolioUrl)}
+                {...register('portfolioUrl')}
+              />
+            </FieldWithIcon>
+          </div>
+          {cvData.personalInfo.qrCodeData && (
+            <div className="w-12 h-12 border border-slate-200 rounded-lg p-1 bg-white mb-1 shadow-sm flex items-center justify-center">
+              <img src={cvData.personalInfo.qrCodeData} alt="QR Preview" className="w-full h-full object-contain" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="border-t border-slate-100 pt-6 mt-6">
+        <label className="form-label mb-2 flex items-center gap-2">
+          <ImageIcon className="w-4 h-4 text-blue-500" /> Tanda Tangan (PNG Transparan Disarankan)
+        </label>
+        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+          {cvData.personalInfo.signature ? (
+            <div className="relative group">
+              <img
+                src={cvData.personalInfo.signature}
+                alt="Signature"
+                className="h-16 bg-white border border-slate-200 rounded-lg p-1 object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => updatePersonalInfo({ signature: '' })}
+                className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Trash className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <div className="h-16 w-32 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center text-slate-400">
+              Belum ada
+            </div>
+          )}
+          <div className="flex-1">
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              id="signature-upload"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => updatePersonalInfo({ signature: ev.target.result });
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            <label
+              htmlFor="signature-upload"
+              className="btn btn-outline-blue text-xs py-2 px-4 cursor-pointer inline-flex items-center gap-2"
+            >
+              {cvData.personalInfo.signature ? 'Ganti Tanda Tangan' : 'Upload Tanda Tangan'}
+            </label>
+            <p className="text-[10px] text-slate-400 mt-1">Gunakan foto tanda tangan di atas kertas putih (disarankan hapus background).</p>
+          </div>
+        </div>
       </div>
 
       {/* Tips ATS */}

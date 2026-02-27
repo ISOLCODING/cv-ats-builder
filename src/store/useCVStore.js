@@ -25,6 +25,9 @@ const defaultCVData = {
     linkedin: '',
     location: '',
     website: '',
+    portfolioUrl: '', // URL untuk QR Code
+    qrCodeData: '',   // Base64 QR Image
+    signature: '', // Base64 image
   },
   experiences: [
     // {
@@ -72,8 +75,22 @@ const useCVStore = create(
       // ── State ────────────────────────────────────────────
       currentStep: 1,
       cvData: defaultCVData,
-      atsResult: defaultATSResult,
+      atsResult: {
+        ...defaultATSResult,
+        breakdown: { keywordMatch: 0, formatScore: 0, relevance: 0 },
+        specificSuggestions: [],
+        experienceRelevance: '',
+      },
       jobDescription: '',
+      coverLetter: {
+        content: '',
+        tone: 'formal',
+        jobPosition: '',
+        company: '',
+        hrdName: '',
+        status: 'draft', // 'draft' | 'generated'
+      },
+      history: [], // [{ id, date, company, position, type: 'cv'|'letter' }]
       isSaving: false,
       isLoading: false,
       savedCVId: null,
@@ -83,13 +100,15 @@ const useCVStore = create(
       setCurrentStep: (step) => set({ currentStep: step }),
       
       nextStep: () => set((state) => ({
-        currentStep: Math.min(5, state.currentStep + 1)
+        currentStep: Math.min(8, state.currentStep + 1) // 8 steps total now
       })),
       
       prevStep: () => set((state) => ({
         currentStep: Math.max(1, state.currentStep - 1)
       })),
 
+      // ... existing methods (I'll use multi_replace for better precision if needed, but let's try to keep it clean)
+      
       // ── Personal Info ─────────────────────────────────────
       updatePersonalInfo: (info) => set((state) => ({
         cvData: {
@@ -192,6 +211,21 @@ const useCVStore = create(
         cvData: { ...state.cvData, summary }
       })),
 
+      // ── Cover Letter ──────────────────────────────────────
+      updateCoverLetter: (data) => set((state) => ({
+        coverLetter: { ...state.coverLetter, ...data }
+      })),
+
+      setCoverLetterContent: (content) => set((state) => ({
+        coverLetter: { ...state.coverLetter, content, status: 'generated' }
+      })),
+
+      // ── History ───────────────────────────────────────────
+      setHistory: (history) => set({ history }),
+      addToHistory: (entry) => set((state) => ({
+        history: [{ id: generateId(), date: new Date().toISOString(), ...entry }, ...state.history]
+      })),
+
       // ── Full CV Data ──────────────────────────────────────
       setCVData: (cvData) => set({ cvData }),
       
@@ -200,7 +234,15 @@ const useCVStore = create(
         atsResult: defaultATSResult,
         currentStep: 1,
         savedCVId: null,
-        jobDescription: ''
+        jobDescription: '',
+        coverLetter: {
+          content: '',
+          tone: 'formal',
+          jobPosition: '',
+          company: '',
+          hrdName: '',
+          status: 'draft',
+        },
       }),
 
       // ── ATS Result ────────────────────────────────────────
@@ -246,8 +288,11 @@ const useCVStore = create(
         cvData: state.cvData,
         jobDescription: state.jobDescription,
         savedCVId: state.savedCVId,
+        coverLetter: state.coverLetter,
+        history: state.history,
       }),
     }
+
   )
 );
 

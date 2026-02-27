@@ -124,10 +124,13 @@ export function useGAS() {
         // ── Mode 1: Embedded dalam GAS Web App ──────────────
         // Map action → nama fungsi GAS
         const functionMap = {
-          saveCV:   'gsSaveCV',
-          loadCV:   'gsLoadCV',
-          listCVs:  'gsListCVs',
-          deleteCV: 'gsDeleteCV',
+          saveCV:    'gsSaveCV',
+          loadCV:    'gsLoadCV',
+          listCVs:   'gsListCVs',
+          deleteCV:  'gsDeleteCV',
+          sendEmail: 'gsSendEmail',
+          saveToDrive: 'gsSaveToDrive',
+          listHistory: 'gsListHistory',
         };
 
         const gasFunction = functionMap[action];
@@ -141,11 +144,20 @@ export function useGAS() {
           case 'saveCV':
             args = [payload.cvData];
             break;
+          case 'sendEmail':
+            args = [payload];
+            break;
           case 'loadCV':
             args = [payload.email];
             break;
           case 'deleteCV':
             args = [payload.id];
+            break;
+          case 'saveToDrive':
+            args = [payload.fileData, payload.historyData];
+            break;
+          case 'listHistory':
+            args = [payload.email];
             break;
           case 'listCVs':
           default:
@@ -156,7 +168,14 @@ export function useGAS() {
 
       } else {
         // ── Mode 2: HTTP Fetch (development / external) ──────
-        result = await callGASViaFetch({ action, ...payload });
+        let fetchPayload = { action, ...payload };
+        
+        // GAS handleSendEmail expects { options }
+        if (action === 'sendEmail') {
+          fetchPayload = { action, options: payload };
+        }
+        
+        result = await callGASViaFetch(fetchPayload);
       }
 
       return result;
@@ -212,9 +231,11 @@ export function useGAS() {
     loadCV,
     listCVs,
     deleteCV,
+    callGAS,
     isLoading,
     error,
     isGASMode: isGASEnvironment(),
+    hasEndpoint: !!GAS_ENDPOINT,
   };
 }
 

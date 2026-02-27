@@ -19,7 +19,9 @@ export default defineConfig({
     // viteSingleFile hanya untuk mode GAS
     ...(!isPages ? [viteSingleFile()] : []),
   ],
-
+  define: {
+    global: 'window',
+  },
   build: {
     outDir: isPages ? 'dist-pages' : 'dist',
     target: 'es2017',
