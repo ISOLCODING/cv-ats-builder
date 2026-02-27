@@ -37,43 +37,131 @@ var SheetsDB = (function() {
     return sheet;
   }
 
-  // ── Helper: tambah header row ────────────────────────────
+  // ── Helper: tambah header row dengan Style Premium ──────────
   function _addHeaders(sheet) {
-    var headers = ['id', 'timestamp', 'name', 'email', 'data'];
-    sheet.getRange(1, 1, 1, headers.length)
+    var headers = ['ID LAMARAN', 'WAKTU INPUT', 'NAMA LENGKAP', 'EMAIL USER', 'DATA JSON'];
+    var headerRange = sheet.getRange(1, 1, 1, headers.length);
+    
+    headerRange
       .setValues([headers])
       .setFontWeight('bold')
-      .setBackground('#1e3a8a')
-      .setFontColor('#ffffff');
+      .setFontSize(11)
+      .setFontFamily('Montserrat')
+      .setBackground('#0f172a') // Slate 900
+      .setFontColor('#ffffff')
+      .setVerticalAlignment('middle')
+      .setHorizontalAlignment('center');
     
-    // Freeze baris header
+    sheet.setRowHeight(1, 40);
     sheet.setFrozenRows(1);
     
-    // Set lebar kolom
-    sheet.setColumnWidth(1, 200);  // id
-    sheet.setColumnWidth(2, 180);  // timestamp
-    sheet.setColumnWidth(3, 200);  // name
-    sheet.setColumnWidth(4, 200);  // email
-    sheet.setColumnWidth(5, 400);  // data
+    // Set lebar kolom profesional
+    sheet.setColumnWidth(1, 150); // id
+    sheet.setColumnWidth(2, 180); // timestamp
+    sheet.setColumnWidth(3, 220); // name
+    sheet.setColumnWidth(4, 250); // email
+    sheet.setColumnWidth(5, 300); // data
+  }
+
+  // ── Helper: Format History Sheet Premium ───────────────────
+  function _formatHistorySheet(sheet) {
+    var headers = ['ID', 'TANGGAL & WAKTU', 'EMAIL PELAMAR', 'PERUSAHAAN', 'POSISI', 'KATEGORI', 'STATUS', 'URL BERKAS'];
+    var headerRange = sheet.getRange(1, 1, 1, headers.length);
+    
+    headerRange
+      .setValues([headers])
+      .setFontWeight('bold')
+      .setFontSize(10)
+      .setFontFamily('Roboto')
+      .setBackground('#1e293b') // Slate 800
+      .setFontColor('#f8fafc');
+    
+    sheet.setRowHeight(1, 35);
+    sheet.setFrozenRows(1);
+    
+    // Column widths
+    var widths = [100, 180, 220, 200, 200, 120, 120, 300];
+    widths.forEach(function(w, i) {
+      sheet.setColumnWidth(i + 1, w);
+    });
+
+    // Conditional Formatting for Status
+    _applyStatusFormatting(sheet);
+  }
+
+  function _applyStatusFormatting(sheet) {
+    var range = sheet.getRange("G2:G1000");
+    
+    // Clean existing rules
+    sheet.clearConditionalFormatRules();
+    
+    var rules = [];
+    
+    // Rule: Terkirim (Green)
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo("TERKIRIM")
+      .setBackground("#dcfce7")
+      .setFontColor("#15803d")
+      .setRanges([range])
+      .build());
+
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo("Terkirim")
+      .setBackground("#dcfce7")
+      .setFontColor("#15803d")
+      .setRanges([range])
+      .build());
+
+    // Rule: Saved/Draft (Blue)
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenTextContains("Saved")
+      .setBackground("#dbeafe")
+      .setFontColor("#1d4ed8")
+      .setRanges([range])
+      .build());
+
+    sheet.setConditionalFormatRules(rules);
   }
 
   // ── Helper: row array → object ───────────────────────────
   function _rowToObject(row) {
     return {
       id:        row[0] || '',
-      timestamp: row[1] || '',
+      timestamp: row[1] ? (row[1] instanceof Date ? Utilities.formatDate(row[1], "GMT+7", "dd/MM/yyyy HH:mm:ss") : String(row[1])) : '',
       name:      row[2] || '',
       email:     row[3] || '',
       data:      row[4] || ''
     };
   }
 
+  function _historyRowToObject(row) {
+    var ts = row[1];
+    // Jika data dari Sheets adalah objek Date, paksa ke string format Indo
+    var formattedTs = '';
+    if (ts instanceof Date) {
+      formattedTs = Utilities.formatDate(ts, "GMT+7", "dd/MM/yyyy HH:mm:ss");
+    } else if (ts) {
+      formattedTs = String(ts);
+    }
+
+    return {
+      id:        row[0] || '',
+      timestamp: formattedTs,
+      email:     row[2] || '',
+      company:   row[3] || '',
+      position:  row[4] || '',
+      type:      row[5] || '',
+      status:    row[6] || '',
+      fileUrl:   row[7] || ''
+    };
+  }
+
   // ── Helper: ambil semua data (tanpa header) ───────────────
-  function _getAllRows(sheet) {
+  function _getAllRows(sheet, colCount) {
     var lastRow = sheet.getLastRow();
     if (lastRow <= 1) return []; // hanya header atau kosong
     
-    var range = sheet.getRange(2, 1, lastRow - 1, 5);
+    var range = sheet.getRange(2, 1, lastRow - 1, colCount || 5);
     return range.getValues();
   }
 
@@ -92,10 +180,85 @@ var SheetsDB = (function() {
       _addHeaders(sheet);
       Logger.log('Sheet "' + sheetName + '" berhasil dibuat.');
     } else {
-      Logger.log('Sheet "' + sheetName + '" sudah ada, skip inisialisasi.');
+      _addHeaders(sheet); // Update styling even if exists
+    }
+    
+    // Inisialisasi Sheet History jika belum ada
+    var historySheet = ss.getSheetByName('History');
+    if (!historySheet) {
+      historySheet = ss.insertSheet('History');
+      _formatHistorySheet(historySheet);
+    } else {
+      _formatHistorySheet(historySheet); // Refresh styling
     }
     
     return sheet;
+  }
+
+  /**
+   * insertHistory — Masukkan log history baru
+   */
+  function insertHistory(spreadsheetId, record) {
+    var sheet = _getSheet(spreadsheetId, 'History');
+    
+    // Format Waktu Indonesia (WIB) yang cantik
+    var now = new Date();
+    var formattedDate = Utilities.formatDate(now, "GMT+7", "dd/MM/yyyy HH:mm:ss");
+    
+    var row = [
+      record.id || Utils.generateId(),
+      formattedDate,
+      record.email || '',
+      record.company || '',
+      record.position || '',
+      record.type || 'CV',
+      record.status || 'Draft',
+      record.fileUrl || ''
+    ];
+    
+    sheet.appendRow(row);
+    
+    // Apply styling to the new row
+    var lastRow = sheet.getLastRow();
+    var newRange = sheet.getRange(lastRow, 1, 1, row.length);
+    newRange.setFontFamily('Inter').setFontSize(9).setVerticalAlignment('middle');
+    
+    // Alternating color
+    if (lastRow % 2 === 0) {
+      newRange.setBackground('#f8fafc');
+    }
+    
+    return true;
+  }
+
+  /**
+   * getHistory — Ambil semua history untuk email tertentu
+   */
+  function getHistory(spreadsheetId, email) {
+    var sheet = _getSheet(spreadsheetId, 'History');
+    var rows = _getAllRows(sheet, 8);
+    var emailLower = (email || '').toLowerCase().trim();
+    
+    return rows
+      .filter(function(row) { 
+        return emailLower === '' || (row[2] || '').toLowerCase().trim() === emailLower; 
+      })
+      .map(_historyRowToObject);
+  }
+
+  /**
+   * updateHistoryStatus — Update status history (misal "Terkirim")
+   */
+  function updateHistoryStatus(spreadsheetId, id, status) {
+    var sheet = _getSheet(spreadsheetId, 'History');
+    var rows = _getAllRows(sheet, 8);
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i][0] === id) {
+        sheet.getRange(i + 2, 7).setValue(status);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -236,7 +399,10 @@ var SheetsDB = (function() {
     findCVByEmail:    findCVByEmail,
     findCVById:       findCVById,
     getAllCVs:         getAllCVs,
-    deleteCVById:     deleteCVById
+    deleteCVById:     deleteCVById,
+    insertHistory:    insertHistory,
+    getHistory:       getHistory,
+    updateHistoryStatus: updateHistoryStatus
   };
 
 })();

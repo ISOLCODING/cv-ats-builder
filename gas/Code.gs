@@ -82,6 +82,18 @@ function doPost(e) {
       case 'deleteCV':
         response = handleDeleteCV(requestBody);
         break;
+
+      case 'saveToDrive':
+        response = handleSaveToDrive(requestBody);
+        break;
+      
+      case 'sendEmail':
+        response = handleSendEmail(requestBody);
+        break;
+      
+      case 'listHistory':
+        response = handleListHistory(requestBody);
+        break;
       
       default:
         response.message = 'Action tidak dikenal: ' + action;
@@ -296,3 +308,92 @@ function gsInitSheet() {
   SheetsDB.initializeSheets(SPREADSHEET_ID, SHEET_NAME_CVS);
   return { success: true, message: 'Sheet berhasil diinisialisasi' };
 }
+
+/**
+ * handleSaveToDrive — Simpan file PDF ke Drive
+ */
+function handleSaveToDrive(requestBody) {
+  // Support both flat params (fetch) and wrapped params (gsSaveToDrive)
+  var fileData = requestBody.fileData || requestBody;
+  var historyData = requestBody.historyData || requestBody;
+  
+  Utils.log('handleSaveToDrive: saving file ' + fileData.fileName + ' for user ' + fileData.userName);
+  
+  try {
+    var result = DriveDB.saveFile(
+      fileData.fileName, 
+      fileData.contentType, 
+      fileData.blobData, 
+      fileData.userName
+    );
+    
+    // Simpan ke history
+    SheetsDB.insertHistory(SPREADSHEET_ID, {
+      email: historyData.email || '',
+      company: historyData.company || 'Unknown',
+      position: historyData.position || '',
+      type: historyData.type || 'File',
+      status: 'Saved',
+      fileUrl: result.url
+    });
+    
+    return { success: true, message: 'File berhasil disimpan ke Drive', data: result };
+  } catch (e) {
+    Utils.log('handleSaveToDrive Error: ' + e.message);
+    return { success: false, message: 'Gagal simpan ke Drive: ' + e.message };
+  }
+}
+
+/**
+ * handleSendEmail — Kirim email lamaran via Gmail
+ */
+function handleSendEmail(requestBody) {
+  // Support both flat params (fetch) and wrapped params {options:...} (gsSendEmail)
+  var options = requestBody.options || requestBody; 
+  
+  Utils.log('handleSendEmail: sending to ' + options.to);
+  
+  try {
+    if (!options.to) {
+      throw new Error('Email tujuan (to) tidak ditemukan dalam request');
+    }
+    
+    var result = GmailDB.sendJobApplication(options);
+    
+    if (result.success) {
+      // LOG THE COMPLETED APPLICATION
+      SheetsDB.insertHistory(SPREADSHEET_ID, {
+        email: options.applicantEmail || options.to,
+        company: options.company || 'Unknown',
+        position: options.position || 'Unknown',
+        type: 'APPLICATION',
+        status: 'TERKIRIM',
+        fileUrl: 'Gmail (Terkirim)'
+      });
+    }
+    
+    return result;
+  } catch (e) {
+    Utils.log('handleSendEmail Error: ' + e.message);
+    return { success: false, message: 'Gagal kirim email: ' + e.message };
+  }
+}
+
+/**
+ * handleListHistory — List history pengiriman
+ */
+function handleListHistory(requestBody) {
+  var email = requestBody.email || requestBody.options?.email;
+  try {
+    var list = SheetsDB.getHistory(SPREADSHEET_ID, email);
+    return { success: true, data: list };
+  } catch (e) {
+    Utils.log('handleListHistory Error: ' + e.message);
+    return { success: false, message: 'Gagal ambil history: ' + e.message };
+  }
+}
+
+// Global functions for direct call
+function gsSaveToDrive(fileData, historyData) { return handleSaveToDrive({ fileData: fileData, historyData: historyData }); }
+function gsSendEmail(options) { return handleSendEmail({ options: options }); }
+function gsListHistory(email) { return handleListHistory({ email: email }); }
