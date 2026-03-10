@@ -57,7 +57,21 @@ const defaultCVData = {
     softSkills: [],   // string[]
     languages: [],    // string[]
   },
+  certifications: [], // { id, name, issuer, year, link }
+  projects: [],       // { id, name, description, techStack, link }
+  organizations: [],  // { id, name, role, period, contribution }
   summary: '',
+  selectedTemplate: 'standard_ats', // 'standard_ats' | 'modern_creative' | 'minimalist'
+};
+
+// Default Settings (Royal Branding)
+const defaultSettings = {
+  appName: 'CV Master',
+  appLogo: '', // Base64
+  favicon: '', // Base64
+  primaryColor: '#2563eb',
+  accentColor: '#f59e0b',
+  language: 'id', // 'id' | 'en'
 };
 
 // Default ATS result
@@ -91,6 +105,7 @@ const useCVStore = create(
         status: 'draft', // 'draft' | 'generated'
       },
       history: [], // [{ id, date, company, position, type: 'cv'|'letter' }]
+      appSettings: defaultSettings,
       isSaving: false,
       isLoading: false,
       savedCVId: null,
@@ -100,7 +115,7 @@ const useCVStore = create(
       setCurrentStep: (step) => set({ currentStep: step }),
       
       nextStep: () => set((state) => ({
-        currentStep: Math.min(8, state.currentStep + 1) // 8 steps total now
+        currentStep: Math.min(12, state.currentStep + 1) // 12 steps total now
       })),
       
       prevStep: () => set((state) => ({
@@ -109,6 +124,64 @@ const useCVStore = create(
 
       // ... existing methods (I'll use multi_replace for better precision if needed, but let's try to keep it clean)
       
+      // ── Settings ──────────────────────────────────────────
+      updateSettings: (settings) => set((state) => ({
+        appSettings: { ...state.appSettings, ...settings }
+      })),
+
+      // ── Language Toggle & Translator ──────────────────────
+      translateCVData: async (targetLang) => {
+        set({ isSaving: true });
+        try {
+          // Dynamic import of gemini to avoid cyclic issues or keep it light during initial load
+          const { translateCVContent } = await import('../services/gemini');
+          const state = get();
+          // Strip out base64 images or large payloads that don't need translation to save tokens
+          const cvDataToTranslate = { ...state.cvData };
+          if (cvDataToTranslate.personalInfo) {
+            cvDataToTranslate.personalInfo = {
+              ...cvDataToTranslate.personalInfo,
+              qrCodeData: '',
+              signature: ''
+            };
+          }
+
+          const result = await translateCVContent({
+            cvData: cvDataToTranslate,
+            coverLetter: state.coverLetter,
+            targetLang
+          });
+
+          // Replace translated fields while keeping non-translated intact like personalInfo
+          set((prev) => ({
+            cvData: {
+              ...prev.cvData,
+              summary: result.cvData.summary || prev.cvData.summary,
+              experiences: result.cvData.experiences || prev.cvData.experiences,
+              education: result.cvData.education || prev.cvData.education,
+              skills: result.cvData.skills || prev.cvData.skills,
+              certifications: result.cvData.certifications || prev.cvData.certifications,
+              projects: result.cvData.projects || prev.cvData.projects,
+              organizations: result.cvData.organizations || prev.cvData.organizations,
+            },
+            coverLetter: {
+              ...prev.coverLetter,
+              content: result.coverLetter || prev.coverLetter.content,
+            },
+            appSettings: {
+              ...prev.appSettings,
+              language: targetLang
+            }
+          }));
+
+          get().showToast('success', `Translasi CV ke bahasa ${targetLang.toUpperCase()} berhasil!`);
+        } catch (err) {
+          get().showToast('error', 'Gagal menerjemahkan konten: ' + err.message);
+        } finally {
+          set({ isSaving: false });
+        }
+      },
+
       // ── Personal Info ─────────────────────────────────────
       updatePersonalInfo: (info) => set((state) => ({
         cvData: {
@@ -175,6 +248,87 @@ const useCVStore = create(
         }
       })),
 
+      // ── Certifications ───────────────────────────────────
+      addCertification: (cert) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          certifications: [
+            ...state.cvData.certifications,
+            { id: generateId(), ...cert }
+          ]
+        }
+      })),
+
+      updateCertification: (id, data) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          certifications: state.cvData.certifications.map((c) =>
+            c.id === id ? { ...c, ...data } : c
+          )
+        }
+      })),
+
+      removeCertification: (id) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          certifications: state.cvData.certifications.filter((c) => c.id !== id)
+        }
+      })),
+
+      // ── Projects ──────────────────────────────────────────
+      addProject: (project) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          projects: [
+            ...state.cvData.projects,
+            { id: generateId(), ...project }
+          ]
+        }
+      })),
+
+      updateProject: (id, data) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          projects: state.cvData.projects.map((p) =>
+            p.id === id ? { ...p, ...data } : p
+          )
+        }
+      })),
+
+      removeProject: (id) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          projects: state.cvData.projects.filter((p) => p.id !== id)
+        }
+      })),
+
+      // ── Organizations ─────────────────────────────────────
+      addOrganization: (org) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          organizations: [
+            ...state.cvData.organizations,
+            { id: generateId(), ...org }
+          ]
+        }
+      })),
+
+      updateOrganization: (id, data) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          organizations: state.cvData.organizations.map((o) =>
+            o.id === id ? { ...o, ...data } : o
+          )
+        }
+      })),
+
+      removeOrganization: (id) => set((state) => ({
+        cvData: {
+          ...state.cvData,
+          organizations: state.cvData.organizations.filter((o) => o.id !== id)
+        }
+      })),
+
       // ── Skills ────────────────────────────────────────────
       addSkill: (category, skill) => set((state) => {
         const trimmed = skill.trim();
@@ -211,6 +365,10 @@ const useCVStore = create(
         cvData: { ...state.cvData, summary }
       })),
 
+      setTemplate: (templateId) => set((state) => ({
+        cvData: { ...state.cvData, selectedTemplate: templateId }
+      })),
+
       // ── Cover Letter ──────────────────────────────────────
       updateCoverLetter: (data) => set((state) => ({
         coverLetter: { ...state.coverLetter, ...data }
@@ -223,7 +381,12 @@ const useCVStore = create(
       // ── History ───────────────────────────────────────────
       setHistory: (history) => set({ history }),
       addToHistory: (entry) => set((state) => ({
-        history: [{ id: generateId(), date: new Date().toISOString(), ...entry }, ...state.history]
+        history: [{ id: generateId(), date: new Date().toISOString(), status: 'Terkirim', ...entry }, ...state.history]
+      })),
+      updateHistoryItem: (id, updates) => set((state) => ({
+        history: state.history.map((item) =>
+          item.id === id ? { ...item, ...updates } : item
+        )
       })),
 
       // ── Full CV Data ──────────────────────────────────────
@@ -290,6 +453,7 @@ const useCVStore = create(
         savedCVId: state.savedCVId,
         coverLetter: state.coverLetter,
         history: state.history,
+        appSettings: state.appSettings,
       }),
     }
 

@@ -1,323 +1,342 @@
 // src/components/preview/CVPreview.jsx
-// ============================================================
-// Live CV Preview — ATS-friendly, Times New Roman 12pt
-// Margin: 2.54cm (1 inch) semua sisi, text-align justify
-// ============================================================
-
 import React, { forwardRef } from 'react';
 import useCVStore from '../../store/useCVStore';
+import { getTranslation } from '../../utils/translations';
 
-// ── Format date YYYY-MM → "Jan 2022" ────────────────────────
-function formatDate(dateStr) {
+// ── Helpers ──────────────────────────────────────────────────
+function formatDate(dateStr, lang = 'id') {
   if (!dateStr) return '';
   const [year, month] = dateStr.split('-');
-  if (!year) return dateStr;
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-  const m = month ? months[parseInt(month) - 1] : '';
-  return m ? `${m} ${year}` : year;
+  const monthsId = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = lang === 'en' ? monthsEn : monthsId;
+  return month ? `${months[parseInt(month) - 1]} ${year}` : year;
 }
 
-// ── Render HTML dari TipTap ──────────────────────────────────
-function RichContent({ html }) {
+function RichContent({ html, isAts = true }) {
   if (!html?.trim()) return null;
-  const isHTML = /<[a-z][\s\S]*>/i.test(html);
-  if (!isHTML) {
-    return (
-      <p style={pStyle}>{html}</p>
-    );
-  }
   return (
-    <div
+    <div 
+      className={`cv-rich ${isAts ? 'font-times' : 'font-sans'}`}
       dangerouslySetInnerHTML={{ __html: html }}
-      style={{ fontSize: 'inherit', lineHeight: 'inherit', color: 'inherit' }}
-      className="cv-rich"
     />
   );
 }
 
-// ── Base typography constants ────────────────────────────────
-const FONT = "'Times New Roman', Times, serif";
-const SIZE = '12pt';
-const COLOR = '#000000';
-const LINE_H = '1.5';
+// ── Shared Sub-Components for Preview ────────────────────────
 
-// Teks biasa (justify)
-const pStyle = {
-  margin: '0 0 4px 0',
-  fontSize: SIZE,
-  fontFamily: FONT,
-  color: COLOR,
-  lineHeight: LINE_H,
-  textAlign: 'justify',
+const SectionHeader = ({ title, template = 'ats' }) => {
+  if (template === 'ats') {
+    return <h2 className="text-[12pt] font-bold uppercase border-b border-black mb-2 mt-4">{title}</h2>;
+  }
+  if (template === 'creative') {
+    return <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 border-b-2 border-blue-500 pb-1 inline-block mb-4 mt-8">{title}</h2>;
+  }
+  return <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 border-t border-slate-100 pt-8 mb-6 text-center">{title}</h3>;
 };
 
-// ── Section Header ───────────────────────────────────────────
-function CVSection({ title, children }) {
-  if (!children) return null;
+// ── Template Views ──────────────────────────────────────────
+
+const StandardATSView = ({ data, lang }) => {
+  const { personalInfo: info, experiences, education, skills, certifications, projects, organizations, summary } = data;
   return (
-    <div style={{ marginBottom: '16px' }}>
-      <h2 style={{
-        fontSize: '12pt',
-        fontFamily: FONT,
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-        letterSpacing: '0.04em',
-        borderBottom: '1.5px solid #000',
-        paddingBottom: '2px',
-        marginBottom: '8px',
-        marginTop: '0',
-        color: '#000',
-      }}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  );
-}
-
-// ── Header: Nama & Kontak ────────────────────────────────────
-function CVHeader({ info }) {
-  if (!info) return null;
-  const { name, email, phone, linkedin, location, website, qrCodeData } = info;
-
-  const contactsLine1 = [email, phone, location].filter(Boolean).join('  |  ');
-  const contactsLine2 = [
-    linkedin && (linkedin.startsWith('http')
-      ? linkedin.replace('https://www.', '').replace('https://', '')
-      : linkedin),
-    website && (website.startsWith('http')
-      ? website.replace('https://', '')
-      : website),
-  ].filter(Boolean).join('  |  ');
-
-  return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '18px',
-      paddingBottom: '12px',
-      borderBottom: '1.5px solid #000',
-    }}>
-      <div style={{ flex: 1, textAlign: 'left' }}>
-        <h1 style={{
-          fontSize: '16pt',
-          fontFamily: FONT,
-          fontWeight: 'bold',
-          margin: '0 0 4px 0',
-          color: '#000',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-        }}>
-          {name || 'Nama Anda'}
-        </h1>
-        <p style={{ fontSize: '10pt', color: '#222', margin: '0', lineHeight: '1.4' }}>
-          {contactsLine1}
-        </p>
-        {contactsLine2 && (
-          <p style={{ fontSize: '10pt', color: '#222', margin: '0', lineHeight: '1.4' }}>
-            {contactsLine2}
-          </p>
+    <div className="p-[80px] bg-white text-black font-times text-[11pt] leading-[1.4] min-h-[1123px]">
+      <div className="border-b-[1.5pt] border-black pb-3 mb-6 text-center">
+        <h1 className="text-[18pt] font-bold uppercase tracking-widest leading-none mb-2">{info.name || 'NAMA ANDA'}</h1>
+        <p className="text-[9pt]">{[info.email, info.phone, info.location].filter(Boolean).join('  |  ')}</p>
+        {[info.website, info.linkedin].some(Boolean) && (
+          <p className="text-[9pt] mt-1">{[info.linkedin, info.website].filter(Boolean).join('  |  ')}</p>
         )}
       </div>
+      
+      {summary && (
+        <div className="mb-4">
+          <SectionHeader title={getTranslation(lang, 'sec.summary')} template="ats" />
+          <RichContent html={summary} isAts={true} />
+        </div>
+      )}
 
-      {qrCodeData && (
-        <div style={{ marginLeft: '15px' }}>
-          <img
-            src={qrCodeData}
-            alt="QR Code"
-            style={{ width: '60px', height: '60px' }}
-          />
+      {experiences?.length > 0 && (
+        <div className="mb-4">
+          <SectionHeader title={getTranslation(lang, 'sec.experience')} template="ats" />
+          {experiences.map((exp, i) => (
+            <div key={i} className="mb-4">
+              <div className="flex justify-between items-baseline font-bold text-[11pt]">
+                <span>{exp.position}</span>
+                <span className="font-normal">{formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : formatDate(exp.endDate, lang)}</span>
+              </div>
+              <p className="italic mb-1">{exp.company}</p>
+              <RichContent html={exp.description} isAts={true} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {education?.length > 0 && (
+        <div className="mb-4">
+          <SectionHeader title={getTranslation(lang, 'sec.education')} template="ats" />
+          {education.map((edu, i) => (
+            <div key={i} className="mb-3">
+              <div className="flex justify-between items-baseline font-bold text-[11pt]">
+                <span>{edu.degree} {edu.field ? `- ${edu.field}` : ''}</span>
+                <span className="font-normal text-[10pt]">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
+              </div>
+              <p className="italic text-[11pt]">{edu.institution}</p>
+              {edu.gpa && <p className="text-[10pt]">GPA: {edu.gpa}</p>}
+              {edu.link && <p className="text-[9pt] text-blue-600 underline">Sertifikat: {edu.link}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {certifications?.length > 0 && (
+        <div className="mb-4">
+          <SectionHeader title={getTranslation(lang, 'sec.certifications')} template="ats" />
+          {certifications.map((c, i) => (
+            <div key={i} className="mb-2">
+              <div className="flex justify-between items-baseline font-bold">
+                <span>{c.name}</span>
+                <span className="font-normal">{c.year}</span>
+              </div>
+              <p className="text-[10pt]">{c.issuer}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {projects?.length > 0 && (
+        <div className="mb-4">
+          <SectionHeader title={getTranslation(lang, 'sec.projects')} template="ats" />
+          {projects.map((p, i) => (
+            <div key={i} className="mb-3">
+              <div className="flex justify-between items-baseline font-bold">
+                <span>{p.name}</span>
+                <span className="font-italic font-normal">{p.techStack}</span>
+              </div>
+              <RichContent html={p.description} isAts={true} />
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
-}
+};
 
-// ── Summary ──────────────────────────────────────────────────
-function CVSummary({ summary }) {
-  if (!summary?.trim()) return null;
-  return (
-    <CVSection title="Professional Summary">
-      <RichContent html={summary} />
-    </CVSection>
-  );
-}
-
-// ── Work Experience ──────────────────────────────────────────
-function CVExperience({ experiences }) {
-  if (!experiences?.length) return null;
-  return (
-    <CVSection title="Work Experience">
-      {experiences.map((exp, i) => {
-        const dateStr = exp.isCurrent
-          ? `${formatDate(exp.startDate)} – Sekarang`
-          : `${formatDate(exp.startDate)}${exp.endDate ? ` – ${formatDate(exp.endDate)}` : ''}`;
-        return (
-          <div key={exp.id || i} style={{ marginBottom: i < experiences.length - 1 ? '12px' : '0' }}>
-            {/* Posisi + tanggal */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <strong style={{ fontSize: SIZE, fontFamily: FONT, fontWeight: 'bold', color: COLOR }}>
-                {exp.position}
-              </strong>
-              <span style={{ fontSize: '11pt', fontFamily: FONT, color: '#333', whiteSpace: 'nowrap', marginLeft: '8px' }}>
-                {dateStr}
-              </span>
-            </div>
-            {/* Perusahaan */}
-            <p style={{ fontSize: SIZE, fontFamily: FONT, color: '#222', margin: '1px 0 4px 0', fontStyle: 'italic' }}>
-              {exp.company}
-            </p>
-            {/* Deskripsi */}
-            {exp.description && <RichContent html={exp.description} />}
-          </div>
-        );
-      })}
-    </CVSection>
-  );
-}
-
-// ── Education ────────────────────────────────────────────────
-function CVEducation({ education }) {
-  if (!education?.length) return null;
-  return (
-    <CVSection title="Education">
-      {education.map((edu, i) => (
-        <div key={edu.id || i} style={{ marginBottom: i < education.length - 1 ? '10px' : '0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <strong style={{ fontSize: SIZE, fontFamily: FONT, color: COLOR }}>
-              {edu.degree}{edu.field && `, ${edu.field}`}
-            </strong>
-            <span style={{ fontSize: '11pt', fontFamily: FONT, color: '#333' }}>
-              {formatDate(edu.startDate)}{edu.endDate && ` – ${formatDate(edu.endDate)}`}
-            </span>
-          </div>
-          <p style={{ fontSize: SIZE, fontFamily: FONT, color: '#222', margin: '1px 0', fontStyle: 'italic' }}>
-            {edu.institution}
-          </p>
-          {edu.gpa && (
-            <p style={{ fontSize: '11pt', fontFamily: FONT, color: '#333', margin: '2px 0' }}>
-              IPK / GPA: <strong>{edu.gpa}</strong>
-            </p>
-          )}
-          {edu.description && <RichContent html={edu.description} />}
-        </div>
-      ))}
-    </CVSection>
-  );
-}
-
-// ── Skills ───────────────────────────────────────────────────
-function CVSkills({ skills }) {
+const ModernCreativeView = ({ data, lang }) => {
+  const { personalInfo: info, experiences, education, skills, certifications, projects, organizations, summary } = data;
   const { technical = [], softSkills = [], languages = [] } = skills || {};
-  if (!technical.length && !softSkills.length && !languages.length) return null;
+
   return (
-    <CVSection title="Skills">
-      <div style={{ fontSize: SIZE, fontFamily: FONT, color: COLOR, lineHeight: '1.7' }}>
+    <div className="flex min-h-[1123px] bg-white font-sans text-slate-700 overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-[32%] bg-slate-50 border-r border-slate-200 p-8 flex flex-col gap-8">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 leading-tight mb-1">{info.name || 'Nama Anda'}</h1>
+          <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-6">
+            {experiences?.[0]?.position || 'Professional'}
+          </p>
+          {info.qrCodeData && <img src={info.qrCodeData} className="w-24 h-24 bg-white p-2 border border-slate-100 rounded-xl shadow-sm mb-6" alt="QR" />}
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-[9px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-200 pb-1">{getTranslation(lang, 'sec.contact', 'Kontak')}</h3>
+          {[
+            { label: getTranslation(lang, 'label.email', 'Email'), val: info.email },
+            { label: getTranslation(lang, 'label.phone', 'Telepon'), val: info.phone },
+            { label: getTranslation(lang, 'label.location', 'Lokasi'), val: info.location },
+            { label: getTranslation(lang, 'label.linkedin', 'LinkedIn'), val: info.linkedin },
+            { label: getTranslation(lang, 'label.portfolio', 'Portofolio'), val: info.website }
+          ].map(c => c.val && (
+            <div key={c.label}>
+              <p className="text-[7px] uppercase text-slate-400 font-bold mb-0.5">{c.label}</p>
+              <p className="text-[11px] break-all leading-snug">{c.val}</p>
+            </div>
+          ))}
+        </div>
+
         {technical.length > 0 && (
-          <p style={{ margin: '0 0 3px 0', textAlign: 'justify' }}>
-            <strong>Technical: </strong>{technical.join(', ')}
-          </p>
+          <div className="space-y-4">
+            <h3 className="text-[9px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-200 pb-1">{getTranslation(lang, 'sec.techskills', 'Keahlian Utama')}</h3>
+            <div className="flex flex-wrap gap-1.5">
+              {technical.map(s => (
+                <span key={s} className="px-2 py-1 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg shadow-sm">{s}</span>
+              ))}
+            </div>
+          </div>
         )}
-        {softSkills.length > 0 && (
-          <p style={{ margin: '0 0 3px 0', textAlign: 'justify' }}>
-            <strong>Soft Skills: </strong>{softSkills.join(', ')}
-          </p>
-        )}
+
         {languages.length > 0 && (
-          <p style={{ margin: '0', textAlign: 'justify' }}>
-            <strong>Bahasa: </strong>{languages.join(', ')}
-          </p>
+          <div className="space-y-4">
+            <h3 className="text-[9px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-200 pb-1">{getTranslation(lang, 'sec.languages', 'Bahasa')}</h3>
+            <div className="space-y-1">
+              {languages.map(l => <p key={l} className="text-[11px] font-medium">{l}</p>)}
+            </div>
+          </div>
         )}
       </div>
-    </CVSection>
+
+      {/* Main Container */}
+      <div className="flex-1 p-10 space-y-2">
+        {summary && (
+          <div className="space-y-3">
+            <SectionHeader title={getTranslation(lang, 'sec.summary')} template="creative" />
+            <div className="text-[13px] text-slate-600 leading-relaxed"><RichContent html={summary} isAts={false} /></div>
+          </div>
+        )}
+
+        {experiences?.length > 0 && (
+          <div className="space-y-6">
+            <SectionHeader title={getTranslation(lang, 'sec.experience')} template="creative" />
+            <div className="space-y-6">
+              {experiences.map((exp, i) => (
+                <div key={i} className="relative pl-6 border-l-2 border-blue-100 last:border-transparent">
+                  <div className="absolute w-3 h-3 rounded-full bg-blue-500 -left-[7.5px] top-1 shadow-md border-2 border-white"></div>
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="text-[14px] font-black text-slate-900 leading-tight">{exp.position}</h4>
+                    <span className="text-[9px] font-black text-slate-400 bg-slate-50 border border-slate-100 px-2 py-1 rounded-full uppercase tracking-tighter">
+                      {formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Sekarang') : formatDate(exp.endDate, lang)}
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-black text-blue-600 mb-2 uppercase tracking-wide">{exp.company}</p>
+                  <div className="text-[12px] leading-relaxed text-slate-600"><RichContent html={exp.description} isAts={false} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {education?.length > 0 && (
+          <div className="space-y-6">
+            <SectionHeader title={getTranslation(lang, 'sec.education')} template="creative" />
+            <div className="space-y-4">
+              {education.map((edu, i) => (
+                <div key={i} className="space-y-1.5">
+                  <div className="flex justify-between items-baseline">
+                    <h4 className="text-[13px] font-black text-slate-900">{edu.degree} {edu.field ? `di ${edu.field}` : ''}</h4>
+                    <span className="text-[10px] font-bold text-slate-400">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
+                  </div>
+                  <p className="text-[12px] font-bold text-slate-500 italic">{edu.institution}</p>
+                  {edu.gpa && <p className="text-[11px] text-slate-400 font-medium">GPA: {edu.gpa}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {projects?.length > 0 && (
+          <div className="space-y-6">
+            <SectionHeader title={getTranslation(lang, 'sec.projects')} template="creative" />
+            <div className="grid grid-cols-1 gap-4">
+              {projects.map((p, i) => (
+                <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex justify-between mb-2">
+                    <h4 className="text-[13px] font-black text-slate-900">{p.name}</h4>
+                    <span className="text-[9px] font-bold text-blue-500 uppercase">{p.techStack}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-600"><RichContent html={p.description} isAts={false} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
-}
+};
 
-// ── Main CVPreview ────────────────────────────────────────────
+const MinimalistView = ({ data, lang }) => {
+  const { personalInfo: info, experiences, education, skills, summary } = data;
+  return (
+    <div className="p-16 bg-white text-slate-600 font-sans text-sm leading-relaxed min-h-[1123px]">
+      <header className="text-center mb-16">
+        <h1 className="text-4xl font-light text-slate-900 tracking-tighter mb-4">{info.name || 'Nama Anda'}</h1>
+        <p className="text-[10px] text-slate-400 uppercase tracking-[0.5em] font-black">
+          {[info.email, info.phone, info.location].filter(Boolean).join('  •  ')}
+        </p>
+      </header>
+
+      {summary && (
+        <div className="mb-14 text-center max-w-xl mx-auto">
+          <div className="text-[15px] leading-relaxed text-slate-500 italic opacity-80 underline underline-offset-8 decoration-slate-100">
+            <RichContent html={summary} isAts={false} />
+          </div>
+        </div>
+      )}
+
+      {experiences?.length > 0 && (
+        <div className="mb-12">
+          <SectionHeader title={getTranslation(lang, 'sec.experience')} template="minimal" />
+          {experiences.map((exp, i) => (
+            <div key={i} className="mb-8 flex gap-12">
+              <div className="w-24 text-right shrink-0 mt-1">
+                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{formatDate(exp.startDate, lang)}</p>
+                <div className="h-4 w-[1px] bg-slate-100 mx-auto my-1 mr-0"></div>
+                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{exp.isCurrent ? getTranslation(lang, 'sec.present', 'Now') : formatDate(exp.endDate, lang)}</p>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-[16px] font-bold text-slate-900 mb-0.5">{exp.position}</h4>
+                <p className="text-xs text-slate-400 font-medium italic mb-3">{exp.company}</p>
+                <div className="text-[13px] text-slate-500"><RichContent html={exp.description} isAts={false} /></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {education?.length > 0 && (
+        <div className="mb-12">
+          <SectionHeader title={getTranslation(lang, 'sec.education')} template="minimal" />
+          <div className="grid grid-cols-2 gap-x-12 gap-y-8">
+            {education.map((edu, i) => (
+              <div key={i} className="space-y-1">
+                <h4 className="font-bold text-slate-900">{edu.degree}</h4>
+                <p className="text-xs text-slate-400">{edu.institution}</p>
+                <p className="text-[9px] font-black text-slate-300 uppercase">{formatDate(edu.startDate, lang)} — {formatDate(edu.endDate, lang)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Main CVPreview ──────────────────────────────────────────
 const CVPreview = forwardRef(function CVPreview(_, ref) {
-  const { cvData } = useCVStore();
-  const { personalInfo, summary, experiences, education, skills } = cvData;
+  const { cvData, appSettings } = useCVStore();
+  const template = cvData.selectedTemplate || 'standard_ats';
+  const lang = appSettings?.language || 'id';
 
-  const isEmpty =
-    !personalInfo?.name &&
-    !summary &&
-    !experiences?.length &&
-    !education?.length;
+  const isEmpty = !cvData.personalInfo?.name && !cvData.summary && !cvData.experiences?.length;
 
   return (
-    <div
-      ref={ref}
-      id="cv-preview-content"
-      style={{
-        // A4: 794px × 1123px @ 96dpi
-        width: '794px',
-        minHeight: '1123px',
-        backgroundColor: '#ffffff',
-        // Margin 2.54cm (1 inch) ≈ 96px pada 96dpi
-        padding: '96px 96px 96px 96px',
-        fontFamily: FONT,
-        fontSize: SIZE,
-        lineHeight: LINE_H,
-        color: COLOR,
-        boxSizing: 'border-box',
-      }}
-    >
-      {/* Scoped CSS untuk rich content dari TipTap */}
-      <style>{`
-        #cv-preview-content .cv-rich p {
-          margin: 0 0 3px 0;
-          font-size: 12pt;
-          font-family: 'Times New Roman', Times, serif;
-          color: #000;
-          line-height: 1.5;
-          text-align: justify;
-        }
-        #cv-preview-content .cv-rich ul,
-        #cv-preview-content .cv-rich ol {
-          margin: 2px 0 4px 0;
-          padding-left: 20px;
-          font-size: 12pt;
-          font-family: 'Times New Roman', Times, serif;
-          color: #000;
-          line-height: 1.5;
-        }
-        #cv-preview-content .cv-rich li {
-          margin-bottom: 2px;
-          text-align: justify;
-        }
-        #cv-preview-content .cv-rich ul  { list-style-type: disc; }
-        #cv-preview-content .cv-rich ol  { list-style-type: decimal; }
-        #cv-preview-content .cv-rich strong { font-weight: bold; }
-        #cv-preview-content .cv-rich em     { font-style: italic; }
-        #cv-preview-content .cv-rich u      { text-decoration: underline; }
-        #cv-preview-content .cv-rich *:last-child { margin-bottom: 0; }
-      `}</style>
-
+    <div ref={ref} id="cv-preview-content" className="w-[794px] min-h-[1123px] bg-white shadow-master relative">
       {isEmpty ? (
-        <div style={{
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          height: '500px', color: '#94a3b8', textAlign: 'center',
-          fontFamily: FONT,
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
-          <p style={{ fontSize: '14pt', fontWeight: 'bold', margin: '0 0 8px 0' }}>
-            CV Anda akan tampil di sini
-          </p>
-          <p style={{ fontSize: '11pt', margin: '0', color: '#aaa' }}>
-            Mulai isi form di sebelah kiri untuk melihat preview
-          </p>
+        <div className="flex flex-col items-center justify-center h-[1123px] bg-slate-50/50">
+          <div className="w-20 h-20 rounded-[2.5rem] bg-white shadow-indigo flex items-center justify-center mb-6">
+            <span className="text-4xl">📄</span>
+          </div>
+          <p className="font-black text-2xl text-slate-900 tracking-tight">Pratinjau CV</p>
+          <p className="text-sm font-bold text-slate-400 mt-2">Mulai isi data Anda di sisi kiri</p>
         </div>
       ) : (
-        <>
-            <CVHeader info={personalInfo} />
-          <CVSummary summary={summary} />
-          <CVSkills skills={skills} />
-          <CVExperience experiences={experiences} />
-          <CVEducation education={education} />
-        </>
+        <div className="animate-in fade-in duration-700">
+          {template === 'standard_ats' && <StandardATSView data={cvData} lang={lang} />}
+          {template === 'modern_creative' && <ModernCreativeView data={cvData} lang={lang} />}
+          {template === 'minimalist' && <MinimalistView data={cvData} lang={lang} />}
+        </div>
       )}
+
+      {/* Global Preview Styles */}
+      <style>{`
+        #cv-preview-content .font-times { font-family: 'Times New Roman', Times, serif; }
+        #cv-preview-content .font-sans { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        #cv-preview-content .cv-rich ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin: 0.5rem 0 !important; }
+        #cv-preview-content .cv-rich ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin: 0.5rem 0 !important; }
+        #cv-preview-content .cv-rich li { margin-bottom: 0.25rem !important; }
+        #cv-preview-content .cv-rich p { margin-bottom: 0.5rem !important; }
+        #cv-preview-content .cv-rich strong { font-weight: 700 !important; }
+      `}</style>
     </div>
   );
 });

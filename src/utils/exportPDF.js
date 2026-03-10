@@ -120,7 +120,7 @@ export function downloadAsText(cvData, fileName) {
 function buildPlainText(cvData) {
   if (!cvData) return '';
   const L = [];
-  const { personalInfo: p, summary, experiences, education, skills } = cvData;
+  const { personalInfo: p, summary, experiences, education, skills, certifications, projects, organizations } = cvData;
 
   if (p) {
     L.push(p.name || '');
@@ -164,6 +164,36 @@ function buildPlainText(cvData) {
     if (skills.technical?.length)  L.push(`Technical   : ${skills.technical.join(', ')}`);
     if (skills.softSkills?.length) L.push(`Soft Skills : ${skills.softSkills.join(', ')}`);
     if (skills.languages?.length)  L.push(`Bahasa      : ${skills.languages.join(', ')}`);
+  }
+  if (certifications?.length) {
+    L.push('CERTIFICATIONS');
+    L.push('-'.repeat(40));
+    certifications.forEach((c) => {
+      L.push(`${c.name} (${c.year})`);
+      L.push(`${c.issuer}${c.link ? ` | ${c.link}` : ''}`);
+      L.push('');
+    });
+  }
+  if (projects?.length) {
+    L.push('PROJECTS');
+    L.push('-'.repeat(40));
+    projects.forEach((p) => {
+      L.push(p.name);
+      if (p.techStack) L.push(`Tech Stack: ${p.techStack}`);
+      if (p.link) L.push(`Link: ${p.link}`);
+      if (p.description) L.push(p.description.replace(/<[^>]+>/g, ''));
+      L.push('');
+    });
+  }
+  if (organizations?.length) {
+    L.push('ORGANIZATIONS');
+    L.push('-'.repeat(40));
+    organizations.forEach((o) => {
+      L.push(`${o.name} — ${o.role}`);
+      L.push(o.period);
+      if (o.contribution) L.push(o.contribution.replace(/<[^>]+>/g, ''));
+      L.push('');
+    });
   }
   return L.join('\n');
 }

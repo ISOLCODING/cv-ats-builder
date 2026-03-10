@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
-import { generateCoverLetter } from '../../services/gemini';
+import { useGemini } from '../../hooks/useGemini';
 import RichEditor from '../ui/RichEditor';
 
 export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   const { cvData, coverLetter, updateCoverLetter, setCoverLetterContent, showToast } = useCVStore();
+  const { generateCoverLetterAI } = useGemini();
   const [generating, setGenerating] = useState(false);
 
   // Otomatis pindah preview ke 'Surat Lamaran' saat masuk step ini
@@ -22,7 +23,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
 
     setGenerating(true);
     try {
-      const content = await generateCoverLetter({
+      const content = await generateCoverLetterAI({
         cvData,
         tone: coverLetter.tone,
         jobPosition: coverLetter.jobPosition,

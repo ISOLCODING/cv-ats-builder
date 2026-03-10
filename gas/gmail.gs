@@ -21,11 +21,18 @@ var GmailDB = (function() {
     try {
       var attachments = [];
       attachmentIds.forEach(function(id) {
+        if (!id) return;
         try {
           var file = DriveApp.getFileById(id);
-          attachments.push(file.getAs(MimeType.PDF));
+          var blob = file.getBlob();
+          // Jika file belum PDF, coba konversi.
+          if (blob.getContentType() !== MimeType.PDF) {
+            blob = file.getAs(MimeType.PDF);
+          }
+          attachments.push(blob);
+          Utils.log('Attachment ditambahkan: ' + file.getName() + ' (' + id + ')');
         } catch (err) {
-          Utils.log('Gagal mengambil file attachment ID: ' + id);
+          Utils.log('Gagal mengambil file attachment ID: ' + id + '. Error: ' + err.message);
         }
       });
 
@@ -42,7 +49,7 @@ var GmailDB = (function() {
           'Halo ' + senderName + ',\n\nEmail lamaran Anda ke ' + (options.nameHRD || to) + ' telah berhasil dikirim.\n\nSubjek: ' + subject + '\nStatus: Terkirim\n\nTerima kasih telah menggunakan CV ATS Builder.');
       }
 
-      Utils.log('Email dikirim ke: ' + to);
+      Utils.log('handleSendEmail: sending to ' + options.to + ', attachments: ' + (options.attachmentIds ? options.attachmentIds.length : 0));
       return { success: true, message: 'Email berhasil dikirim ke ' + to };
     } catch (e) {
       Utils.log('GmailDB.sendJobApplication Error: ' + e.message);

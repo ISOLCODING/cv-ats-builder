@@ -37,87 +37,186 @@ var SheetsDB = (function() {
     return sheet;
   }
 
-  // ── Helper: tambah header row dengan Style Premium ──────────
+  // ── Helper: tambah header row untuk sheet CVs (Internal Data) ──────────
   function _addHeaders(sheet) {
-    var headers = ['ID LAMARAN', 'WAKTU INPUT', 'NAMA LENGKAP', 'EMAIL USER', 'DATA JSON'];
-    var headerRange = sheet.getRange(1, 1, 1, headers.length);
+    if (sheet.getName() === 'History') return; // History punya format sendiri
     
-    headerRange
-      .setValues([headers])
-      .setFontWeight('bold')
-      .setFontSize(11)
-      .setFontFamily('Montserrat')
-      .setBackground('#0f172a') // Slate 900
-      .setFontColor('#ffffff')
-      .setVerticalAlignment('middle')
-      .setHorizontalAlignment('center');
-    
-    sheet.setRowHeight(1, 40);
-    sheet.setFrozenRows(1);
-    
-    // Set lebar kolom profesional
-    sheet.setColumnWidth(1, 150); // id
-    sheet.setColumnWidth(2, 180); // timestamp
-    sheet.setColumnWidth(3, 220); // name
-    sheet.setColumnWidth(4, 250); // email
-    sheet.setColumnWidth(5, 300); // data
-  }
-
-  // ── Helper: Format History Sheet Premium ───────────────────
-  function _formatHistorySheet(sheet) {
-    var headers = ['ID', 'TANGGAL & WAKTU', 'EMAIL PELAMAR', 'PERUSAHAAN', 'POSISI', 'KATEGORI', 'STATUS', 'URL BERKAS'];
+    var headers = ['ID CV', 'WAKTU TERAKHIR', 'NAMA USER', 'EMAIL', 'DATA LENGKAP (JSON)'];
     var headerRange = sheet.getRange(1, 1, 1, headers.length);
     
     headerRange
       .setValues([headers])
       .setFontWeight('bold')
       .setFontSize(10)
-      .setFontFamily('Roboto')
+      .setFontFamily('Inter')
       .setBackground('#1e293b') // Slate 800
-      .setFontColor('#f8fafc');
+      .setFontColor('#ffffff')
+      .setVerticalAlignment('middle')
+      .setHorizontalAlignment('center');
     
     sheet.setRowHeight(1, 35);
     sheet.setFrozenRows(1);
     
-    // Column widths
-    var widths = [100, 180, 220, 200, 200, 120, 120, 300];
+    var widths = [120, 160, 200, 220, 400];
+    widths.forEach(function(w, i) {
+      sheet.setColumnWidth(i + 1, w);
+    });
+  }
+
+  // ── Helper: Format History Sheet Premium ───────────────────
+  function _formatHistorySheet(sheet) {
+    // 0. Clean the sheet first for professional reset
+    sheet.clear();
+    sheet.getRange(1, 1, 1000, 20).clearFormat().clearDataValidations();
+    
+    // 1. Setup Header Progress Tracker (Gold/Premium Theme)
+    sheet.getRange("A1:H1").merge().setValue("RECRUITMENT PROGRESS TRACKER 2026")
+      .setBackground("#ca8a04") // Gold
+      .setFontColor("#ffffff")
+      .setFontWeight("bold")
+      .setHorizontalAlignment("center")
+      .setVerticalAlignment("middle")
+      .setFontSize(14)
+      .setFontFamily("Inter");
+
+    var headers = ['No', 'Company', 'Position/Program', 'Job Type', 'Source (Reff)', 'Link Document', 'Apply Date', 'Progress (Status)', 'Applicant Email', 'UID'];
+    var headerRange = sheet.getRange(2, 1, 1, headers.length);
+    
+    headerRange
+      .setValues([headers])
+      .setFontWeight('bold')
+      .setFontSize(10)
+      .setFontFamily('Inter')
+      .setBackground('#0f172a') // Slate 900
+      .setFontColor('#ffffff')
+      .setVerticalAlignment('middle')
+      .setHorizontalAlignment('center');
+
+    // Atur Lebar Kolom (A-J)
+    var widths = [40, 180, 200, 100, 120, 150, 130, 140, 180, 120];
+    widths.forEach(function(w, i) {
+      sheet.setColumnWidth(i + 1, w);
+    });
+    
+    sheet.setRowHeight(1, 45);
+    sheet.setRowHeight(2, 40);
+    sheet.setFrozenRows(2);
+    
+    var widths = [40, 200, 220, 100, 130, 250, 120, 140, 10, 10];
     widths.forEach(function(w, i) {
       sheet.setColumnWidth(i + 1, w);
     });
 
-    // Conditional Formatting for Status
+    // 2. Setup Dashboard Widgets (Sidebar J - S)
+    _setupDashboardWidgets(sheet);
+
+    // 3. Validation & Conditional Formatting
+    _applyDataValidations(sheet);
     _applyStatusFormatting(sheet);
   }
 
-  function _applyStatusFormatting(sheet) {
-    var range = sheet.getRange("G2:G1000");
+  function _setupDashboardWidgets(sheet) {
+    var startCol = 10; // J
     
-    // Clean existing rules
+    // --- Widget 1: Summary Progress ---
+    var r1 = sheet.getRange(2, startCol, 1, 5);
+    r1.merge().setValue("SUMMARY PROGRESS").setBackground("#0f172a").setFontColor("#ffffff").setFontWeight("bold").setHorizontalAlignment("center").setFontSize(9);
+    
+    var sHeaders = ["On Process", "Declined", "Waiting", "Offering", "Total Apply"];
+    sheet.getRange(3, startCol, 1, 5).setValues([sHeaders]).setBackground("#f8fafc").setFontWeight("bold").setHorizontalAlignment("center").setFontSize(8).setBorder(true, true, true, true, true, true, "#e2e8f0", SpreadsheetApp.BorderStyle.SOLID);
+    
+    var sFormulas = [
+      '=COUNTIF(H3:H1000; "Interview")',
+      '=COUNTIF(H3:H1000; "Ditolak")',
+      '=COUNTIF(H3:H1000; "Terkirim")',
+      '=COUNTIF(H3:H1000; "Offering")',
+      '=COUNTA(B3:B1000)'
+    ];
+    sheet.getRange(4, startCol, 1, 5).setFormulas([sFormulas]).setBackground("#ffffff").setFontWeight("bold").setHorizontalAlignment("center").setFontSize(11);
+
+    // --- Widget 2: Job Type Overall ---
+    var r2 = sheet.getRange(6, startCol, 1, 5);
+    r2.merge().setValue("JOB TYPE OVERALL").setBackground("#334155").setFontColor("#ffffff").setFontWeight("bold").setHorizontalAlignment("center").setFontSize(9);
+    
+    var jHeaders = ["Fulltime", "Intern", "Contract", "MT", "Freelance"];
+    sheet.getRange(7, startCol, 1, 5).setValues([jHeaders]).setBackground("#f8fafc").setFontWeight("bold").setHorizontalAlignment("center").setFontSize(8);
+    
+    var jFormulas = [
+      '=COUNTIF(D3:D1000; "Fulltime")',
+      '=COUNTIF(D3:D1000; "Intern")',
+      '=COUNTIF(D3:D1000; "Contract")',
+      '=COUNTIF(D3:D1000; "MT")',
+      '=COUNTIF(D3:D1000; "Freelance")'
+    ];
+    sheet.getRange(8, startCol, 1, 5).setFormulas([jFormulas]).setBackground("#ffffff").setHorizontalAlignment("center").setFontWeight("bold");
+
+    // Padding & Border for Widgets
+    sheet.getRange(2, startCol, 7, 5).setBorder(true, true, true, true, null, null, "#cbd5e1", SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  }
+
+  function _applyDataValidations(sheet) {
+    // Tambahkan 'On Process' agar sinkron dengan backend
+    var statusRule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(['On Process', 'Terkirim', 'Interview', 'Assesment', 'Offering', 'Ditolak'], true)
+      .build();
+    sheet.getRange("H2:H1000").setDataValidation(statusRule);
+
+    var typeRule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(['Fulltime', 'Intern', 'Contract', 'MT', 'Freelance'], true)
+      .build();
+    sheet.getRange("D2:D1000").setDataValidation(typeRule);
+    
+    var reffRule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(['LinkedIn', 'Jobstreet', 'Glints', 'Job Fair', 'Website', 'Referral'], true)
+      .build();
+    sheet.getRange("E2:E1000").setDataValidation(reffRule);
+  }
+
+  function _applyStatusFormatting(sheet) {
+    var range = sheet.getRange("H2:H1000"); // Column H is STATUS now
+    
     sheet.clearConditionalFormatRules();
     
     var rules = [];
     
-    // Rule: Terkirim (Green)
-    rules.push(SpreadsheetApp.newConditionalFormatRule()
-      .whenTextEqualTo("TERKIRIM")
-      .setBackground("#dcfce7")
-      .setFontColor("#15803d")
-      .setRanges([range])
-      .build());
-
+    // Rule: TERKIRIM (Emerald)
     rules.push(SpreadsheetApp.newConditionalFormatRule()
       .whenTextEqualTo("Terkirim")
-      .setBackground("#dcfce7")
-      .setFontColor("#15803d")
+      .setBackground("#ecfdf5")
+      .setFontColor("#065f46")
       .setRanges([range])
       .build());
 
-    // Rule: Saved/Draft (Blue)
+    // Rule: ON PROCESS (Blue/Sky)
     rules.push(SpreadsheetApp.newConditionalFormatRule()
-      .whenTextContains("Saved")
-      .setBackground("#dbeafe")
-      .setFontColor("#1d4ed8")
+      .whenTextEqualTo("On Process")
+      .setBackground("#e0f2fe")
+      .setFontColor("#0369a1")
       .setRanges([range])
+      .build());
+
+    // Rule: INTERVIEW (Purple)
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo("Interview")
+      .setBackground("#f5f3ff")
+      .setFontColor("#5b21b6")
+      .setRanges([range])
+      .build());
+
+    // Rule: DITOLAK (Rose)
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo("Ditolak")
+      .setBackground("#fff1f2")
+      .setFontColor("#9f1239")
+      .setRanges([range])
+      .build());
+
+    // Alternate Row Colors for entire table
+    var tableRange = sheet.getRange("A2:I1000");
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenFormulaSatisfied("=MOD(ROW(),2)=0")
+      .setBackground("#f8fafc")
+      .setRanges([tableRange])
       .build());
 
     sheet.setConditionalFormatRules(rules);
@@ -135,32 +234,42 @@ var SheetsDB = (function() {
   }
 
   function _historyRowToObject(row) {
-    var ts = row[1];
-    // Jika data dari Sheets adalah objek Date, paksa ke string format Indo
-    var formattedTs = '';
-    if (ts instanceof Date) {
-      formattedTs = Utilities.formatDate(ts, "GMT+7", "dd/MM/yyyy HH:mm:ss");
-    } else if (ts) {
-      formattedTs = String(ts);
+    var rawDate = row[6];
+    var timestamp = '';
+    if (rawDate instanceof Date) {
+      timestamp = Utilities.formatDate(rawDate, "GMT+7", "dd/MM/yyyy HH:mm");
+    } else {
+      timestamp = String(rawDate || '');
     }
 
     return {
-      id:        row[0] || '',
-      timestamp: formattedTs,
-      email:     row[2] || '',
-      company:   row[3] || '',
-      position:  row[4] || '',
-      type:      row[5] || '',
-      status:    row[6] || '',
-      fileUrl:   row[7] || ''
+      no:        row[0] || '',
+      company:   row[1] || '',
+      position:  row[2] || '',
+      jobType:   row[3] || '',
+      source:    row[4] || '',
+      fileUrl:   row[5] || '',
+      timestamp: timestamp, // Using timestamp to match frontend
+      status:    row[7] || '',
+      email:     row[8] || '',
+      id:        row[9] || '' // UID (J)
     };
   }
 
   // ── Helper: ambil semua data (tanpa header) ───────────────
   function _getAllRows(sheet, colCount) {
     var lastRow = sheet.getLastRow();
-    if (lastRow <= 1) return []; // hanya header atau kosong
+    var sheetName = sheet.getName();
     
+    // History punya 2 baris header (Title + Header Labels)
+    if (sheetName === 'History') {
+      if (lastRow <= 2) return [];
+      var range = sheet.getRange(3, 1, lastRow - 2, colCount || 10);
+      return range.getValues();
+    }
+    
+    // Sheet lain (CVs) punya 1 baris header
+    if (lastRow <= 1) return [];
     var range = sheet.getRange(2, 1, lastRow - 1, colCount || 5);
     return range.getValues();
   }
@@ -173,26 +282,18 @@ var SheetsDB = (function() {
    */
   function initializeSheets(spreadsheetId, sheetName) {
     var ss = _getSpreadsheet(spreadsheetId);
-    var sheet = ss.getSheetByName(sheetName);
     
-    if (!sheet) {
-      sheet = ss.insertSheet(sheetName);
-      _addHeaders(sheet);
-      Logger.log('Sheet "' + sheetName + '" berhasil dibuat.');
-    } else {
-      _addHeaders(sheet); // Update styling even if exists
-    }
+    // 1. Setup CVs Sheet
+    var cvSheet = ss.getSheetByName('CVs');
+    if (!cvSheet) cvSheet = ss.insertSheet('CVs');
+    _addHeaders(cvSheet);
     
-    // Inisialisasi Sheet History jika belum ada
+    // 2. Setup History Sheet (Premium Tracker)
     var historySheet = ss.getSheetByName('History');
-    if (!historySheet) {
-      historySheet = ss.insertSheet('History');
-      _formatHistorySheet(historySheet);
-    } else {
-      _formatHistorySheet(historySheet); // Refresh styling
-    }
+    if (!historySheet) historySheet = ss.insertSheet('History');
+    _formatHistorySheet(historySheet);
     
-    return sheet;
+    return (sheetName === 'History') ? historySheet : cvSheet;
   }
 
   /**
@@ -201,31 +302,44 @@ var SheetsDB = (function() {
   function insertHistory(spreadsheetId, record) {
     var sheet = _getSheet(spreadsheetId, 'History');
     
-    // Format Waktu Indonesia (WIB) yang cantik
-    var now = new Date();
-    var formattedDate = Utilities.formatDate(now, "GMT+7", "dd/MM/yyyy HH:mm:ss");
+    // Cari baris terakhir khusus berdasarkan Kolom A agar tidak terpengaruh widget Dashboard di kolom kanan
+    var aValues = sheet.getRange("A:A").getValues();
+    var lastContentRow = 2; // Default jika kosong, data berawal di baris 3 (karena header di baris 1 & 2)
+    for (var i = aValues.length - 1; i >= 0; i--) {
+      if (aValues[i][0] !== "") {
+        lastContentRow = i + 1;
+        break;
+      }
+    }
     
+    var nextNo = lastContentRow >= 2 ? (lastContentRow - 1) : 1; 
+    var formattedDate = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm");
+
+    // Susun row data (10 kolom lengkap)
     var row = [
-      record.id || Utils.generateId(),
-      formattedDate,
-      record.email || '',
-      record.company || '',
-      record.position || '',
-      record.type || 'CV',
-      record.status || 'Draft',
-      record.fileUrl || ''
+      nextNo,                          // Kolom A: No
+      record.company || '',           // Kolom B: Perusahaan
+      record.position || '',          // Kolom C: Posisi
+      record.jobType || '',           // Kolom D: Jenis Pekerjaan
+      record.source || '',            // Kolom E: Sumber Loker
+      record.fileUrl || '',           // Kolom F: Link Dokumen
+      formattedDate,                  // Kolom G: Tanggal (WIB)
+      record.status || 'Terkirim',    // Kolom H: Status Terbaru
+      record.email || '',             // Kolom I: Email Pelamar
+      record.id || Utils.generateId()  // Kolom J: UID Unik
     ];
     
-    sheet.appendRow(row);
+    var currentRow = lastContentRow + 1;
+    sheet.getRange(currentRow, 1, 1, row.length).setValues([row]);
     
     // Apply styling to the new row
-    var lastRow = sheet.getLastRow();
-    var newRange = sheet.getRange(lastRow, 1, 1, row.length);
+    // Apply styling to the new row
+    var newRange = sheet.getRange(currentRow, 1, 1, row.length);
     newRange.setFontFamily('Inter').setFontSize(9).setVerticalAlignment('middle');
     
-    // Alternating color
-    if (lastRow % 2 === 0) {
-      newRange.setBackground('#f8fafc');
+    // Alternate Row Colors for table area only (A-H)
+    if (currentRow % 2 === 0) {
+      sheet.getRange(currentRow, 1, 1, 8).setBackground('#f8fafc');
     }
     
     return true;
@@ -236,12 +350,12 @@ var SheetsDB = (function() {
    */
   function getHistory(spreadsheetId, email) {
     var sheet = _getSheet(spreadsheetId, 'History');
-    var rows = _getAllRows(sheet, 8);
+    var rows = _getAllRows(sheet, 10); // Now 10 columns
     var emailLower = (email || '').toLowerCase().trim();
     
     return rows
       .filter(function(row) { 
-        return emailLower === '' || (row[2] || '').toLowerCase().trim() === emailLower; 
+        return emailLower === '' || (row[8] || '').toLowerCase().trim() === emailLower; 
       })
       .map(_historyRowToObject);
   }
@@ -251,10 +365,11 @@ var SheetsDB = (function() {
    */
   function updateHistoryStatus(spreadsheetId, id, status) {
     var sheet = _getSheet(spreadsheetId, 'History');
-    var rows = _getAllRows(sheet, 8);
+    var rows = _getAllRows(sheet, 10); // Now looking at 10 columns
     for (var i = 0; i < rows.length; i++) {
-      if (rows[i][0] === id) {
-        sheet.getRange(i + 2, 7).setValue(status);
+      // UID is column J (index 9)
+      if (rows[i][9] === id) { 
+        sheet.getRange(i + 3, 8).setValue(status); // Column H
         return true;
       }
     }
@@ -391,9 +506,22 @@ var SheetsDB = (function() {
     return false;
   }
 
+  /**
+   * fixLayout — Force refresh layout jika berantakan
+   */
+  function fixLayout(spreadsheetId) {
+    var ss = _getSpreadsheet(spreadsheetId);
+    var historySheet = ss.getSheetByName('History');
+    if (historySheet) _formatHistorySheet(historySheet);
+    var cvSheet = ss.getSheetByName('CVs');
+    if (cvSheet) _addHeaders(cvSheet);
+    return true;
+  }
+
   // ── Expose public methods ─────────────────────────────────
   return {
     initializeSheets: initializeSheets,
+    fixLayout:        fixLayout,
     insertCV:         insertCV,
     updateCV:         updateCV,
     findCVByEmail:    findCVByEmail,
@@ -404,5 +532,6 @@ var SheetsDB = (function() {
     getHistory:       getHistory,
     updateHistoryStatus: updateHistoryStatus
   };
+
 
 })();

@@ -95,6 +95,18 @@ function doPost(e) {
         response = handleListHistory(requestBody);
         break;
       
+      case 'updateStatus':
+        response = handleUpdateStatus(requestBody);
+        break;
+
+      case 'callGemini':
+        response = gsCallGemini(requestBody.prompt, requestBody.isJson);
+        break;
+      
+      case 'resetHistory':
+        response = handleResetHistory(requestBody);
+        break;
+      
       default:
         response.message = 'Action tidak dikenal: ' + action;
     }
@@ -105,10 +117,18 @@ function doPost(e) {
     Utils.log('doPost error: ' + error.message + '\n' + error.stack);
   }
 
-  // Return JSON response
-  return ContentService
-    .createTextOutput(JSON.stringify(response))
+  // Return JSON response as TEXT with CORS Header (GAS fix for localhost)
+  return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * doOptions — Handle Preflight Request (CORS)
+ */
+function doOptions(e) {
+  // CORS is automatically handled by GAS infrastructure
+  return ContentService.createTextOutput("OK")
+    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 // ─── HANDLERS ────────────────────────────────────────────────
@@ -310,6 +330,28 @@ function gsInitSheet() {
 }
 
 /**
+ * gsResetHistory — Reset layout dan bersihkan history (panggil via tab pengaturan/fitur)
+ */
+function gsResetHistory() {
+  return handleResetHistory({});
+}
+
+function handleResetHistory(requestBody) {
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ss.getSheetByName('History');
+    if (sheet) {
+      SheetsDB.fixLayout(SPREADSHEET_ID);
+      Utils.log('History sheet reset and reformatted.');
+      return { success: true, message: 'Tab History berhasil dibersihkan dan diformat ulang!' };
+    }
+    return { success: false, message: 'Tab History tidak ditemukan' };
+  } catch (e) {
+    return { success: false, message: 'Error reset history: ' + e.message };
+  }
+}
+
+/**
  * handleSaveToDrive — Simpan file PDF ke Drive
  */
 function handleSaveToDrive(requestBody) {
@@ -327,14 +369,16 @@ function handleSaveToDrive(requestBody) {
       fileData.userName
     );
     
-    // Simpan ke history
+    // Simpan ke history dengan skema baru
     SheetsDB.insertHistory(SPREADSHEET_ID, {
       email: historyData.email || '',
       company: historyData.company || 'Unknown',
       position: historyData.position || '',
-      type: historyData.type || 'File',
-      status: 'Saved',
-      fileUrl: result.url
+      jobType: historyData.jobType || 'Document',
+      source: historyData.source || 'Drive',
+      status: 'On Process',
+      fileUrl: result?.url || '#',
+      id: result?.id || Utils.generateId()
     });
     
     return { success: true, message: 'File berhasil disimpan ke Drive', data: result };
@@ -351,7 +395,7 @@ function handleSendEmail(requestBody) {
   // Support both flat params (fetch) and wrapped params {options:...} (gsSendEmail)
   var options = requestBody.options || requestBody; 
   
-  Utils.log('handleSendEmail: sending to ' + options.to);
+  Utils.log('handleSendEmail: sending to ' + options.to + ', attachments count: ' + (options.attachmentIds ? options.attachmentIds.length : 0));
   
   try {
     if (!options.to) {
@@ -366,9 +410,11 @@ function handleSendEmail(requestBody) {
         email: options.applicantEmail || options.to,
         company: options.company || 'Unknown',
         position: options.position || 'Unknown',
-        type: 'APPLICATION',
-        status: 'TERKIRIM',
-        fileUrl: 'Gmail (Terkirim)'
+        jobType: options.jobType || 'Fulltime',
+        source: options.source || 'Direct',
+        status: 'Terkirim',
+        fileUrl: 'Gmail (Terkirim)',
+        id: Utils.generateId()
       });
     }
     
@@ -393,7 +439,31 @@ function handleListHistory(requestBody) {
   }
 }
 
+/**
+ * handleUpdateStatus — Update status lamaran di Sheets
+ */
+function handleUpdateStatus(requestBody) {
+  var id = requestBody.id;
+  var status = requestBody.status;
+  
+  if (!id || !status) {
+    return { success: false, message: 'ID dan Status wajib diisi' };
+  }
+  
+  try {
+    var updated = SheetsDB.updateHistoryStatus(SPREADSHEET_ID, id, status);
+    if (updated) {
+      return { success: true, message: 'Status berhasil diperbarui di Sheets' };
+    } else {
+      return { success: false, message: 'History ID tidak ditemukan di Sheets' };
+    }
+  } catch (e) {
+    return { success: false, message: 'Error update status: ' + e.message };
+  }
+}
+
 // Global functions for direct call
 function gsSaveToDrive(fileData, historyData) { return handleSaveToDrive({ fileData: fileData, historyData: historyData }); }
 function gsSendEmail(options) { return handleSendEmail({ options: options }); }
 function gsListHistory(email) { return handleListHistory({ email: email }); }
+function gsUpdateStatus(id, status) { return handleUpdateStatus({ id: id, status: status }); }

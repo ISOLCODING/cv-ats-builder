@@ -96,7 +96,7 @@ function SkillTagInput({ category, skills = [], onAdd, onRemove }) {
   };
 
   return (
-    <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-3 hover:border-blue-200 transition-colors">
+    <div className="p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm space-y-4 hover:border-blue-200 hover:shadow-indigo transition-all duration-300 group/skill">
       {/* Category header */}
       <div className="flex items-center gap-2.5">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${cfg.colors.bg}`}>
@@ -253,7 +253,7 @@ export default function SkillsForm({ onNext, onBack }) {
           Kembali
         </Button>
         <Button onClick={onNext} rightIcon={<ChevronRight className="w-4 h-4" />}>
-          Lanjut: Summary & ATS Check
+          Lanjut: Sertifikasi
         </Button>
       </div>
     </div>

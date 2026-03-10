@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   GraduationCap, Plus, Trash2, Pencil, ChevronRight,
-  ChevronLeft, BookOpen, Calendar, Award, CheckCircle2
+  ChevronLeft, BookOpen, Calendar, Award, CheckCircle2,
+  ExternalLink, Link as LinkIcon
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
@@ -56,9 +57,9 @@ function EmptyEducation({ onAdd }) {
 function EducationCard({ edu, onEdit, onDelete }) {
   const dateStr = `${fmtDate(edu.startDate)}${edu.endDate ? ` – ${fmtDate(edu.endDate)}` : ''}`;
   return (
-    <div className="entry-card flex gap-3 group animate-fade-up">
-      <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <GraduationCap className="w-4.5 h-4.5 text-blue-600" />
+    <div className="entry-card group animate-fade-up">
+      <div className="entry-card-icon">
+        <GraduationCap className="w-5 h-5 text-blue-600" />
       </div>
 
       <div className="flex-1 min-w-0">
@@ -90,7 +91,18 @@ function EducationCard({ edu, onEdit, onDelete }) {
             )}
           </div>
 
-          <div className="flex gap-1 flex-shrink-0">
+          <div className="flex gap-1 flex-shrink-0 items-start">
+            {edu.link && (
+              <a 
+                href={edu.link} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="btn btn-ghost btn-icon w-8 h-8 text-blue-500 hover:bg-blue-50"
+                title="Lihat Sertifikat"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
             <button type="button" onClick={onEdit} className="btn btn-secondary btn-icon w-8 h-8">
               <Pencil className="w-3.5 h-3.5" />
             </button>
@@ -107,12 +119,17 @@ function EducationCard({ edu, onEdit, onDelete }) {
 // ── Education entry form ───────────────────────────────────────
 function EducationEntryForm({ initial = null, onSave, onCancel }) {
   const isEdit = !!initial;
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
     defaultValues: initial || {
       institution: '', degree: 'D4/S1', field: '',
       startDate: '', endDate: '', gpa: '', description: '',
+      link: '',
     },
   });
+
+  const selectedDegree = watch('degree');
+  const isNonFormal = selectedDegree === 'Bootcamp' || selectedDegree === 'Sertifikasi';
+
   const [desc, setDesc] = useState(initial?.description || '');
 
   const onSubmit = (data) => {
@@ -139,9 +156,11 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
 
         {/* Field of study */}
         <div className="space-y-1.5">
-          <label className="form-label">Jurusan / Bidang Studi</label>
+          <label className="form-label">
+            {isNonFormal ? 'Bidang Keahlian / Program' : 'Jurusan / Bidang Studi'}
+          </label>
           <input
-            placeholder="Teknik Informatika, Manajemen, dll."
+            placeholder={isNonFormal ? 'Contoh: Fullstack Web, UX Design' : 'Teknik Informatika, Manajemen, dll.'}
             {...register('field')}
             className="form-input"
           />
@@ -149,12 +168,14 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
 
         {/* Institution */}
         <div className="sm:col-span-2 space-y-1.5">
-          <label className="form-label">Nama Institusi <span className="text-red-500">*</span></label>
+          <label className="form-label">
+            {isNonFormal ? 'Platform / Penyelenggara' : 'Nama Institusi'} <span className="text-red-500">*</span>
+          </label>
           <div className="relative">
             <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
             <input
-              placeholder="Universitas Indonesia, SMK Negeri 1, Dicoding, dll."
-              {...register('institution', { required: 'Institusi wajib diisi' })}
+              placeholder={isNonFormal ? 'Contoh: Dicoding, Coursera, Udemy' : 'Universitas Indonesia, SMK Negeri 1, dll.'}
+              {...register('institution', { required: 'Wajib diisi' })}
               className={`form-input pl-10 ${errors.institution ? 'form-input-error' : ''}`}
             />
           </div>
@@ -175,24 +196,36 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
 
         {/* GPA */}
         <div className="space-y-1.5">
-          <label className="form-label">IPK / Nilai Akhir</label>
+          <label className="form-label">
+            {isNonFormal ? 'Skor / Predikat (Opsional)' : 'IPK / Nilai Akhir'}
+          </label>
           <div className="relative">
             <Award className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
             <input
-              type="number"
-              step="0.01"
-              min="0" max="4"
-              placeholder="3.85"
-              {...register('gpa', {
-                min: { value: 0, message: 'Minimal 0' },
-                max: { value: 4, message: 'Skala 4.0' },
-              })}
-              className={`form-input pl-10 ${errors.gpa ? 'form-input-error' : ''}`}
+              placeholder={isNonFormal ? 'Contoh: 90 / Distinction' : '3.85'}
+              {...register('gpa')}
+              className="form-input pl-10"
             />
           </div>
-          {errors.gpa && <p className="form-error">{errors.gpa.message}</p>}
-          <p className="form-helper">Skala 4.0. Kosongkan jika tidak ingin ditampilkan.</p>
+          <p className="form-helper">
+            {isNonFormal ? 'Skor ujian atau predikat kelulusan.' : 'Skala 4.0. Kosongkan jika tidak ingin ditampilkan.'}
+          </p>
         </div>
+
+        {/* Link Sertifikat (Only for non-formal) */}
+        {isNonFormal && (
+          <div className="space-y-1.5">
+            <label className="form-label">Link Sertifikat (URL)</label>
+            <div className="relative">
+              <LinkIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400" />
+              <input
+                placeholder="https://credential.com/..."
+                {...register('link')}
+                className="form-input pl-10"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Description TipTap */}
@@ -278,9 +311,9 @@ export default function EducationForm({ onNext, onBack }) {
                 <button
                   type="button"
                   onClick={() => setShowForm(true)}
-                  className="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-sm text-blue-500 font-medium hover:border-blue-400 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                  className="btn-add-dashed"
                 >
-                  <Plus className="w-4 h-4" /> Tambah Pendidikan Lagi
+                  <Plus className="w-5 h-5" /> TAMBAH PENDIDIKAN LAGI
                 </button>
               )}
             </div>

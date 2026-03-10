@@ -18,6 +18,7 @@
     "gas:deploy": "clasp deploy --description \"Deploy $(date +%Y-%m-%d)\""
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@react-pdf/renderer": "^4.3.2",
     "@tiptap/extension-bullet-list": "^3.20.0",
     "@tiptap/extension-character-count": "^3.20.0",
@@ -31,9 +32,11 @@
     "@tiptap/starter-kit": "^3.20.0",
     "buffer": "^6.0.3",
     "framer-motion": "^12.34.3",
+    "gsap": "^3.14.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "lucide-react": "^0.303.0",
+    "pdfjs-dist": "^5.5.207",
     "qrcode": "^1.5.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

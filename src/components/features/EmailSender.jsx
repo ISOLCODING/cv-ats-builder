@@ -1,6 +1,6 @@
 // src/components/features/EmailSender.jsx
 import React, { useState } from 'react';
-import { Send, Cloud, FileCode, CheckCircle2, ChevronLeft, Mail, User, Building, StickyNote, Eye, Building2, AlertTriangle } from 'lucide-react';
+import { Send, Cloud, FileCode, CheckCircle2, ChevronLeft, Mail, User, Building, StickyNote, Eye, Building2, AlertTriangle, Lightbulb } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
 import { useGAS } from '../../hooks/useGAS';
@@ -18,7 +18,9 @@ export default function EmailSender({ onBack }) {
     hrdName: coverLetter.hrdName || '',
     company: coverLetter.company || '',
     subject: `Lamaran Pekerjaan - ${coverLetter.jobPosition} - ${cvData.personalInfo.name}`,
-    intro: `Halo ${coverLetter.hrdName ? `Bapak/Ibu ${coverLetter.hrdName}` : 'Bapak/Ibu HRD'},\n\nSaya bermaksud menyampaikan lamaran pekerjaan untuk posisi ${coverLetter.jobPosition}. Terlampir saya sampaikan CV dan Surat Lamaran saya.\n\nTerima kasih.`
+    intro: `Halo ${coverLetter.hrdName ? `Bapak/Ibu ${coverLetter.hrdName}` : 'Bapak/Ibu HRD'},\n\nSaya bermaksud menyampaikan lamaran pekerjaan untuk posisi ${coverLetter.jobPosition}. Terlampir saya sampaikan CV dan Surat Lamaran saya.\n\nTerima kasih.`,
+    jobType: 'Fulltime',
+    source: 'LinkedIn'
   });
 
   const { updateCoverLetter } = useCVStore();
@@ -116,24 +118,31 @@ export default function EmailSender({ onBack }) {
         subject: emailInfo.subject,
         body: emailInfo.intro,
         senderName: cvData.personalInfo.name,
-        attachmentIds: [cvRes.data.id, letterRes.data.id],
+        // Gunakan optional chaining agar tidak crash jika data/id undefined (local dev mode)
+        attachmentIds: [cvRes?.data?.id, letterRes?.data?.id].filter(Boolean),
         // Metadata tambahan untuk logging lengkap di Sheets
         applicantEmail: cvData.personalInfo.email,
         company: emailInfo.company,
-        position: coverLetter.jobPosition
+        position: coverLetter.jobPosition,
+        jobType: emailInfo.jobType,
+        source: emailInfo.source
       };
 
       const res = await callGAS('sendEmail', emailOptions);
-      if (res.success) {
+      if (res?.success) {
         showToast('success', 'Email Lamaran & Lampiran Berhasil Terkirim!');
         addToHistory({
+          name: cvData.personalInfo.name,
+          email: cvData.personalInfo.email,
           company: emailInfo.company || emailInfo.hrdName || emailInfo.hrdEmail,
           position: coverLetter.jobPosition,
+          jobType: emailInfo.jobType,
+          source: emailInfo.source,
           type: 'Application',
           status: 'Terkirim'
         });
       } else {
-        throw new Error(res.message);
+        throw new Error(res?.message || 'Gagal mengirim email. Periksa koneksi atau kuota Gmail harian Anda.');
       }
     } catch (error) {
       showToast('error', 'Gagal kirim: ' + error.message);
@@ -202,9 +211,39 @@ export default function EmailSender({ onBack }) {
                     hrdName: val,
                     intro: `Halo ${val ? `Bapak/Ibu ${val}` : 'Bapak/Ibu HRD'},\n\nSaya bermaksud menyampaikan lamaran pekerjaan untuk posisi ${coverLetter.jobPosition}. Terlampir saya sampaikan CV dan Surat Lamaran saya.\n\nTerima kasih.`
                   }));
-                  updateCoverLetter({ hrdName: val });
                 }}
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipe Pekerjaan</label>
+                <select
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500/20"
+                  value={emailInfo.jobType}
+                  onChange={(e) => setEmailInfo({ ...emailInfo, jobType: e.target.value })}
+                >
+                  <option value="Fulltime">Fulltime</option>
+                  <option value="Intern">Intern</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Freelance">Freelance</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sumber Info</label>
+                <select
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500/20"
+                  value={emailInfo.source}
+                  onChange={(e) => setEmailInfo({ ...emailInfo, source: e.target.value })}
+                >
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Jobstreet">Jobstreet</option>
+                  <option value="Glints">Glints</option>
+                  <option value="Job Fair">Job Fair</option>
+                  <option value="Website">Website</option>
+                  <option value="Referral">Referral</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -292,6 +331,48 @@ export default function EmailSender({ onBack }) {
           </div>
         </div>
       )}
+
+      {/* ── Persiapan Karir (Detailed Features for Pencaker) ────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="glass-card p-6 rounded-[2rem] border-slate-200/60 bg-white/50 space-y-4">
+          <div className="flex items-center gap-3 text-emerald-600 mb-2">
+            <CheckCircle2 className="w-5 h-5" />
+            <h3 className="font-black text-xs uppercase tracking-widest">Checklist Sebelum Kirim</h3>
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              'Nama file PDF sudah profesional (Contoh: CV_Nama_Lengkap.pdf)',
+              'Email tujuan HRD sudah diperiksa ulang tidak ada typo',
+              'Isi email pengantar sopan dan menyebutkan posisi yang dilamar',
+              'Surat Lamaran (Cover Letter) sudah mencantumkan nama perusahaan',
+              'Pastikan Portofolio/Link eksternal di CV dapat diakses umum'
+            ].map((tip, i) => (
+              <li key={i} className="flex gap-3 text-xs text-slate-600 font-medium items-start">
+                <input type="checkbox" className="mt-0.5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500" />
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="glass-card p-6 rounded-[2rem] border-amber-200/60 bg-amber-50/30 space-y-4">
+          <div className="flex items-center gap-3 text-amber-600 mb-2">
+            <Lightbulb className="w-5 h-5" />
+            <h3 className="font-black text-xs uppercase tracking-widest">Tips Interview Kilat</h3>
+          </div>
+          <div className="space-y-3">
+            <div className="p-3 bg-white/80 rounded-xl border border-amber-100 shadow-sm text-xs text-amber-900">
+              <strong>"Bercerita dengan Data"</strong>: Jangan cuma bilang "Saya jago marketing", tapi "Saya naikkan trafik 40% lewat SEO".
+            </div>
+            <div className="p-3 bg-white/80 rounded-xl border border-amber-100 shadow-sm text-xs text-amber-900">
+              <strong>Pertanyaan Balik</strong>: Tanya ke HRD: "Apa tantangan terbesar departemen ini dalam 6 bulan mendatang?"
+            </div>
+            <div className="p-3 bg-white/80 rounded-xl border border-amber-100 shadow-sm text-xs text-amber-900 text-center font-bold">
+              💡 Selalu teliti profil perusahaan di LinkedIn sebelum mulai interview!
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-10">
         <Button

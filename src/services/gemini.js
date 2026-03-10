@@ -1,55 +1,59 @@
-// src/services/gemini.js
-const API_KEY = 'AIzaSyBNVIcRiwjzQI-mWwwd8T2o-61jz4vhQ-g';
-// Menggunakan Gemini 2.5 Flash sesuai permintaan user
-const MODEL = 'gemini-2.5-flash'; 
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const GAS_ENDPOINT = import.meta.env.VITE_GAS_ENDPOINT || '';
 
 /**
  * Call Gemini API with a prompt
+ * Diarahkan melalui Google Apps Script Backend agar API Key jauh lebih aman.
  */
 async function callGemini(prompt, isJson = false) {
-  try {
-    const config = {
-      temperature: 0.1, // Very low for strict consistency
-      topK: 1,
-      topP: 1,
-      maxOutputTokens: 4096,
-    };
+  // Cek apakah di dalam environment GAS
+  const isGASEnv = typeof window !== 'undefined' && 
+                   typeof window.google !== 'undefined' && 
+                   typeof window.google.script !== 'undefined';
 
-    if (isJson) {
-      config.response_mime_type = "application/json";
+  try {
+    let rawText = '';
+
+    if (isGASEnv) {
+      rawText = await new Promise((resolve, reject) => {
+        window.google.script.run
+          .withSuccessHandler((res) => {
+            if (res.success) resolve(res.data);
+            else reject(new Error(res.message));
+          })
+          .withFailureHandler((err) => reject(new Error(err.message)))
+          .gsCallGemini(prompt, isJson);
+      });
+    } else {
+      // Local dev fetch via GAS Endpoint
+      if (!GAS_ENDPOINT) throw new Error("VITE_GAS_ENDPOINT tidak ditemukan di .env");
+
+      const response = await fetch(GAS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "callGemini", prompt, isJson }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message || "Gagal menghubungi AI Server");
+      
+      rawText = data.data;
     }
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: config,
-      }),
-    });
+    if (!rawText) throw new Error("No response from AI model");
 
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error("No response from AI model");
-
+    let text = rawText;
     if (isJson) {
-      // Robust extraction: find the first { and last }
       const start = text.indexOf('{');
       const end = text.lastIndexOf('}');
       if (start !== -1 && end !== -1) {
         text = text.substring(start, end + 1);
       }
-      
-      // Remove any literal control characters that break JSON.parse
       text = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, " ");
     }
 
     return text;
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Gemini API Error via GAS:", error);
     throw error;
   }
 }
@@ -155,5 +159,58 @@ export async function optimizeCV({ cvData, jobDescription }) {
   } catch (error) {
     console.error("Optimize CV Error:", error);
     throw new Error("Gagal mengolah optimasi AI. Pastikan input tidak terlalu panjang.");
+  }
+}
+
+/**
+ * Translate CV Data & Cover Letter
+ */
+export async function translateCVContent({ cvData, coverLetter, targetLang }) {
+  const langName = targetLang === 'en' ? 'English' : 'Indonesian';
+  const prompt = `
+    Tugas: Terjemahkan seluruh isi konten CV dan Surat Lamaran berikut ke dalam bahasa ${langName}.
+    
+    TETAPKAN struktur JSON persis seperti aslinya. Hanya nilai-nilai string (teks) yang mengandung kalimat/penjelasan yang perlu diterjemahkan. 
+    Hal-hal yang BUKAN kalimat (seperti nama orang, institusi, gelar (kecuali gelar umum yang bisa diterjemahkan), email, link, skill bahasa pemrograman) biarkan saja atau sesuaikan secara wajar.
+    Tapi pastikan bagian "summary", "description", "position" diterjemahkan sesuai bahasa target.
+    Surat lamaran (coverLetter) JIKA ADA isi HTML nya, terjemahkan juga namun biarkan tag HTML utuh.
+
+    DATA JSON INPUT:
+    {
+      "cvData": {
+        "summary": ${JSON.stringify(cvData.summary || "")},
+        "experiences": ${JSON.stringify(cvData.experiences || [])},
+        "education": ${JSON.stringify(cvData.education || [])},
+        "projects": ${JSON.stringify(cvData.projects || [])},
+        "organizations": ${JSON.stringify(cvData.organizations || [])},
+        "certifications": ${JSON.stringify(cvData.certifications || [])},
+        "skills": ${JSON.stringify(cvData.skills || {})}
+      },
+      "coverLetter": ${JSON.stringify(coverLetter?.content || "")}
+    }
+
+    OUTPUT WAJIB JSON murni (tanpa markdown blok):
+    {
+      "cvData": { ...struktur cvData persis sama tapi isinya ditranslate... },
+      "coverLetter": "isi HTML yang ditranslate"
+    }
+  `;
+
+  try {
+    const response = await callGemini(prompt, true);
+    try {
+      return JSON.parse(response);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini translation output:", response);
+      // Fallback: try to aggressively clean the string before parsing
+      const cleanedMatch = response.match(/\{[\s\S]*\}/);
+      if (cleanedMatch) {
+        return JSON.parse(cleanedMatch[0]);
+      }
+      throw parseError;
+    }
+  } catch (error) {
+    console.error("Translate CV Error:", error);
+    throw new Error("Gagal menerjemahkan konten. " + error.message);
   }
 }

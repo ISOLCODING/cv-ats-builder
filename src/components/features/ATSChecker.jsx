@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Target, Search, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, BarChart3, Info } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
-import { analyzeATS, optimizeCV } from '../../services/gemini';
+import { useGemini } from '../../hooks/useGemini';
 import { Sparkles, RefreshCw } from 'lucide-react';
 
 export default function ATSChecker({ onBack, onNext }) {
@@ -12,6 +12,7 @@ export default function ATSChecker({ onBack, onNext }) {
     atsResult, setATSResult, showToast,
     updateSummary, updateSkills, coverLetter 
   } = useCVStore();
+  const { analyzeATSAI, optimizeCVAI } = useGemini();
   const [analyzing, setAnalyzing] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
 
@@ -22,7 +23,7 @@ export default function ATSChecker({ onBack, onNext }) {
 
     setAnalyzing(true);
     try {
-      const result = await analyzeATS({ cvData, jobDescription, coverLetter });
+      const result = await analyzeATSAI({ cvData, jobDescription, coverLetter });
       setATSResult(result);
       showToast('success', 'Analisis ATS selesai!');
     } catch (error) {
@@ -35,7 +36,7 @@ export default function ATSChecker({ onBack, onNext }) {
   const handleOptimize = async () => {
     setOptimizing(true);
     try {
-      const { optimizedSummary, suggestedSkills } = await optimizeCV({ cvData, jobDescription });
+      const { optimizedSummary, suggestedSkills } = await optimizeCVAI({ cvData, jobDescription });
       
       // Update Summary
       updateSummary(optimizedSummary);

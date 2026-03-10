@@ -51,18 +51,23 @@ function ExperienceCard({ exp, index, total, onEdit, onDelete, onMoveUp, onMoveD
     : `${fmtDate(exp.startDate)}${exp.endDate ? ` – ${fmtDate(exp.endDate)}` : ''}`;
 
   return (
-    <div className="entry-card flex gap-3 group animate-fade-up">
-      {/* Drag handle / order buttons */}
-      <div className="flex flex-col items-center gap-0.5 pt-0.5 entry-card-actions">
-        <button type="button" onClick={onMoveUp} disabled={index === 0}
-          className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke atas">
-          <ChevronUp className="w-3.5 h-3.5" />
-        </button>
-        <GripVertical className="w-4 h-4 text-slate-300" />
-        <button type="button" onClick={onMoveDown} disabled={index === total - 1}
-          className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke bawah">
-          <ChevronDown className="w-3.5 h-3.5" />
-        </button>
+    <div className="entry-card group animate-fade-up">
+      {/* Order & Icon */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-0.5 pt-0.5 entry-card-actions">
+          <button type="button" onClick={onMoveUp} disabled={index === 0}
+            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke atas">
+            <ChevronUp className="w-3.5 h-3.5" />
+          </button>
+          <GripVertical className="w-4 h-4 text-slate-300" />
+          <button type="button" onClick={onMoveDown} disabled={index === total - 1}
+            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke bawah">
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="entry-card-icon">
+          <Briefcase className="w-5 h-5 text-blue-600" />
+        </div>
       </div>
 
       {/* Content */}
@@ -348,9 +353,9 @@ export default function ExperienceForm({ onNext, onBack }) {
                 <button
                   type="button"
                   onClick={() => setShowForm(true)}
-                  className="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-sm text-blue-500 font-medium hover:border-blue-400 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                  className="btn-add-dashed"
                 >
-                  <Plus className="w-4 h-4" /> Tambah Pengalaman Lagi
+                  <Plus className="w-5 h-5" /> TAMBAH PENGALAMAN LAGI
                 </button>
               )}
             </div>
