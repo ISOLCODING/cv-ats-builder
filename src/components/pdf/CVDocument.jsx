@@ -81,8 +81,8 @@ const styles = {
       fontSize: SIZE_SECTION,
       textTransform: 'uppercase',
       borderBottom: '1pt solid #000000',
-      marginTop: 6, // Reduced from 8
-      marginBottom: 3, // Reduced from 4
+      marginTop: 4, // Reduced from 6
+      marginBottom: 2, // Reduced from 3
       paddingBottom: 1,
     },
     itemTitle: { fontSize: 10, fontWeight: 'bold' },
@@ -198,7 +198,7 @@ const styles = {
 
 // Common Utility Styles
 const CS = StyleSheet.create({
-  itemBlock: { marginBottom: 6 }, // Reduced from 10
+  itemBlock: { marginBottom: 3 }, // Reduced from 6
   itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 1 },
   itemDate: { fontSize: 8, color: '#666666', flexShrink: 0, marginLeft: 10 },
   bodyText: { fontSize: 9, textAlign: 'justify', lineHeight: 1.3, color: '#333333' },
