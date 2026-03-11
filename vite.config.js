@@ -9,7 +9,6 @@ export default defineConfig(({ mode }) => {
   const gasEndpoint = env.VITE_GAS_ENDPOINT || '';
 
   return {
-    // Base path untuk GitHub Pages: /cv-ats-builder/
     base: isPages ? '/cv-ats-builder/' : '/',
 
     server: {
@@ -25,25 +24,38 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       react(),
-      // viteSingleFile hanya untuk mode GAS
       ...(!isPages ? [viteSingleFile()] : []),
     ],
+
     define: {
       global: 'window',
+      // FIX: define __VITE_PRELOAD__ agar tidak error saat runtime
+      __VITE_PRELOAD__: 'undefined',
     },
+
     build: {
       outDir: isPages ? 'dist-pages' : 'dist',
       target: 'es2017',
       rollupOptions: isPages
-        ? {}
+        ? {
+            output: {
+              // FIX: matikan manual chunk splitting agar tidak ada
+              // dynamic import yang referensikan __VITE_PRELOAD__
+              manualChunks: undefined,
+            },
+          }
         : {
             output: {
               inlineDynamicImports: true,
             },
           },
       assetsInlineLimit: isPages ? 4096 : 100000000,
-      cssCodeSplit: !isPages ? false : true,
-      modulePreload: false,
+      cssCodeSplit: isPages,
+      // FIX: gunakan object form, bukan boolean false
+      // polyfill: false → browser handle sendiri, tidak inject variabel
+      modulePreload: isPages
+        ? { polyfill: false }
+        : false,
     },
 
     resolve: {
