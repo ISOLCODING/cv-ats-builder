@@ -127,7 +127,7 @@ const styles = {
       fontWeight: 'bold',
       color: '#0f172a',
       textTransform: 'uppercase',
-      letterSpacing: 1.2,
+      letterSpacing: 1.0,
       borderBottom: '2pt solid #3b82f6',
       paddingBottom: 4,
       marginBottom: 3,
