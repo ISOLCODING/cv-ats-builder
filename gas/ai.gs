@@ -84,7 +84,10 @@ var AIService = (function () {
     }
   }
 
-  return { callGemini: callGemini };
+  return { 
+    callGemini: callGemini,
+    getModelName: function() { return MODEL; }
+  };
 
 })();
 
@@ -97,4 +100,15 @@ function gsCallGemini(prompt, isJson) {
   } catch (e) {
     return Utils.errorResponse(e.message);
   }
+}
+
+/**
+ * Diagnostic: Cek model apa yang sedang aktif di server
+ */
+function gsGetActiveModel() {
+  return {
+    model: AIService.getModelName(),
+    timestamp: new Date().toISOString(),
+    version: 52 // Kita naikkan angka ini setiap deploy untuk verifikasi
+  };
 }
