@@ -56,7 +56,7 @@ function parseBlock(node, base, key) {
       if (!content) return null;
       return ce(
         Text,
-        { key, style: { ...base, marginBottom: 8 } },
+        { key, style: { ...base, marginBottom: 3 } },
         ...(inlines.length ? inlines : [content])
       );
     }
@@ -65,12 +65,12 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 8 } },
+        { key, style: { marginBottom: 3 } },
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           return ce(
             Text,
-            { key: j, style: { marginBottom: 4 } },
+            { key: j, style: { marginBottom: 2 } },
             `• `,
             ...inlines
           );
@@ -82,7 +82,7 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 4 } },
+        { key, style: { marginBottom: 3 } },
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();

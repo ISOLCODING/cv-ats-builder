@@ -46,8 +46,8 @@ const getFontFamily = (f) => {
 
 const SIZE_BODY = 10;
 const SIZE_SMALL = 8;
-const SIZE_HEADER = 13;
-const SIZE_SECTION = 10;
+const SIZE_HEADER = 16;
+const SIZE_SECTION = 11;
 const LINE_HEIGHT = 1.2;
 const PRIMARY_COLOR = '#000000';
 const SECONDARY_COLOR = '#4B5563';
@@ -59,13 +59,13 @@ const styles = {
     page: {
       fontSize:        SIZE_BODY,
       color:           '#000000',
-      padding: 10,
+      padding: 24,
       backgroundColor: '#ffffff',
     },
     header: {
       borderBottom: '1pt solid #000000',
-      paddingBottom: 4,
-      marginBottom: 4,
+      paddingBottom: 8,
+      marginBottom: 12,
       textAlign: 'center',
     },
     headerName: {
@@ -84,8 +84,8 @@ const styles = {
       fontSize: SIZE_SECTION,
       textTransform: 'uppercase',
       borderBottom: '1pt solid #000000',
-      marginTop: 10,
-      marginBottom: 8,
+      marginTop: 8,
+      marginBottom: 4,
       paddingBottom: 1,
     },
     itemTitle: { fontSize: 10, fontWeight: 'bold' },
@@ -201,7 +201,7 @@ const styles = {
 
 // Common Utility Styles
 const CS = StyleSheet.create({
-  itemBlock: { marginBottom: 8 },
+  itemBlock: { marginBottom: 4 },
   itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 1 },
   itemDate: { fontSize: 8, color: '#666666', flexShrink: 0, marginLeft: 10 },
   bodyText: { fontSize: 9, textAlign: 'justify', lineHeight: 1.02, color: '#333333' },
@@ -235,7 +235,7 @@ function RichText({ html, style = CS.bodyText }) {
 const Summary = ({ data, lang, S, SGlobal }) => {
   if (!data?.summary) return null;
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.summary')}</Text>
       <RichText html={data.summary} style={S.bodyText || CS.bodyText} />
     </View>
@@ -245,7 +245,7 @@ const Summary = ({ data, lang, S, SGlobal }) => {
 const Experience = ({ data, lang, S, SGlobal }) => {
   if (!data?.experiences?.length) return null;
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.experience')}</Text>
       {data.experiences.map((exp, i) => (
         <View key={exp.id || i} style={CS.itemBlock}>
@@ -268,7 +268,7 @@ const Experience = ({ data, lang, S, SGlobal }) => {
 const Education = ({ data, lang, S, SGlobal }) => {
   if (!data?.education?.length) return null;
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.education')}</Text>
       {data.education.map((edu, i) => {
         const isBootcamp = edu.degree === 'Bootcamp' || edu.degree === 'Sertifikasi';
@@ -302,7 +302,7 @@ const Education = ({ data, lang, S, SGlobal }) => {
 const Certifications = ({ data, lang, S, SGlobal }) => {
   if (!data?.certifications || data.certifications.length === 0) return null;
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.certifications')}</Text>
       {data.certifications.map((c, i) => (
         <View key={c.id || i} style={{ marginBottom: 2 }}>
@@ -322,7 +322,7 @@ const Certifications = ({ data, lang, S, SGlobal }) => {
 const Projects = ({ data, lang, S, SGlobal }) => {
   if (!data?.projects || data.projects.length === 0) return null;
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.projects')}</Text>
       {data.projects.map((p, i) => (
         <View key={p.id || i} style={CS.itemBlock}>
@@ -349,7 +349,7 @@ const Organizations = ({ data, lang, S, SGlobal }) => {
   }, []);
 
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.organizations')}</Text>
       {groups.map((group, gi) => (
         <View key={gi} style={{ marginBottom: 3 }}>
@@ -399,7 +399,7 @@ const Skills = ({ data, lang, S, SGlobal, sidebar = false }) => {
   }
 
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 0 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.skills')}</Text>
       <View style={{ gap: 2 }}>
         {technical.length > 0 ? (
