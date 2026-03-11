@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import {
   GraduationCap, Plus, Trash2, Pencil, ChevronRight,
   ChevronLeft, BookOpen, Calendar, Award, CheckCircle2,
-  ExternalLink, Link as LinkIcon
+  ExternalLink, Link as LinkIcon, ChevronUp, ChevronDown, GripVertical
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
@@ -29,7 +29,8 @@ const DEGREES = [
   { value: 'D1',           label: '🎓 D1 – Diploma 1' },
   { value: 'D2',           label: '🎓 D2 – Diploma 2' },
   { value: 'D3',           label: '🎓 D3 – Diploma 3' },
-  { value: 'D4/S1',        label: '🎓 D4 / S1 – Sarjana' },
+  { value: 'D4',           label: '🎓 D4 – Sarjana Terapan' },
+  { value: 'S1',           label: '🎓 S1 – Sarjana' },
   { value: 'S2',           label: '🔬 S2 – Magister' },
   { value: 'S3',           label: '🔬 S3 – Doktor' },
   { value: 'Sertifikasi',  label: '📜 Sertifikasi Profesional' },
@@ -54,12 +55,26 @@ function EmptyEducation({ onAdd }) {
 }
 
 // ── Education card ─────────────────────────────────────────────
-function EducationCard({ edu, onEdit, onDelete }) {
+function EducationCard({ edu, index, total, onEdit, onDelete, onMoveUp, onMoveDown }) {
   const dateStr = `${fmtDate(edu.startDate)}${edu.endDate ? ` – ${fmtDate(edu.endDate)}` : ''}`;
   return (
     <div className="entry-card group animate-fade-up">
-      <div className="entry-card-icon">
-        <GraduationCap className="w-5 h-5 text-blue-600" />
+      {/* Order & Icon */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-0.5 pt-0.5 entry-card-actions">
+          <button type="button" onClick={onMoveUp} disabled={index === 0}
+            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke atas">
+            <ChevronUp className="w-3.5 h-3.5" />
+          </button>
+          <GripVertical className="w-4 h-4 text-slate-300" />
+          <button type="button" onClick={onMoveDown} disabled={index === total - 1}
+            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke bawah">
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="entry-card-icon">
+          <GraduationCap className="w-5 h-5 text-blue-600" />
+        </div>
       </div>
 
       <div className="flex-1 min-w-0">
@@ -121,7 +136,7 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
   const isEdit = !!initial;
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     defaultValues: initial || {
-      institution: '', degree: 'D4/S1', field: '',
+      institution: '', degree: 'S1', field: '',
       startDate: '', endDate: '', gpa: '', description: '',
       link: '',
     },
@@ -252,7 +267,7 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
 
 // ── Main Export ────────────────────────────────────────────────
 export default function EducationForm({ onNext, onBack }) {
-  const { cvData, addEducation, updateEducation, removeEducation } = useCVStore();
+  const { cvData, addEducation, updateEducation, removeEducation, reorderEducation } = useCVStore();
   const { education } = cvData;
   const [showForm, setShowForm]     = useState(false);
   const [editTarget, setEditTarget]  = useState(null);
@@ -263,6 +278,19 @@ export default function EducationForm({ onNext, onBack }) {
     setShowForm(false);
   };
   const handleEdit = (edu) => { setEditTarget(edu); setShowForm(false); };
+
+  const handleMoveUp = (index) => {
+    if (index === 0) return;
+    const newList = [...education];
+    [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
+    reorderEducation(newList);
+  };
+  const handleMoveDown = (index) => {
+    if (index === education.length - 1) return;
+    const newList = [...education];
+    [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+    reorderEducation(newList);
+  };
 
   return (
     <div className="animate-fade-up">
@@ -299,12 +327,16 @@ export default function EducationForm({ onNext, onBack }) {
             <EmptyEducation onAdd={() => setShowForm(true)} />
           ) : (
             <div className="space-y-3 mb-5">
-              {education.map((edu) => (
+              {education.map((edu, i) => (
                 <EducationCard
                   key={edu.id}
                   edu={edu}
+                  index={i}
+                  total={education.length}
                   onEdit={() => handleEdit(edu)}
                   onDelete={() => removeEducation(edu.id)}
+                  onMoveUp={() => handleMoveUp(i)}
+                  onMoveDown={() => handleMoveDown(i)}
                 />
               ))}
               {!showForm && (

@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Mail, Phone, MapPin, Linkedin,
-  Globe, ChevronRight, Sparkles, Trash,
-  Image as ImageIcon, QrCode, Fingerprint, Stars
+  Globe, ChevronRight, Sparkles,
+  QrCode, Fingerprint, Stars
 } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
@@ -149,60 +149,7 @@ export default function PersonalInfoForm({ onNext }) {
         </div>
       </div>
 
-      {/* ── Signature Section (Royal Aesthetic) ──────────────── */}
-      <div className="p-8 bg-mesh border border-slate-100 rounded-[2.5rem] relative group shadow-sm">
-        <div className="relative z-10 space-y-8">
-          <label className="flex items-center gap-3 text-[10px] font-black text-slate-800 uppercase tracking-widest">
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><ImageIcon className="w-4 h-4" /></div>
-            Tanda Tangan digital
-          </label>
 
-          <div className="flex flex-col md:flex-row items-center gap-10">
-            {cvData.personalInfo.signature ? (
-              <div className="relative group/sig">
-                <div className="w-48 h-24 bg-white shadow-master rounded-[2rem] p-4 flex items-center justify-center border border-slate-100/50">
-                  <img
-                    src={cvData.personalInfo.signature} 
-                    alt="Sign"
-                    className="max-w-full max-h-full object-contain pointer-events-none"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updatePersonalInfo({ signature: '' })}
-                  className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-rose-500 text-white shadow-lg opacity-0 group-hover/sig:opacity-100 transition-all flex items-center justify-center z-10"
-                >
-                  <Trash className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="h-24 w-48 border-2 border-dashed border-slate-200 rounded-[2rem] flex items-center justify-center bg-white">
-                <span className="text-[10px] font-black text-slate-300 uppercase tracking-wider">Belum Ada Tanda Tangan</span>
-              </div>
-            )}
-
-            <div className="flex-1 space-y-3">
-              <input
-                type="file" accept="image/*" className="hidden" id="royal-sig"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const r = new FileReader();
-                    r.onload = (ev) => updatePersonalInfo({ signature: ev.target.result });
-                    r.readAsDataURL(file);
-                  }
-                }}
-              />
-              <label htmlFor="royal-sig">
-                <Button variant="secondary" size="sm" as="div" className="cursor-pointer">
-                  {cvData.personalInfo.signature ? 'Ganti Tanda Tangan' : 'Unggah Tanda Tangan'}
-                </Button>
-              </label>
-              <p className="text-[10px] font-bold text-slate-400">High-fidelity PNG recommended. Max 2MB.</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* ── Expert Advice ────────────────────────────── */}
       <div className="p-6 bg-blue-600 rounded-[2rem] flex gap-6 text-white shadow-2xl shadow-blue-500/20">

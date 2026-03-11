@@ -62,6 +62,13 @@ export const t = {
     'label.orgName': 'Nama Organisasi',
     'label.orgRole': 'Peran',
     'label.orgPeriod': 'Periode',
+
+    'type.fulltime': 'Full-time',
+    'type.internship': 'Magang',
+    'type.parttime': 'Part-time',
+    'type.freelance': 'Freelance',
+    'type.contract': 'Kontrak',
+    'type.volunteer': 'Volunteer',
   },
   en: {
     // Stepper & Nav
@@ -125,6 +132,13 @@ export const t = {
     'label.orgName': 'Organization Name',
     'label.orgRole': 'Role',
     'label.orgPeriod': 'Period',
+
+    'type.fulltime': 'Full-time',
+    'type.internship': 'Internship',
+    'type.parttime': 'Part-time',
+    'type.freelance': 'Freelance',
+    'type.contract': 'Contract',
+    'type.volunteer': 'Volunteer',
   }
 };
 

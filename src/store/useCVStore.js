@@ -174,9 +174,16 @@ const useCVStore = create(
             }
           }));
 
-          get().showToast('success', `Translasi CV ke bahasa ${targetLang.toUpperCase()} berhasil!`);
+          get().showToast('success', `Translasi CV ke bahasa ${targetLang.toUpperCase()} berhasil menggunakan Gemini 2.5 Flash!`);
         } catch (err) {
-          get().showToast('error', 'Gagal menerjemahkan konten: ' + err.message);
+          // Tetap ganti bahasa UI meskipun translasi konten CV dari AI gagal karena limit
+          set((prev) => ({
+            appSettings: {
+              ...prev.appSettings,
+              language: targetLang
+            }
+          }));
+          get().showToast('error', 'UI bahasa diubah, tapi translasi konten CV gagal limit AI: ' + err.message);
         } finally {
           set({ isSaving: false });
         }
@@ -246,6 +253,10 @@ const useCVStore = create(
           ...state.cvData,
           education: state.cvData.education.filter((edu) => edu.id !== id)
         }
+      })),
+
+      reorderEducation: (education) => set((state) => ({
+        cvData: { ...state.cvData, education }
       })),
 
       // ── Certifications ───────────────────────────────────

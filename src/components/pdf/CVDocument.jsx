@@ -223,7 +223,9 @@ const Experience = ({ experiences, S, lang }) => experiences?.length ? (
     {experiences.map((exp, i) => (
       <View key={exp.id || i} style={CS.itemBlock}>
         <View style={CS.itemHeader}>
-          <Text style={S.itemTitle || CS.itemTitle}>{exp.position}</Text>
+          <Text style={S.itemTitle || CS.itemTitle}>
+            {exp.position} {exp.type && `(${getTranslation(lang, `type.${exp.type}`)})`}
+          </Text>
           <Text style={CS.itemDate}>
             {fmtDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : fmtDate(exp.endDate, lang)}
           </Text>
@@ -299,21 +301,38 @@ const Projects = ({ projects, S, lang }) => projects?.length ? (
   </View>
 ) : null;
 
-const Organizations = ({ organizations, S, lang }) => organizations?.length ? (
-  <View style={{ marginBottom: 10 }}>
-    <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.organizations')}</Text>
-    {organizations.map((org, i) => (
-      <View key={org.id || i} style={CS.itemBlock}>
-        <View style={CS.itemHeader}>
-          <Text style={S.itemTitle || CS.itemTitle}>{org.name}</Text>
-          <Text style={CS.itemDate}>{org.period}</Text>
+const Organizations = ({ organizations, S, lang }) => {
+  if (!organizations?.length) return null;
+  
+  const groups = organizations.reduce((acc, current) => {
+    const existing = acc.find(g => (g.name || '').toLowerCase() === (current.name || '').toLowerCase());
+    if (existing) { existing.items.push(current); }
+    else { acc.push({ name: current.name, items: [current] }); }
+    return acc;
+  }, []);
+
+  return (
+    <View style={{ marginBottom: 10 }}>
+      <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.organizations')}</Text>
+      {groups.map((group, gi) => (
+        <View key={gi} style={{ marginBottom: 8 }}>
+          <Text style={{ ...S.itemTitle, borderBottom: '0.5pt solid #eeeeee', marginBottom: 4, paddingBottom: 2 }}>{group.name}</Text>
+          {group.items.map((org, i) => (
+            <View key={org.id || i} style={{ marginLeft: 10, marginBottom: 4 }}>
+              <View style={CS.itemHeader}>
+                <Text style={{ ...S.itemSubtitle, fontFamily: FONT_BOLD, color: '#333', fontSize: 10 }}>{org.role}</Text>
+                <Text style={CS.itemDate}>{org.period}</Text>
+              </View>
+              <RichText html={org.contribution} />
+            </View>
+          ))}
         </View>
-        <Text style={S.itemSubtitle || CS.itemSubtitle}>{org.role}</Text>
-        <RichText html={org.contribution} />
-      </View>
-    ))}
-  </View>
-) : null;
+      ))}
+    </View>
+  );
+};
+
+
 
 const Skills = ({ skills, S, sidebar = false }) => {
   const { technical = [], softSkills = [], languages = [] } = skills || {};
@@ -378,20 +397,20 @@ const StandardATS = ({ data }) => {
         <Text style={S.headerContacts}>
           {[info.email, info.phone, info.location].filter(Boolean).join('  |  ')}
         </Text>
-        {info.website || info.linkedin ? (
+        {[info.website, info.linkedin, info.portfolioUrl].some(Boolean) && (
           <Text style={S.headerContacts}>
-            {[info.linkedin, info.website].filter(Boolean).join('  |  ')}
+            {[info.linkedin, info.website, info.portfolioUrl].filter(Boolean).join('  |  ')}
           </Text>
-        ) : null}
+        ) || null}
       </View>
 
       <Summary summary={data.summary} S={S} lang={data.lang} />
+      <Education education={data.education} S={S} lang={data.lang} />
       <Skills skills={data.skills} S={S} lang={data.lang} />
       <Experience experiences={data.experiences} S={S} lang={data.lang} />
-      <Education education={data.education} S={S} lang={data.lang} />
-      <Certifications certifications={data.certifications} S={S} lang={data.lang} />
       <Projects projects={data.projects} S={S} lang={data.lang} />
       <Organizations organizations={data.organizations} S={S} lang={data.lang} />
+      <Certifications certifications={data.certifications} S={S} lang={data.lang} />
     </Page>
   );
 };
@@ -417,7 +436,8 @@ const ModernCreative = ({ data }) => {
           { label: 'Phone', val: info.phone },
           { label: 'Location', val: info.location },
           { label: 'LinkedIn', val: info.linkedin },
-          { label: 'Web', val: info.website }
+          { label: 'Web', val: info.website },
+          { label: 'Portfolio', val: info.portfolioUrl }
         ].map(c => c.val && (
           <View key={c.label} style={S.contactItem}>
             <Text style={S.contactLabel}>{c.label}</Text>
@@ -430,11 +450,11 @@ const ModernCreative = ({ data }) => {
 
       <View style={S.main}>
         <Summary summary={data.summary} S={S} lang={data.lang} />
-        <Experience experiences={data.experiences} S={S} lang={data.lang} />
         <Education education={data.education} S={S} lang={data.lang} />
-        <Certifications certifications={data.certifications} S={S} lang={data.lang} />
+        <Experience experiences={data.experiences} S={S} lang={data.lang} />
         <Projects projects={data.projects} S={S} lang={data.lang} />
         <Organizations organizations={data.organizations} S={S} lang={data.lang} />
+        <Certifications certifications={data.certifications} S={S} lang={data.lang} />
       </View>
     </Page>
   );
@@ -449,16 +469,17 @@ const MinimalistLayout = ({ data }) => {
         <Text style={S.headerName}>{info.name || 'Your Name'}</Text>
         <Text style={S.headerTitle}>{data.experiences?.[0]?.position || ''}</Text>
         <Text style={S.headerContacts}>
-          {[info.email, info.phone, info.location].filter(Boolean).join(' • ')}
+          {[info.email, info.phone, info.location, info.linkedin, info.website, info.portfolioUrl].filter(Boolean).join('  •  ')}
         </Text>
       </View>
 
       <Summary summary={data.summary} S={S} lang={data.lang} />
-      <Experience experiences={data.experiences} S={S} lang={data.lang} />
       <Education education={data.education} S={S} lang={data.lang} />
       <Skills skills={data.skills} S={S} lang={data.lang} />
-      <Certifications certifications={data.certifications} S={S} lang={data.lang} />
+      <Experience experiences={data.experiences} S={S} lang={data.lang} />
       <Projects projects={data.projects} S={S} lang={data.lang} />
+      <Organizations organizations={data.organizations} S={S} lang={data.lang} />
+      <Certifications certifications={data.certifications} S={S} lang={data.lang} />
     </Page>
   );
 };
