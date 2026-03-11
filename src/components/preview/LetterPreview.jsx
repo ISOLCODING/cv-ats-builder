@@ -2,13 +2,21 @@
 import React from 'react';
 import useCVStore from '../../store/useCVStore';
 
-const FONT = "'Times New Roman', Times, serif";
-const SIZE = '12pt';
+const getPreviewFont = (f) => {
+  if (f === 'serif') return "'Times New Roman', Times, serif";
+  if (f === 'sans') return "Helvetica, Arial, sans-serif";
+  if (f === 'tahoma' || f === 'inter') return "'Inter', 'Tahoma', 'Verdana', sans-serif";
+  if (f === 'roboto') return "'Roboto', sans-serif";
+  return "'Times New Roman', Times, serif";
+};
 
 export default function LetterPreview() {
-  const { cvData, coverLetter } = useCVStore();
+  const { cvData, coverLetter, appSettings } = useCVStore();
   const { personalInfo, education } = cvData;
   const { content } = coverLetter;
+  const selectedFont = appSettings?.fontFamily || 'serif';
+  const FONT = getPreviewFont(selectedFont);
+  const SIZE = '12pt';
 
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric',

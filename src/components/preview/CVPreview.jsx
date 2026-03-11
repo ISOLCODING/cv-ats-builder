@@ -13,11 +13,12 @@ function formatDate(dateStr, lang = 'id') {
   return month ? `${months[parseInt(month) - 1]} ${year}` : year;
 }
 
-function RichContent({ html, isAts = true }) {
+function RichContent({ html, fontFamily }) {
   if (!html?.trim()) return null;
   return (
     <div 
-      className={`cv-rich ${isAts ? 'font-times' : 'font-sans'}`}
+      className="cv-rich"
+      style={{ fontFamily }}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -50,10 +51,10 @@ const SectionHeader = ({ title, template = 'ats' }) => {
 
 // ── Template Views ──────────────────────────────────────────
 
-const StandardATSView = ({ data, lang }) => {
+const StandardATSView = ({ data, lang, font }) => {
   const { personalInfo: info, experiences, education, skills, certifications, projects, organizations, summary } = data;
   return (
-    <div className="p-[80px] bg-white text-black font-times text-[11pt] leading-[1.4] min-h-[1123px]">
+    <div className="p-[80px] bg-white text-black text-[11pt] leading-[1.4] min-h-[1123px]" style={{ fontFamily: font }}>
       <div className="border-b-[1.5pt] border-black pb-3 mb-6 text-center">
         <h1 className="text-[18pt] font-bold uppercase tracking-widest leading-none mb-2">{info.name || 'NAMA ANDA'}</h1>
         <p className="text-[9pt]">{[info.email, info.phone, info.location].filter(Boolean).join('  |  ')}</p>
@@ -65,7 +66,7 @@ const StandardATSView = ({ data, lang }) => {
       {summary && (
         <div className="mb-4">
           <SectionHeader title={getTranslation(lang, 'sec.summary')} template="ats" />
-          <RichContent html={summary} isAts={true} />
+          <RichContent html={summary} fontFamily={font} />
         </div>
       )}
 
@@ -81,7 +82,7 @@ const StandardATSView = ({ data, lang }) => {
               <p className="italic text-[11pt]">{edu.institution}</p>
               {edu.gpa && <p className="text-[10pt]">GPA: {edu.gpa}</p>}
               {edu.description && (
-                <div className="mt-1 text-[10pt]"><RichContent html={edu.description} isAts={true} /></div>
+                <div className="mt-1 text-[10pt]"><RichContent html={edu.description} fontFamily={font} /></div>
               )}
               {edu.link && <p className="text-[9pt] text-blue-600 underline">Sertifikat: {edu.link}</p>}
             </div>
@@ -114,7 +115,7 @@ const StandardATSView = ({ data, lang }) => {
                 <span className="font-normal">{formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : formatDate(exp.endDate, lang)}</span>
               </div>
               <p className="italic mb-1">{exp.company}</p>
-              <RichContent html={exp.description} isAts={true} />
+              <RichContent html={exp.description} fontFamily={font} />
             </div>
           ))}
         </div>
@@ -130,7 +131,7 @@ const StandardATSView = ({ data, lang }) => {
                 <span className="font-normal text-[10pt] italic">{p.techStack}</span>
               </div>
               {p.link && <p className="text-[9pt] text-blue-600 underline mb-1">{p.link}</p>}
-              <RichContent html={p.description} isAts={true} />
+              <RichContent html={p.description} fontFamily={font} />
             </div>
           ))}
         </div>
@@ -149,7 +150,7 @@ const StandardATSView = ({ data, lang }) => {
                     <span className="text-[10pt]">{org.period}</span>
                   </div>
                   {org.contribution && (
-                    <div className="mt-1 text-[10pt] pl-2"><RichContent html={org.contribution} isAts={true} /></div>
+                    <div className="mt-1 text-[10pt] pl-2"><RichContent html={org.contribution} fontFamily={font} /></div>
                   )}
                 </div>
               ))}
@@ -177,12 +178,12 @@ const StandardATSView = ({ data, lang }) => {
   );
 };
 
-const ModernCreativeView = ({ data, lang }) => {
+const ModernCreativeView = ({ data, lang, font }) => {
   const { personalInfo: info, experiences, education, skills, certifications, projects, organizations, summary } = data;
   const { technical = [], softSkills = [], languages = [] } = skills || {};
 
   return (
-    <div className="flex min-h-[1123px] bg-white font-sans text-slate-700 overflow-hidden">
+    <div className="flex min-h-[1123px] bg-white text-slate-700 overflow-hidden" style={{ fontFamily: font }}>
       {/* Sidebar */}
       <div className="w-[32%] bg-slate-50 border-r border-slate-200 p-8 flex flex-col gap-8">
         <div>
@@ -247,7 +248,7 @@ const ModernCreativeView = ({ data, lang }) => {
         {summary && (
           <div className="space-y-3">
             <SectionHeader title={getTranslation(lang, 'sec.summary')} template="creative" />
-            <div className="text-[13px] text-slate-600 leading-relaxed"><RichContent html={summary} isAts={false} /></div>
+            <div className="text-[13px] text-slate-600 leading-relaxed"><RichContent html={summary} fontFamily={font} /></div>
           </div>
         )}
 
@@ -264,7 +265,7 @@ const ModernCreativeView = ({ data, lang }) => {
                   <p className="text-[12px] font-bold text-slate-500 italic">{edu.institution}</p>
                   {edu.gpa && <p className="text-[11px] text-slate-400 font-medium">GPA: {edu.gpa}</p>}
                   {edu.description && (
-                    <div className="text-[11px] text-slate-500 leading-relaxed mt-1"><RichContent html={edu.description} isAts={false} /></div>
+                    <div className="text-[11px] text-slate-500 leading-relaxed mt-1"><RichContent html={edu.description} fontFamily={font} /></div>
                   )}
                 </div>
               ))}
@@ -289,7 +290,7 @@ const ModernCreativeView = ({ data, lang }) => {
                     </span>
                   </div>
                   <p className="text-[11px] font-black text-blue-600 mb-2 uppercase tracking-wide">{exp.company}</p>
-                  <div className="text-[12px] leading-relaxed text-slate-600"><RichContent html={exp.description} isAts={false} /></div>
+                  <div className="text-[12px] leading-relaxed text-slate-600"><RichContent html={exp.description} fontFamily={font} /></div>
                 </div>
               ))}
             </div>
@@ -306,7 +307,7 @@ const ModernCreativeView = ({ data, lang }) => {
                     <h4 className="text-[13px] font-black text-slate-900">{p.name}</h4>
                     <span className="text-[9px] font-bold text-blue-500 uppercase">{p.techStack}</span>
                   </div>
-                  <div className="text-[11px] text-slate-600"><RichContent html={p.description} isAts={false} /></div>
+                  <div className="text-[11px] text-slate-600"><RichContent html={p.description} fontFamily={font} /></div>
                 </div>
               ))}
             </div>
@@ -328,7 +329,7 @@ const ModernCreativeView = ({ data, lang }) => {
                           <span className="text-[10px] font-bold text-slate-400">{org.period}</span>
                         </div>
                         {org.contribution && (
-                          <div className="text-[11px] text-slate-500 leading-relaxed mt-1"><RichContent html={org.contribution} isAts={false} /></div>
+                          <div className="text-[11px] text-slate-500 leading-relaxed mt-1"><RichContent html={org.contribution} fontFamily={font} /></div>
                         )}
                       </div>
                     ))}
@@ -360,11 +361,11 @@ const ModernCreativeView = ({ data, lang }) => {
   );
 };
 
-const MinimalistView = ({ data, lang }) => {
+const MinimalistView = ({ data, lang, font }) => {
   const { personalInfo: info, experiences, education, skills, certifications, projects, organizations, summary } = data;
   const { technical = [], softSkills = [], languages = [] } = skills || {};
   return (
-    <div className="p-16 bg-white text-slate-600 font-sans text-sm leading-relaxed min-h-[1123px]">
+    <div className="p-16 bg-white text-slate-600 text-sm leading-relaxed min-h-[1123px]" style={{ fontFamily: font }}>
       <header className="text-center mb-16">
         <h1 className="text-4xl font-light text-slate-900 tracking-tighter mb-4">{info.name || 'Nama Anda'}</h1>
         <p className="text-[10px] text-slate-400 uppercase tracking-[0.5em] font-black flex flex-wrap justify-center gap-x-4 gap-y-2">
@@ -377,7 +378,7 @@ const MinimalistView = ({ data, lang }) => {
       {summary && (
         <div className="mb-14 text-center max-w-xl mx-auto">
           <div className="text-[15px] leading-relaxed text-slate-500 italic opacity-80 underline underline-offset-8 decoration-slate-100">
-            <RichContent html={summary} isAts={false} />
+            <RichContent html={summary} fontFamily={font} />
           </div>
         </div>
       )}
@@ -392,7 +393,7 @@ const MinimalistView = ({ data, lang }) => {
                 <p className="text-xs text-slate-400">{edu.institution}</p>
                 <p className="text-[9px] font-black text-slate-300 uppercase">{formatDate(edu.startDate, lang)} — {formatDate(edu.endDate, lang)}</p>
                 {edu.description && (
-                  <div className="text-[10px] text-slate-500 mt-2"><RichContent html={edu.description} isAts={false} /></div>
+                  <div className="text-[10px] text-slate-500 mt-2"><RichContent html={edu.description} fontFamily={font} /></div>
                 )}
               </div>
             ))}
@@ -448,7 +449,7 @@ const MinimalistView = ({ data, lang }) => {
                   {exp.type && <span className="ml-3 text-[9px] font-black text-slate-300 uppercase tracking-widest">{getTranslation(lang, `type.${exp.type}`)}</span>}
                 </h4>
                 <p className="text-xs text-slate-400 font-medium italic mb-3">{exp.company}</p>
-                <div className="text-[13px] text-slate-500"><RichContent html={exp.description} isAts={false} /></div>
+                <div className="text-[13px] text-slate-500"><RichContent html={exp.description} fontFamily={font} /></div>
               </div>
             </div>
           ))}
@@ -467,7 +468,7 @@ const MinimalistView = ({ data, lang }) => {
                 <div className="flex-1">
                   <h4 className="text-base font-bold text-slate-900 mb-1">{p.name}</h4>
                   <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-3">{p.techStack}</p>
-                  <div className="text-[13px] text-slate-500 leading-relaxed"><RichContent html={p.description} isAts={false} /></div>
+                  <div className="text-[13px] text-slate-500 leading-relaxed"><RichContent html={p.description} fontFamily={font} /></div>
                 </div>
               </div>
             ))}
@@ -492,7 +493,7 @@ const MinimalistView = ({ data, lang }) => {
                         <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{org.period}</span>
                       </div>
                       {org.contribution && (
-                        <div className="text-[13px] text-slate-500"><RichContent html={org.contribution} isAts={false} /></div>
+                        <div className="text-[13px] text-slate-500"><RichContent html={org.contribution} fontFamily={font} /></div>
                       )}
                     </div>
                   ))}
@@ -525,11 +526,20 @@ const CVPreview = forwardRef(function CVPreview(_, ref) {
   const { cvData, appSettings } = useCVStore();
   const template = cvData.selectedTemplate || 'standard_ats';
   const lang = appSettings?.language || 'id';
+  const selectedFont = appSettings?.fontFamily || 'serif';
+  const getPreviewFont = (f) => {
+    if (f === 'serif') return "'Times New Roman', Times, serif";
+    if (f === 'sans') return "Helvetica, Arial, sans-serif";
+    if (f === 'tahoma' || f === 'inter') return "'Inter', 'Tahoma', 'Verdana', sans-serif";
+    if (f === 'roboto') return "'Roboto', sans-serif";
+    return "Helvetica, Arial, sans-serif";
+  };
+  const fontStyle = { fontFamily: getPreviewFont(selectedFont) };
 
   const isEmpty = !cvData.personalInfo?.name && !cvData.summary && !cvData.experiences?.length;
 
   return (
-    <div ref={ref} id="cv-preview-content" className="w-[794px] min-h-[1123px] bg-white shadow-master relative">
+    <div ref={ref} id="cv-preview-content" style={fontStyle} className="w-[794px] min-h-[1123px] bg-white shadow-master relative">
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center h-[1123px] bg-slate-50/50">
           <div className="w-20 h-20 rounded-[2.5rem] bg-white shadow-indigo flex items-center justify-center mb-6">
@@ -540,16 +550,14 @@ const CVPreview = forwardRef(function CVPreview(_, ref) {
         </div>
       ) : (
         <div className="animate-in fade-in duration-700">
-          {template === 'standard_ats' && <StandardATSView data={cvData} lang={lang} />}
-          {template === 'modern_creative' && <ModernCreativeView data={cvData} lang={lang} />}
-          {template === 'minimalist' && <MinimalistView data={cvData} lang={lang} />}
+          {template === 'standard_ats' && <StandardATSView data={cvData} lang={lang} font={getPreviewFont(selectedFont)} />}
+          {template === 'modern_creative' && <ModernCreativeView data={cvData} lang={lang} font={getPreviewFont(selectedFont)} />}
+          {template === 'minimalist' && <MinimalistView data={cvData} lang={lang} font={getPreviewFont(selectedFont)} />}
         </div>
       )}
 
       {/* Global Preview Styles */}
       <style>{`
-        #cv-preview-content .font-times { font-family: 'Times New Roman', Times, serif; }
-        #cv-preview-content .font-sans { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         #cv-preview-content .cv-rich ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin: 0.5rem 0 !important; }
         #cv-preview-content .cv-rich ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin: 0.5rem 0 !important; }
         #cv-preview-content .cv-rich li { margin-bottom: 0.25rem !important; }
