@@ -2,14 +2,17 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
-const isPages = process.env.VITE_BUILD_TARGET === 'pages';
+const buildTarget = process.env.VITE_BUILD_TARGET || 'gas';
+const isPages = buildTarget === 'pages';
+const isVercel = buildTarget === 'vercel';
+const isGas = buildTarget === 'gas';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const gasEndpoint = env.VITE_GAS_ENDPOINT || '';
 
   return {
-    // Base path untuk GitHub Pages: /cv-ats-builder/
+    // Base path: /cv-ats-builder/ hanya untuk GitHub Pages, lainnya /
     base: isPages ? '/cv-ats-builder/' : '/',
 
     server: {
@@ -25,8 +28,8 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       react(),
-      // viteSingleFile hanya untuk mode GAS
-      ...(!isPages ? [viteSingleFile()] : []),
+      // viteSingleFile hanya untuk mode GAS (build default)
+      ...(isGas ? [viteSingleFile()] : []),
     ],
     define: {
       global: 'window',
@@ -34,15 +37,15 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: isPages ? 'dist-pages' : 'dist',
       target: 'es2017',
-      rollupOptions: isPages
+      rollupOptions: (isPages || isVercel)
         ? {}
         : {
             output: {
               inlineDynamicImports: true,
             },
           },
-      assetsInlineLimit: isPages ? 4096 : 100 * 1024 * 1024,
-      cssCodeSplit: !isPages ? false : true,
+      assetsInlineLimit: (isPages || isVercel) ? 4096 : 100 * 1024 * 1024,
+      cssCodeSplit: (isPages || isVercel) ? true : false,
       modulePreload: {
         polyfill: false,
       },

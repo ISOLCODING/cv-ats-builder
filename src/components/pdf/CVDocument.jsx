@@ -21,40 +21,27 @@ import { getTranslation } from '../../utils/translations';
 Font.register({
   family: 'Roboto',
   fonts: [
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-normal.ttf', fontWeight: 400 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-700-normal.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-italic.ttf', fontWeight: 400, fontStyle: 'italic' },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Regular.ttf', fontWeight: 400 },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Bold.ttf', fontWeight: 700 },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
   ]
 });
 
 Font.register({
   family: 'Inter',
   fonts: [
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf', fontWeight: 400 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-italic.ttf', fontWeight: 400, fontStyle: 'italic' },
+    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Regular.ttf', fontWeight: 400 },
+    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Bold.ttf', fontWeight: 700 },
+    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
   ]
 });
-
-Font.register({
-  family: 'Tahoma',
-  fonts: [
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/tahoma@latest/latin-400-normal.ttf', fontWeight: 400 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/tahoma@latest/latin-700-normal.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/tahoma@latest/latin-400-italic.ttf', fontWeight: 400, fontStyle: 'italic' },
-  ]
-});
-
 
 const getFontFamily = (f) => {
-  // Note: for built-in PDF fonts, italic is handled via fontStyle, not a separate family name.
-  // 'Times-Roman' + fontStyle:'italic' → Times Italic
-  // 'Helvetica'   + fontStyle:'italic' → Helvetica Oblique
-  if (f === 'serif') return { regular: 'Times-Roman', bold: 'Times-Bold', italic: 'Times-Roman' };
-  if (f === 'sans') return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
+  if (f === 'serif') return { regular: 'Times-Roman', bold: 'Times-Bold', italic: 'Times-Italic' };
+  if (f === 'sans') return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
   if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
   if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
-  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
+  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
 };
 
 const SIZE_BODY    = 10; // Reduced from 11

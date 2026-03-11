@@ -15,18 +15,18 @@ import useCVStore from '../../store/useCVStore';
 Font.register({
   family: 'Roboto',
   fonts: [
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-normal.ttf', fontWeight: 400 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-700-normal.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-400-italic.ttf', fontWeight: 400, fontStyle: 'italic' },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Regular.ttf', fontWeight: 400 },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Bold.ttf', fontWeight: 700 },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
   ]
 });
 
 Font.register({
   family: 'Inter',
   fonts: [
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf', fontWeight: 400 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-italic.ttf', fontWeight: 400, fontStyle: 'italic' },
+    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Regular.ttf', fontWeight: 400 },
+    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Bold.ttf', fontWeight: 700 },
+    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
   ]
 });
 
