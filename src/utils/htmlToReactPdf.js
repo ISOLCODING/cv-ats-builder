@@ -56,7 +56,7 @@ function parseBlock(node, base, key) {
       if (!content) return null;
       return ce(
         Text,
-        { key, style: { ...base, marginBottom: 4 } },
+        { key, style: { ...base, marginBottom: 8 } },
         ...(inlines.length ? inlines : [content])
       );
     }
@@ -65,19 +65,14 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 4 } },
+        { key, style: { marginBottom: 8 } },
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
-          const text    = li.textContent.trim();
           return ce(
-            View,
-            { key: j, style: { flexDirection: 'row', marginBottom: 2 } },
-            ce(Text, { style: { ...base, width: 12, flexShrink: 0 } }, '\u2022'),
-            ce(
-              Text,
-              { style: { ...base, flex: 1 } },
-              ...(inlines.length ? inlines : [text])
-            )
+            Text,
+            { key: j, style: { marginBottom: 4 } },
+            `• `,
+            ...inlines
           );
         })
       );

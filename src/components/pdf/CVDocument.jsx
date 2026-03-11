@@ -44,11 +44,13 @@ const getFontFamily = (f) => {
   return { regular: 'Helvetica', bold: 'Helvetica', italic: 'Helvetica' };
 };
 
-const SIZE_BODY = 10;
+const SIZE_BODY = 11;
 const SIZE_SMALL = 8;
 const SIZE_HEADER = 18;
 const SIZE_SECTION = 11;
-const LINE_HEIGHT = 1.12;
+const LINE_HEIGHT = 1.4;
+const PRIMARY_COLOR = '#000000';
+const SECONDARY_COLOR = '#4B5563';
 
 // ── Layout Styles ─────────────────────────────────────────────
 const styles = {
@@ -57,13 +59,13 @@ const styles = {
     page: {
       fontSize:        SIZE_BODY,
       color:           '#000000',
-      padding: 40,
+      padding: 80,
       backgroundColor: '#ffffff',
     },
     header: {
       borderBottom: '1pt solid #000000',
-      paddingBottom: 5,
-      marginBottom: 10,
+      paddingBottom: 12,
+      marginBottom: 24,
       textAlign: 'center',
     },
     headerName: {
@@ -71,6 +73,7 @@ const styles = {
       fontSize: SIZE_HEADER,
       textTransform: 'uppercase',
       letterSpacing: 2,
+      marginBottom: 6,
     },
     headerContacts: {
       fontSize: 9,
@@ -81,8 +84,8 @@ const styles = {
       fontSize: SIZE_SECTION,
       textTransform: 'uppercase',
       borderBottom: '1pt solid #000000',
-      marginTop: 8,
-      marginBottom: 4,
+      marginTop: 16,
+      marginBottom: 8,
       paddingBottom: 1,
     },
     itemTitle: { fontSize: 10, fontWeight: 'bold' },
@@ -198,7 +201,7 @@ const styles = {
 
 // Common Utility Styles
 const CS = StyleSheet.create({
-  itemBlock: { marginBottom: 6 },
+  itemBlock: { marginBottom: 8 },
   itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 1 },
   itemDate: { fontSize: 8, color: '#666666', flexShrink: 0, marginLeft: 10 },
   bodyText: { fontSize: 9, textAlign: 'justify', lineHeight: 1.02, color: '#333333' },
