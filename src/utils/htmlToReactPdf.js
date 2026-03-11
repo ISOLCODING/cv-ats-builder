@@ -112,8 +112,6 @@ function parseBlock(node, base, key) {
     case 'h2':
     case 'h3': {
       const boldStyle = { ...base, fontWeight: 'bold', marginBottom: 3 };
-      if (base.fontFamily === 'Times-Roman') boldStyle.fontFamily = 'Times-Bold';
-      if (base.fontFamily === 'Helvetica') boldStyle.fontFamily = 'Helvetica-Bold';
       
       const inlines   = parseInlines(children, boldStyle);
       const text      = node.textContent.trim();
@@ -152,8 +150,6 @@ function parseInline(node, base, key) {
     case 'strong':
     case 'b': {
       const s = { ...base, fontWeight: 'bold' };
-      if (base.fontFamily === 'Times-Roman') s.fontFamily = 'Times-Bold';
-      if (base.fontFamily === 'Helvetica') s.fontFamily = 'Helvetica-Bold';
       return ce(Text, { key, style: s }, ...parseInlines(children, s));
     }
 
