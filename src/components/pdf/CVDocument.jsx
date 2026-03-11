@@ -229,96 +229,101 @@ function RichText({ html, style = CS.bodyText }) {
 
 // ── Shared Sections ──────────────────────────────────────────
 
-const Summary = ({ summary, S, lang, SGlobal }) => (summary && typeof summary === 'string' && summary.trim()) ? (
-  <View style={{ marginBottom: 8 }}>
-    <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.summary')}</Text>
-    <RichText html={summary} style={S.bodyText || CS.bodyText} />
-  </View>
-) : null;
+const Summary = ({ summary, S, lang, SGlobal }) => 
+  (summary && typeof summary === 'string' && summary.trim()) ? (
+    <View style={{ marginBottom: 8 }}>
+      <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.summary')}</Text>
+      <RichText html={summary} style={S.bodyText || CS.bodyText} />
+    </View>
+  ) : null;
 
-const Experience = ({ experiences, S, lang, SGlobal }) => experiences?.length ? (
-  <View style={{ marginBottom: 8 }}>
-    <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.experience')}</Text>
-    {experiences.map((exp, i) => (
-      <View key={exp.id || i} style={CS.itemBlock}>
-        <View style={CS.itemHeader}>
-          <Text style={[S.itemTitle || CS.itemTitle, SGlobal.bold]}>
-            {exp.position} {exp.type && `(${getTranslation(lang, `type.${exp.type}`)})`}
-          </Text>
-          <Text style={CS.itemDate}>
-            {fmtDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : fmtDate(exp.endDate, lang)}
-          </Text>
-        </View>
-        <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{exp.company}</Text>
-        <RichText html={exp.description} />
-      </View>
-    ))}
-  </View>
-) : null;
-
-const Education = ({ education, S, lang, SGlobal }) => education?.length ? (
-  <View style={{ marginBottom: 8 }}>
-    <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.education')}</Text>
-    {education.map((edu, i) => {
-      const isBootcamp = edu.degree === 'Bootcamp' || edu.degree === 'Sertifikasi';
-      return (
-        <View key={edu.id || i} style={CS.itemBlock}>
+const Experience = ({ experiences, S, lang, SGlobal }) => 
+  (experiences && experiences.length > 0) ? (
+    <View style={{ marginBottom: 8 }}>
+      <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.experience')}</Text>
+      {experiences.map((exp, i) => (
+        <View key={exp.id || i} style={CS.itemBlock}>
           <View style={CS.itemHeader}>
             <Text style={[S.itemTitle || CS.itemTitle, SGlobal.bold]}>
-              {edu.degree}{edu.field ? `, ${edu.field}` : ''}
+              {exp.position} {exp.type ? `(${getTranslation(lang, `type.${exp.type}`)})` : ''}
             </Text>
             <Text style={CS.itemDate}>
-              {fmtDate(edu.startDate, lang)} – {fmtDate(edu.endDate, lang)}
+              {fmtDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : fmtDate(exp.endDate, lang)}
             </Text>
           </View>
-          <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{edu.institution}</Text>
-          {edu.gpa && (
-            <Text style={{ ...CS.bodyText, fontSize: 8, marginBottom: 1 }}>
-              {isBootcamp ? 'Skor / Predikat' : 'IPK / GPA'}: <Text style={SGlobal.bold}>{edu.gpa}</Text>
-            </Text>
-          )}
-          {edu.link && (
-            <Text style={CS.linkText}>Sertifikat: {edu.link}</Text>
-          )}
-          <RichText html={edu.description} />
+          <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{exp.company}</Text>
+          <RichText html={exp.description} />
         </View>
-      );
-    })}
-  </View>
-) : null;
+      ))}
+    </View>
+  ) : null;
 
-const Certifications = ({ certifications, S, lang }) => certifications?.length ? (
-  <View style={{ marginBottom: 10 }}>
-    <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.certifications')}</Text>
-    {certifications.map((c, i) => (
-      <View key={c.id || i} style={{ marginBottom: 6 }}>
-        <View style={CS.itemHeader}>
-          <Text style={S.itemTitle || CS.itemTitle}>{c.name}</Text>
-          <Text style={CS.itemDate}>{c.year}</Text>
-        </View>
-        <Text style={{ fontSize: 9, color: '#444' }}>
-          {c.issuer}{c.link ? ` | ${c.link}` : ''}
-        </Text>
-      </View>
-    ))}
-  </View>
-) : null;
+const Education = ({ education, S, lang, SGlobal }) => 
+  (education && education.length > 0) ? (
+    <View style={{ marginBottom: 8 }}>
+      <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.education')}</Text>
+      {education.map((edu, i) => {
+        const isBootcamp = edu.degree === 'Bootcamp' || edu.degree === 'Sertifikasi';
+        return (
+          <View key={edu.id || i} style={CS.itemBlock}>
+            <View style={CS.itemHeader}>
+              <Text style={[S.itemTitle || CS.itemTitle, SGlobal.bold]}>
+                {edu.degree}{edu.field ? `, ${edu.field}` : ''}
+              </Text>
+              <Text style={CS.itemDate}>
+                {fmtDate(edu.startDate, lang)} – {fmtDate(edu.endDate, lang)}
+              </Text>
+            </View>
+            <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{edu.institution}</Text>
+            {edu.gpa ? (
+              <Text style={{ ...CS.bodyText, fontSize: 8, marginBottom: 1 }}>
+                {isBootcamp ? 'Skor / Predikat' : 'IPK / GPA'}: <Text style={SGlobal.bold}>{edu.gpa}</Text>
+              </Text>
+            ) : null}
+            {edu.link ? (
+              <Text style={CS.linkText}>Sertifikat: {edu.link}</Text>
+            ) : null}
+            <RichText html={edu.description} />
+          </View>
+        );
+      })}
+    </View>
+  ) : null;
 
-const Projects = ({ projects, S, lang }) => projects?.length ? (
-  <View style={{ marginBottom: 10 }}>
-    <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.projects')}</Text>
-    {projects.map((p, i) => (
-      <View key={p.id || i} style={CS.itemBlock}>
-        <View style={CS.itemHeader}>
-          <Text style={S.itemTitle || CS.itemTitle}>{p.name}</Text>
-          <Text style={{ ...CS.itemDate, fontStyle: 'italic' }}>{p.techStack}</Text>
+const Certifications = ({ certifications, S, lang }) => 
+  (certifications && certifications.length > 0) ? (
+    <View style={{ marginBottom: 10 }}>
+      <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.certifications')}</Text>
+      {certifications.map((c, i) => (
+        <View key={c.id || i} style={{ marginBottom: 6 }}>
+          <View style={CS.itemHeader}>
+            <Text style={S.itemTitle || CS.itemTitle}>{c.name}</Text>
+            <Text style={CS.itemDate}>{c.year}</Text>
+          </View>
+          <Text style={{ fontSize: 9, color: '#444' }}>
+            {c.issuer}{c.link ? ` | ${c.link}` : ''}
+          </Text>
         </View>
-        {p.link && <Text style={CS.linkText}>{p.link}</Text>}
-        <RichText html={p.description} />
-      </View>
-    ))}
-  </View>
-) : null;
+      ))}
+    </View>
+  ) : null;
+
+const Projects = ({ projects, S, lang }) => 
+  (projects && projects.length > 0) ? (
+    <View style={{ marginBottom: 10 }}>
+      <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.projects')}</Text>
+      {projects.map((p, i) => (
+        <View key={p.id || i} style={CS.itemBlock}>
+          <View style={CS.itemHeader}>
+            <Text style={S.itemTitle || CS.itemTitle}>{p.name}</Text>
+            <Text style={{ ...CS.itemDate, fontStyle: 'italic' }}>{p.techStack}</Text>
+          </View>
+          {p.link ? <Text style={CS.linkText}>{p.link}</Text> : null}
+          <RichText html={p.description} />
+        </View>
+      ))}
+    </View>
+  ) : null;
 
 const Organizations = ({ organizations, S, lang }) => {
   if (!organizations?.length) return null;
@@ -361,21 +366,23 @@ const Skills = ({ skills, S, lang, SGlobal, sidebar = false }) => {
     return (
       <View>
         <View style={S.sidebarSectionTitle}><Text>{getTranslation(lang, 'sec.techskills', 'Technical Skills')}</Text></View>
-        <Text style={{ fontSize: 8, color: '#334155' }}>{technical.join(', ')}</Text>
+        {technical.length > 0 ? (
+          <Text style={{ fontSize: 8, color: '#334155' }}>{technical.join(', ')}</Text>
+        ) : null}
         
-        {softSkills.length > 0 && (
+        {softSkills.length > 0 ? (
           <>
             <View style={S.sidebarSectionTitle}><Text>{getTranslation(lang, 'sec.softskills', 'Soft Skills')}</Text></View>
             <Text style={{ fontSize: 8, color: '#334155' }}>{softSkills.join(', ')}</Text>
           </>
-        )}
+        ) : null}
 
-        {languages.length > 0 && (
+        {languages.length > 0 ? (
           <>
             <View style={S.sidebarSectionTitle}><Text>{getTranslation(lang, 'sec.languages', 'Languages')}</Text></View>
             <Text style={{ fontSize: 8, color: '#334155' }}>{languages.join(', ')}</Text>
           </>
-        )}
+        ) : null}
       </View>
     );
   }
@@ -384,21 +391,21 @@ const Skills = ({ skills, S, lang, SGlobal, sidebar = false }) => {
     <View style={{ marginBottom: 8 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.skills')}</Text>
       <View style={{ gap: 2 }}>
-        {technical.length > 0 && (
+        {technical.length > 0 ? (
           <Text style={{ fontSize: 9 }}>
             <Text style={SGlobal.bold}>{getTranslation(lang, 'sec.techskills', 'Technical')}: </Text>{technical.join(', ')}
           </Text>
-        )}
-        {softSkills.length > 0 && (
+        ) : null}
+        {softSkills.length > 0 ? (
           <Text style={{ fontSize: 9 }}>
             <Text style={SGlobal.bold}>{getTranslation(lang, 'sec.softskills', 'Soft Skills')}: </Text>{softSkills.join(', ')}
           </Text>
-        )}
-        {languages.length > 0 && (
+        ) : null}
+        {languages.length > 0 ? (
           <Text style={{ fontSize: 9 }}>
             <Text style={SGlobal.bold}>{getTranslation(lang, 'sec.languages', 'Languages')}: </Text>{languages.join(', ')}
           </Text>
-        )}
+        ) : null}
       </View>
     </View>
   );
@@ -410,17 +417,17 @@ const StandardATS = ({ data, SGlobal }) => {
   const S = styles.standard_ats;
   const { personalInfo: info } = data;
   return (
-    <Page size="A4" style={S.page}>
+    <Page size="A4" style={[S.page, SGlobal.global]}>
       <View style={S.header}>
-        <Text style={[S.headerName, SGlobal.bold]}>{info.name || 'Nama Anda'}</Text>
+        <Text style={[S.headerName, SGlobal.bold]}>{info.name || ''}</Text>
         <Text style={S.headerContacts}>
           {[info.email, info.phone, info.location].filter(Boolean).join('  |  ')}
         </Text>
-        {[info.website, info.linkedin, info.portfolioUrl].some(Boolean) && (
+        {([info.website, info.linkedin, info.portfolioUrl].some(Boolean)) ? (
           <Text style={S.headerContacts}>
             {[info.linkedin, info.website, info.portfolioUrl].filter(Boolean).join('  |  ')}
           </Text>
-        ) || null}
+        ) : null}
       </View>
 
       <Summary summary={data.summary} S={S} lang={data.lang} SGlobal={SGlobal} />
@@ -438,16 +445,16 @@ const ModernCreative = ({ data, SGlobal }) => {
   const S = styles.modern_creative;
   const { personalInfo: info } = data;
   return (
-    <Page size="A4" style={S.page}>
+    <Page size="A4" style={[S.page, SGlobal.global]}>
       <View style={S.sidebar}>
-        <Text style={[S.sidebarName, SGlobal.bold]}>{info.name || 'Your Name'}</Text>
-        <Text style={[S.sidebarTitle, SGlobal.bold]}>{data.experiences?.[0]?.position || 'Professional'}</Text>
+        <Text style={[S.sidebarName, SGlobal.bold]}>{info.name || ''}</Text>
+        <Text style={[S.sidebarTitle, SGlobal.bold]}>{data.experiences?.[0]?.position || ''}</Text>
 
-        {info.qrCodeData && (
+        {info.qrCodeData ? (
           <View style={{ width: 60, height: 60, marginBottom: 15 }}>
             <Image src={info.qrCodeData} style={{ width: '100%', height: '100%' }} />
           </View>
-        )}
+        ) : null}
 
         <View style={S.sidebarSectionTitle}><Text>{getTranslation(data.lang, 'sec.contact', 'Contact')}</Text></View>
         {[
@@ -457,12 +464,12 @@ const ModernCreative = ({ data, SGlobal }) => {
           { label: 'LinkedIn', val: info.linkedin },
           { label: 'Web', val: info.website },
           { label: 'Portfolio', val: info.portfolioUrl }
-        ].map(c => c.val && (
+        ].map(c => c.val ? (
           <View key={c.label} style={S.contactItem}>
             <Text style={S.contactLabel}>{c.label}</Text>
             <Text style={S.contactValue}>{c.val}</Text>
           </View>
-        ))}
+        ) : null)}
 
         <Skills skills={data.skills} S={S} sidebar={true} lang={data.lang} SGlobal={SGlobal} />
       </View>
@@ -483,9 +490,9 @@ const MinimalistLayout = ({ data, SGlobal }) => {
   const S = styles.minimalist;
   const { personalInfo: info } = data;
   return (
-    <Page size="A4" style={S.page}>
+    <Page size="A4" style={[S.page, SGlobal.global]}>
       <View style={S.header}>
-        <Text style={[S.headerName, SGlobal.bold]}>{info.name || 'Your Name'}</Text>
+        <Text style={[S.headerName, SGlobal.bold]}>{info.name || ''}</Text>
         <Text style={S.headerTitle}>{data.experiences?.[0]?.position || ''}</Text>
         <Text style={S.headerContacts}>
           {[info.email, info.phone, info.location, info.linkedin, info.website, info.portfolioUrl].filter(Boolean).join('  •  ')}
@@ -534,11 +541,11 @@ export const CVDocument = ({ cvData }) => {
       author={cvData?.personalInfo?.name || ''}
       creator="CV Master Royal"
     >
-      <View style={currentStyles.global}>
+      <>
         {template === 'standard_ats' && <StandardATS data={data} SGlobal={currentStyles} />}
         {template === 'modern_creative' && <ModernCreative data={data} SGlobal={currentStyles} />}
         {template === 'minimalist' && <MinimalistLayout data={data} SGlobal={currentStyles} />}
-      </View>
+      </>
     </Document>
   );
 };

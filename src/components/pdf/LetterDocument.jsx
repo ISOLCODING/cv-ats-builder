@@ -109,7 +109,7 @@ export function LetterDocument({ content, personalInfo, education, hrdName, comp
           <View style={{ flexDirection: 'row', marginBottom: 3 }}>
             <Text style={{ width: 80 }}>Nama</Text>
             <Text style={{ width: 10 }}>:</Text>
-            <Text style={{ flex: 1, fontFamily: font.bold }}>{personalInfo?.name || '-'}</Text>
+            <Text style={{ flex: 1, fontFamily: font.bold }}>{personalInfo?.name || ''}</Text>
           </View>
           <View style={{ flexDirection: 'row', marginBottom: 3 }}>
             <Text style={{ width: 80 }}>Pendidikan</Text>
@@ -149,7 +149,7 @@ export function LetterDocument({ content, personalInfo, education, hrdName, comp
           ) : (
             <View style={{ height: 40 }} />
           )}
-          <Text style={[S.bold, { fontFamily: font.bold }]}>{personalInfo?.name || '[Nama Anda]'}</Text>
+          <Text style={[S.bold, { fontFamily: font.bold }]}>{personalInfo?.name || ''}</Text>
         </View>
       </Page>
     </Document>
