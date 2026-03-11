@@ -38,8 +38,9 @@ const getFontFamily = (f) => {
   return { regular: 'Helvetica', bold: 'Helvetica', italic: 'Helvetica' };
 };
 
-const SIZE_BODY    = 11; // Reduced from 12
-const LINE_HEIGHT = 1.10; // Reduced from 1.35
+const SIZE_BODY    = 10;
+const SIZE_HEADER  = 18;
+const LINE_HEIGHT  = 1.2; // Reduced from 1.35
 const MARGIN_PAGE  = 30; // Reduced from 72 (1 inch) to fit better
 
 const S = StyleSheet.create({

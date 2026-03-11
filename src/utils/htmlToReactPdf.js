@@ -56,7 +56,7 @@ function parseBlock(node, base, key) {
       if (!content) return null;
       return ce(
         Text,
-        { key, style: { ...base, marginBottom: 0.1 } }, // Dikurangi dari 2
+        { key, style: { ...base, marginBottom: 4 } },
         ...(inlines.length ? inlines : [content])
       );
     }
@@ -65,14 +65,14 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 0.1 } }, // Dikurangi dari 3
+        { key, style: { marginBottom: 4 } },
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();
           return ce(
             View,
-            { key: j, style: { flexDirection: 'row', marginBottom: 1 } },
-            ce(Text, { style: { ...base, width: 14, flexShrink: 0 } }, '\u2022'),
+            { key: j, style: { flexDirection: 'row', marginBottom: 2 } },
+            ce(Text, { style: { ...base, width: 12, flexShrink: 0 } }, '\u2022'),
             ce(
               Text,
               { style: { ...base, flex: 1 } },
@@ -87,14 +87,14 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 0.1 } }, // Dikurangi dari 3
+        { key, style: { marginBottom: 4 } },
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();
           return ce(
             View,
-            { key: j, style: { flexDirection: 'row', marginBottom: 1 } },
-            ce(Text, { style: { ...base, width: 16, flexShrink: 0 } }, `${j + 1}.`),
+            { key: j, style: { flexDirection: 'row', marginBottom: 2 } },
+            ce(Text, { style: { ...base, width: 15, flexShrink: 0 } }, `${j + 1}.`),
             ce(
               Text,
               { style: { ...base, flex: 1 } },
