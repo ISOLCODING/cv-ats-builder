@@ -18,30 +18,52 @@ import useCVStore from '../../store/useCVStore';
 import { getTranslation } from '../../utils/translations';
 
 // ── Typography & Constants ─────────────────────────────────────
-const FONT_REGULAR = 'Times-Roman';
-const FONT_BOLD    = 'Times-Bold';
-const FONT_ITALIC  = 'Times-Italic';
-const SIZE_BODY    = 11;
-const SIZE_SMALL   = 9;
-const SIZE_HEADER  = 20;
-const SIZE_SECTION = 12;
-const LINE_HEIGHT  = 1.4;
+Font.register({
+  family: 'Roboto',
+  fonts: [
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf', fontWeight: 400 },
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf', fontWeight: 700 },
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-italic-webfont.ttf', fontWeight: 400, fontStyle: 'italic' },
+  ]
+});
+
+Font.register({
+  family: 'Inter',
+  fonts: [
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/inter@3.19/docs/font-files/Inter-Regular.ttf', fontWeight: 400 },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/inter@3.19/docs/font-files/Inter-Bold.ttf', fontWeight: 700 },
+    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/inter@3.19/docs/font-files/Inter-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
+  ]
+});
+
+const getFontFamily = (f) => {
+  if (f === 'serif') return { regular: 'Times-Roman', bold: 'Times-Bold', italic: 'Times-Italic' };
+  if (f === 'sans') return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
+  if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
+  if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
+  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
+};
+
+const SIZE_BODY    = 10; // Reduced from 11
+const SIZE_SMALL   = 8;  // Reduced from 9
+const SIZE_HEADER  = 18; // Reduced from 20
+const SIZE_SECTION = 11; // Reduced from 12
+const LINE_HEIGHT  = 1.25; // Tightened from 1.4
 
 // ── Layout Styles ─────────────────────────────────────────────
 const styles = {
   // ── 1. Standard ATS (Professional & Clean) ──
   standard_ats: StyleSheet.create({
     page: {
-      fontFamily:      FONT_REGULAR,
       fontSize:        SIZE_BODY,
       color:           '#000000',
-      padding:         40,
+      padding:         30, // Reduced from 40
       backgroundColor: '#ffffff',
     },
     header: {
       borderBottom: '1pt solid #000000',
-      paddingBottom: 8,
-      marginBottom: 15,
+      paddingBottom: 5, // Reduced from 8
+      marginBottom: 10, // Reduced from 15
       textAlign: 'center',
     },
     headerName: {
@@ -56,16 +78,15 @@ const styles = {
       color: '#333333',
     },
     sectionTitle: {
-      fontFamily: FONT_BOLD,
       fontSize: SIZE_SECTION,
       textTransform: 'uppercase',
       borderBottom: '1pt solid #000000',
-      marginTop: 12,
-      marginBottom: 6,
-      paddingBottom: 2,
+      marginTop: 8, // Reduced from 12
+      marginBottom: 4, // Reduced from 6
+      paddingBottom: 1, // Reduced from 2
     },
-    itemTitle: { fontFamily: FONT_BOLD, fontSize: 11 },
-    itemSubtitle: { fontFamily: FONT_ITALIC, fontSize: 11, marginBottom: 4 },
+    itemTitle: { fontSize: 10, fontWeight: 'bold' },
+    itemSubtitle: { fontSize: 10, fontStyle: 'italic', marginBottom: 2 },
   }),
 
   // ── 2. Modern Creative (Dynamic 2-Column Sidebar) ──
@@ -179,10 +200,10 @@ const styles = {
 
 // Common Utility Styles
 const CS = StyleSheet.create({
-  itemBlock: { marginBottom: 10 },
-  itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 },
-  itemDate: { fontSize: 9, color: '#666666', flexShrink: 0, marginLeft: 10 },
-  bodyText: { fontSize: 10, textAlign: 'justify', lineHeight: 1.4, color: '#333333' },
+  itemBlock: { marginBottom: 6 }, // Reduced from 10
+  itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 1 },
+  itemDate: { fontSize: 8, color: '#666666', flexShrink: 0, marginLeft: 10 },
+  bodyText: { fontSize: 9, textAlign: 'justify', lineHeight: 1.3, color: '#333333' },
   linkText: { fontSize: 9, color: '#0066FF', marginBottom: 2 },
   bulletList: { marginTop: 4 },
   bulletRow: { flexDirection: 'row', marginBottom: 2 },
@@ -210,52 +231,52 @@ function RichText({ html, style = CS.bodyText }) {
 
 // ── Shared Sections ──────────────────────────────────────────
 
-const Summary = ({ summary, S, lang }) => (summary && typeof summary === 'string' && summary.trim()) ? (
-  <View style={{ marginBottom: 10 }}>
-    <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.summary')}</Text>
+const Summary = ({ summary, S, lang, SGlobal }) => (summary && typeof summary === 'string' && summary.trim()) ? (
+  <View style={{ marginBottom: 8 }}>
+    <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.summary')}</Text>
     <RichText html={summary} style={S.bodyText || CS.bodyText} />
   </View>
 ) : null;
 
-const Experience = ({ experiences, S, lang }) => experiences?.length ? (
-  <View style={{ marginBottom: 10 }}>
-    <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.experience')}</Text>
+const Experience = ({ experiences, S, lang, SGlobal }) => experiences?.length ? (
+  <View style={{ marginBottom: 8 }}>
+    <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.experience')}</Text>
     {experiences.map((exp, i) => (
       <View key={exp.id || i} style={CS.itemBlock}>
         <View style={CS.itemHeader}>
-          <Text style={S.itemTitle || CS.itemTitle}>
+          <Text style={[S.itemTitle || CS.itemTitle, SGlobal.bold]}>
             {exp.position} {exp.type && `(${getTranslation(lang, `type.${exp.type}`)})`}
           </Text>
           <Text style={CS.itemDate}>
             {fmtDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : fmtDate(exp.endDate, lang)}
           </Text>
         </View>
-        <Text style={S.itemSubtitle || CS.itemSubtitle}>{exp.company}</Text>
+        <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{exp.company}</Text>
         <RichText html={exp.description} />
       </View>
     ))}
   </View>
 ) : null;
 
-const Education = ({ education, S, lang }) => education?.length ? (
-  <View style={{ marginBottom: 10 }}>
-    <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.education')}</Text>
+const Education = ({ education, S, lang, SGlobal }) => education?.length ? (
+  <View style={{ marginBottom: 8 }}>
+    <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.education')}</Text>
     {education.map((edu, i) => {
       const isBootcamp = edu.degree === 'Bootcamp' || edu.degree === 'Sertifikasi';
       return (
         <View key={edu.id || i} style={CS.itemBlock}>
           <View style={CS.itemHeader}>
-            <Text style={S.itemTitle || CS.itemTitle}>
+            <Text style={[S.itemTitle || CS.itemTitle, SGlobal.bold]}>
               {edu.degree}{edu.field ? `, ${edu.field}` : ''}
             </Text>
             <Text style={CS.itemDate}>
               {fmtDate(edu.startDate, lang)} – {fmtDate(edu.endDate, lang)}
             </Text>
           </View>
-          <Text style={S.itemSubtitle || CS.itemSubtitle}>{edu.institution}</Text>
+          <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{edu.institution}</Text>
           {edu.gpa && (
-            <Text style={{ ...CS.bodyText, fontSize: 9, marginBottom: 2 }}>
-              {isBootcamp ? 'Skor / Predikat' : 'IPK / GPA'}: <Text style={{ fontFamily: FONT_BOLD }}>{edu.gpa}</Text>
+            <Text style={{ ...CS.bodyText, fontSize: 8, marginBottom: 1 }}>
+              {isBootcamp ? 'Skor / Predikat' : 'IPK / GPA'}: <Text style={SGlobal.bold}>{edu.gpa}</Text>
             </Text>
           )}
           {edu.link && (
@@ -334,7 +355,7 @@ const Organizations = ({ organizations, S, lang }) => {
 
 
 
-const Skills = ({ skills, S, lang, sidebar = false }) => {
+const Skills = ({ skills, S, lang, SGlobal, sidebar = false }) => {
   const { technical = [], softSkills = [], languages = [] } = skills || {};
   if (!technical.length && !softSkills.length && !languages.length) return null;
 
@@ -342,19 +363,19 @@ const Skills = ({ skills, S, lang, sidebar = false }) => {
     return (
       <View>
         <View style={S.sidebarSectionTitle}><Text>{getTranslation(lang, 'sec.techskills', 'Technical Skills')}</Text></View>
-        <Text style={{ fontSize: 8.5, color: '#334155' }}>{technical.join(', ')}</Text>
+        <Text style={{ fontSize: 8, color: '#334155' }}>{technical.join(', ')}</Text>
         
         {softSkills.length > 0 && (
           <>
             <View style={S.sidebarSectionTitle}><Text>{getTranslation(lang, 'sec.softskills', 'Soft Skills')}</Text></View>
-            <Text style={{ fontSize: 8.5, color: '#334155' }}>{softSkills.join(', ')}</Text>
+            <Text style={{ fontSize: 8, color: '#334155' }}>{softSkills.join(', ')}</Text>
           </>
         )}
 
         {languages.length > 0 && (
           <>
             <View style={S.sidebarSectionTitle}><Text>{getTranslation(lang, 'sec.languages', 'Languages')}</Text></View>
-            <Text style={{ fontSize: 8.5, color: '#334155' }}>{languages.join(', ')}</Text>
+            <Text style={{ fontSize: 8, color: '#334155' }}>{languages.join(', ')}</Text>
           </>
         )}
       </View>
@@ -362,22 +383,22 @@ const Skills = ({ skills, S, lang, sidebar = false }) => {
   }
 
   return (
-    <View style={{ marginBottom: 10 }}>
-      <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.skills')}</Text>
-      <View style={{ gap: 4 }}>
+    <View style={{ marginBottom: 8 }}>
+      <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.skills')}</Text>
+      <View style={{ gap: 2 }}>
         {technical.length > 0 && (
-          <Text style={{ fontSize: 10 }}>
-            <Text style={{ fontFamily: FONT_BOLD }}>{getTranslation(lang, 'sec.techskills', 'Technical')}: </Text>{technical.join(', ')}
+          <Text style={{ fontSize: 9 }}>
+            <Text style={SGlobal.bold}>{getTranslation(lang, 'sec.techskills', 'Technical')}: </Text>{technical.join(', ')}
           </Text>
         )}
         {softSkills.length > 0 && (
-          <Text style={{ fontSize: 10 }}>
-            <Text style={{ fontFamily: FONT_BOLD }}>{getTranslation(lang, 'sec.softskills', 'Soft Skills')}: </Text>{softSkills.join(', ')}
+          <Text style={{ fontSize: 9 }}>
+            <Text style={SGlobal.bold}>{getTranslation(lang, 'sec.softskills', 'Soft Skills')}: </Text>{softSkills.join(', ')}
           </Text>
         )}
         {languages.length > 0 && (
-          <Text style={{ fontSize: 10 }}>
-            <Text style={{ fontFamily: FONT_BOLD }}>{getTranslation(lang, 'sec.languages', 'Languages')}: </Text>{languages.join(', ')}
+          <Text style={{ fontSize: 9 }}>
+            <Text style={SGlobal.bold}>{getTranslation(lang, 'sec.languages', 'Languages')}: </Text>{languages.join(', ')}
           </Text>
         )}
       </View>
@@ -387,13 +408,13 @@ const Skills = ({ skills, S, lang, sidebar = false }) => {
 
 // ── Layout Components ──────────────────────────────────────────
 
-const StandardATS = ({ data }) => {
+const StandardATS = ({ data, SGlobal }) => {
   const S = styles.standard_ats;
   const { personalInfo: info } = data;
   return (
     <Page size="A4" style={S.page}>
       <View style={S.header}>
-        <Text style={S.headerName}>{info.name || 'Nama Anda'}</Text>
+        <Text style={[S.headerName, SGlobal.bold]}>{info.name || 'Nama Anda'}</Text>
         <Text style={S.headerContacts}>
           {[info.email, info.phone, info.location].filter(Boolean).join('  |  ')}
         </Text>
@@ -404,28 +425,28 @@ const StandardATS = ({ data }) => {
         ) || null}
       </View>
 
-      <Summary summary={data.summary} S={S} lang={data.lang} />
-      <Education education={data.education} S={S} lang={data.lang} />
-      <Skills skills={data.skills} S={S} lang={data.lang} />
-      <Experience experiences={data.experiences} S={S} lang={data.lang} />
-      <Projects projects={data.projects} S={S} lang={data.lang} />
-      <Organizations organizations={data.organizations} S={S} lang={data.lang} />
-      <Certifications certifications={data.certifications} S={S} lang={data.lang} />
+      <Summary summary={data.summary} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Education education={data.education} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Skills skills={data.skills} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Experience experiences={data.experiences} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Projects projects={data.projects} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Organizations organizations={data.organizations} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Certifications certifications={data.certifications} S={S} lang={data.lang} SGlobal={SGlobal} />
     </Page>
   );
 };
 
-const ModernCreative = ({ data }) => {
+const ModernCreative = ({ data, SGlobal }) => {
   const S = styles.modern_creative;
   const { personalInfo: info } = data;
   return (
     <Page size="A4" style={S.page}>
       <View style={S.sidebar}>
-        <Text style={S.sidebarName}>{info.name || 'Your Name'}</Text>
-        <Text style={S.sidebarTitle}>{data.experiences?.[0]?.position || 'Professional'}</Text>
+        <Text style={[S.sidebarName, SGlobal.bold]}>{info.name || 'Your Name'}</Text>
+        <Text style={[S.sidebarTitle, SGlobal.bold]}>{data.experiences?.[0]?.position || 'Professional'}</Text>
 
         {info.qrCodeData && (
-          <View style={{ width: 80, height: 80, marginBottom: 20 }}>
+          <View style={{ width: 60, height: 60, marginBottom: 15 }}>
             <Image src={info.qrCodeData} style={{ width: '100%', height: '100%' }} />
           </View>
         )}
@@ -445,41 +466,41 @@ const ModernCreative = ({ data }) => {
           </View>
         ))}
 
-        <Skills skills={data.skills} S={S} sidebar={true} lang={data.lang} />
+        <Skills skills={data.skills} S={S} sidebar={true} lang={data.lang} SGlobal={SGlobal} />
       </View>
 
       <View style={S.main}>
-        <Summary summary={data.summary} S={S} lang={data.lang} />
-        <Education education={data.education} S={S} lang={data.lang} />
-        <Experience experiences={data.experiences} S={S} lang={data.lang} />
-        <Projects projects={data.projects} S={S} lang={data.lang} />
-        <Organizations organizations={data.organizations} S={S} lang={data.lang} />
-        <Certifications certifications={data.certifications} S={S} lang={data.lang} />
+        <Summary summary={data.summary} S={S} lang={data.lang} SGlobal={SGlobal} />
+        <Education education={data.education} S={S} lang={data.lang} SGlobal={SGlobal} />
+        <Experience experiences={data.experiences} S={S} lang={data.lang} SGlobal={SGlobal} />
+        <Projects projects={data.projects} S={S} lang={data.lang} SGlobal={SGlobal} />
+        <Organizations organizations={data.organizations} S={S} lang={data.lang} SGlobal={SGlobal} />
+        <Certifications certifications={data.certifications} S={S} lang={data.lang} SGlobal={SGlobal} />
       </View>
     </Page>
   );
 };
 
-const MinimalistLayout = ({ data }) => {
+const MinimalistLayout = ({ data, SGlobal }) => {
   const S = styles.minimalist;
   const { personalInfo: info } = data;
   return (
     <Page size="A4" style={S.page}>
       <View style={S.header}>
-        <Text style={S.headerName}>{info.name || 'Your Name'}</Text>
+        <Text style={[S.headerName, SGlobal.bold]}>{info.name || 'Your Name'}</Text>
         <Text style={S.headerTitle}>{data.experiences?.[0]?.position || ''}</Text>
         <Text style={S.headerContacts}>
           {[info.email, info.phone, info.location, info.linkedin, info.website, info.portfolioUrl].filter(Boolean).join('  •  ')}
         </Text>
       </View>
 
-      <Summary summary={data.summary} S={S} lang={data.lang} />
-      <Education education={data.education} S={S} lang={data.lang} />
-      <Skills skills={data.skills} S={S} lang={data.lang} />
-      <Experience experiences={data.experiences} S={S} lang={data.lang} />
-      <Projects projects={data.projects} S={S} lang={data.lang} />
-      <Organizations organizations={data.organizations} S={S} lang={data.lang} />
-      <Certifications certifications={data.certifications} S={S} lang={data.lang} />
+      <Summary summary={data.summary} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Education education={data.education} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Skills skills={data.skills} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Experience experiences={data.experiences} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Projects projects={data.projects} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Organizations organizations={data.organizations} S={S} lang={data.lang} SGlobal={SGlobal} />
+      <Certifications certifications={data.certifications} S={S} lang={data.lang} SGlobal={SGlobal} />
     </Page>
   );
 };
@@ -488,10 +509,26 @@ const MinimalistLayout = ({ data }) => {
 
 export const CVDocument = ({ cvData }) => {
   const template = cvData?.selectedTemplate || 'standard_ats';
+  const appSettings = useCVStore.getState().appSettings || {};
   const data = {
     ...cvData,
-    lang: useCVStore.getState().appSettings?.language || 'id'
+    lang: appSettings.language || 'id',
+    font: getFontFamily(appSettings.fontFamily || 'serif')
   };
+
+  const currentStyles = StyleSheet.create({
+    global: {
+      fontFamily: data.font.regular,
+    },
+    bold: {
+      fontFamily: data.font.bold,
+      fontWeight: 'bold',
+    },
+    italic: {
+      fontFamily: data.font.italic,
+      fontStyle: 'italic',
+    }
+  });
 
   return (
     <Document 
@@ -499,9 +536,11 @@ export const CVDocument = ({ cvData }) => {
       author={cvData?.personalInfo?.name || ''}
       creator="CV Master Royal"
     >
-      {template === 'standard_ats' && <StandardATS data={data} />}
-      {template === 'modern_creative' && <ModernCreative data={data} />}
-      {template === 'minimalist' && <MinimalistLayout data={data} />}
+      <View style={currentStyles.global}>
+        {template === 'standard_ats' && <StandardATS data={data} SGlobal={currentStyles} />}
+        {template === 'modern_creative' && <ModernCreative data={data} SGlobal={currentStyles} />}
+        {template === 'minimalist' && <MinimalistLayout data={data} SGlobal={currentStyles} />}
+      </View>
     </Document>
   );
 };

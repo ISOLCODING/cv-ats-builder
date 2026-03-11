@@ -111,7 +111,10 @@ function parseBlock(node, base, key) {
     case 'h1':
     case 'h2':
     case 'h3': {
-      const boldStyle = { ...base, fontFamily: 'Times-Bold', marginBottom: 3 };
+      const boldStyle = { ...base, fontWeight: 'bold', marginBottom: 3 };
+      if (base.fontFamily === 'Times-Roman') boldStyle.fontFamily = 'Times-Bold';
+      if (base.fontFamily === 'Helvetica') boldStyle.fontFamily = 'Helvetica-Bold';
+      
       const inlines   = parseInlines(children, boldStyle);
       const text      = node.textContent.trim();
       return ce(Text, { key, style: boldStyle }, ...(inlines.length ? inlines : [text]));
@@ -148,13 +151,17 @@ function parseInline(node, base, key) {
   switch (tag) {
     case 'strong':
     case 'b': {
-      const s = { ...base, fontFamily: 'Times-Bold' };
+      const s = { ...base, fontWeight: 'bold' };
+      if (base.fontFamily === 'Times-Roman') s.fontFamily = 'Times-Bold';
+      if (base.fontFamily === 'Helvetica') s.fontFamily = 'Helvetica-Bold';
       return ce(Text, { key, style: s }, ...parseInlines(children, s));
     }
 
     case 'em':
     case 'i': {
-      const s = { ...base, fontFamily: 'Times-Italic' };
+      const s = { ...base, fontStyle: 'italic' };
+      if (base.fontFamily === 'Times-Roman') s.fontFamily = 'Times-Italic';
+      if (base.fontFamily === 'Helvetica') s.fontFamily = 'Helvetica-Oblique';
       return ce(Text, { key, style: s }, ...parseInlines(children, s));
     }
 

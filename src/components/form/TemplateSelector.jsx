@@ -28,9 +28,17 @@ const TEMPLATES = [
   }
 ];
 
+const FONTS = [
+  { id: 'serif', name: 'Times New Roman', desc: 'Klasik & Sangat Formal', class: 'font-serif' },
+  { id: 'sans', name: 'Helvetica / Arial', desc: 'Modern & Mudah Dibaca', class: 'font-sans' },
+  { id: 'tahoma', name: 'Tahoma / Verdana', desc: 'Humanist & Profesional', class: 'font-sans italic' },
+  { id: 'roboto', name: 'Roboto', desc: 'Teknologi & Bersih', class: 'font-sans font-medium' },
+];
+
 export default function TemplateSelector({ onNext }) {
-  const { cvData, setTemplate } = useCVStore();
+  const { cvData, setTemplate, appSettings, setFontFamily } = useCVStore();
   const selected = cvData.selectedTemplate || 'standard_ats';
+  const selectedFont = appSettings?.fontFamily || 'serif';
 
   return (
     <div className="space-y-12 animate-fade-up">
@@ -86,6 +94,46 @@ export default function TemplateSelector({ onNext }) {
             </button>
           );
         })}
+      </div>
+
+      <div className="space-y-8 animate-fade-up delay-100">
+        <div className="flex items-center gap-4 px-2">
+          <div className="w-12 h-12 rounded-2xl bg-slate-50 text-blue-600 flex items-center justify-center shadow-inner">
+            <AlignLeft className="w-6 h-6" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight italic">Tipografi <span className="text-blue-600">& Font</span></h3>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">Gaya tulisan dokumen</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {FONTS.map((f) => {
+            const isFontSelected = selectedFont === f.id;
+            return (
+              <button
+                type="button"
+                key={f.id}
+                onClick={() => setFontFamily(f.id)}
+                className={`p-5 rounded-[2rem] border-2 transition-all duration-300 text-left group ${
+                  isFontSelected 
+                    ? 'border-blue-500 bg-white shadow-xl translate-y-[-2px]' 
+                    : 'border-slate-100 bg-slate-50/30 hover:bg-white hover:border-slate-200'
+                }`}
+              >
+                <div className={`text-2xl font-black mb-2 transition-colors ${f.class} ${isFontSelected ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-400'}`}>
+                  Aa
+                </div>
+                <div className={`text-[11px] font-black uppercase tracking-tight ${isFontSelected ? 'text-slate-900' : 'text-slate-500'}`}>
+                  {f.name}
+                </div>
+                <div className="text-[9px] text-slate-400 font-bold leading-tight mt-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                  {f.desc}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex justify-end pt-12 border-t border-slate-50">

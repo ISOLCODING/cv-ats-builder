@@ -74,6 +74,7 @@ const defaultSettings = {
   primaryColor: '#2563eb',
   accentColor: '#f59e0b',
   language: 'id', // 'id' | 'en'
+  fontFamily: 'serif', // 'serif' (Times) | 'sans' (Helvetica) | 'tahoma' (Inter/Tahoma lookalike)
 };
 
 // Default ATS result
@@ -129,6 +130,10 @@ const useCVStore = create(
       // ── Settings ──────────────────────────────────────────
       updateSettings: (settings) => set((state) => ({
         appSettings: { ...state.appSettings, ...settings }
+      })),
+
+      setFontFamily: (font) => set((state) => ({
+        appSettings: { ...state.appSettings, fontFamily: font }
       })),
 
       // ── Language Toggle & Translator ──────────────────────
