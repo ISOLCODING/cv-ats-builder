@@ -50,7 +50,7 @@ const S = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   section: {
-    marginBottom: 10, // Reduced from 12
+    marginBottom: 8, // Reduced from 12
   },
   text: {
     textAlign: 'justify',
