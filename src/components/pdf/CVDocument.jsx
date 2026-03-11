@@ -62,7 +62,7 @@ const styles = {
     },
     header: {
       borderBottom: '1pt solid #000000',
-      paddingBottom: 4, // Reduced from 5
+      paddingBottom: 2, // Reduced from 5
       marginBottom: 2, // Reduced from 10
       textAlign: 'center',
     },
@@ -99,13 +99,13 @@ const styles = {
     sidebar: {
       width: '32%',
       backgroundColor: '#f8fafc',
-      padding: 25,
-      height: '100%',
+      padding: 20,
+       /* height: '100%' */
       borderRight: '1pt solid #e2e8f0',
     },
     main: {
       width: '68%',
-      padding: 30,
+      padding: 20,
     },
     sidebarName: {
       fontSize: 22,
@@ -129,7 +129,7 @@ const styles = {
       textTransform: 'uppercase',
       letterSpacing: 1.0,
       borderBottom: '2pt solid #3b82f6',
-      paddingBottom: 4,
+      paddingBottom: 2,
       marginBottom: 3,
       marginTop: 6,
     },
@@ -231,7 +231,7 @@ function RichText({ html, style = CS.bodyText }) {
 
 const Summary = ({ summary, S, lang, SGlobal }) => 
   (summary && typeof summary === 'string' && summary.trim()) ? (
-    <View style={{ marginBottom: 8 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.summary')}</Text>
       <RichText html={summary} style={S.bodyText || CS.bodyText} />
     </View>
@@ -239,7 +239,7 @@ const Summary = ({ summary, S, lang, SGlobal }) =>
 
 const Experience = ({ experiences, S, lang, SGlobal }) => 
   (experiences && experiences.length > 0) ? (
-    <View style={{ marginBottom: 8 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.experience')}</Text>
       {experiences.map((exp, i) => (
         <View key={exp.id || i} style={CS.itemBlock}>
@@ -260,7 +260,7 @@ const Experience = ({ experiences, S, lang, SGlobal }) =>
 
 const Education = ({ education, S, lang, SGlobal }) => 
   (education && education.length > 0) ? (
-    <View style={{ marginBottom: 8 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.education')}</Text>
       {education.map((edu, i) => {
         const isBootcamp = edu.degree === 'Bootcamp' || edu.degree === 'Sertifikasi';
@@ -292,10 +292,10 @@ const Education = ({ education, S, lang, SGlobal }) =>
 
 const Certifications = ({ certifications, S, lang }) => 
   (certifications && certifications.length > 0) ? (
-    <View style={{ marginBottom: 10 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.certifications')}</Text>
       {certifications.map((c, i) => (
-        <View key={c.id || i} style={{ marginBottom: 6 }}>
+        <View key={c.id || i} style={{ marginBottom: 2 }}>
           <View style={CS.itemHeader}>
             <Text style={S.itemTitle || CS.itemTitle}>{c.name}</Text>
             <Text style={CS.itemDate}>{c.year}</Text>
@@ -310,7 +310,7 @@ const Certifications = ({ certifications, S, lang }) =>
 
 const Projects = ({ projects, S, lang }) => 
   (projects && projects.length > 0) ? (
-    <View style={{ marginBottom: 10 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.projects')}</Text>
       {projects.map((p, i) => (
         <View key={p.id || i} style={CS.itemBlock}>
@@ -336,10 +336,10 @@ const Organizations = ({ organizations, S, lang }) => {
   }, []);
 
   return (
-    <View style={{ marginBottom: 10 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.organizations')}</Text>
       {groups.map((group, gi) => (
-        <View key={gi} style={{ marginBottom: 8 }}>
+        <View key={gi} style={{ marginBottom: 3 }}>
           <Text style={{ ...S.itemTitle, borderBottom: '0.5pt solid #eeeeee', marginBottom: 4, paddingBottom: 2 }}>{group.name}</Text>
           {group.items.map((org, i) => (
             <View key={org.id || i} style={{ marginLeft: 10, marginBottom: 4 }}>
@@ -388,7 +388,7 @@ const Skills = ({ skills, S, lang, SGlobal, sidebar = false }) => {
   }
 
   return (
-    <View style={{ marginBottom: 8 }}>
+    <View style={{ marginBottom: 4 }}>
       <Text style={[S.sectionTitle, SGlobal.bold]}>{getTranslation(lang, 'sec.skills')}</Text>
       <View style={{ gap: 2 }}>
         {technical.length > 0 ? (
@@ -451,7 +451,7 @@ const ModernCreative = ({ data, SGlobal }) => {
         <Text style={[S.sidebarTitle, SGlobal.bold]}>{data.experiences?.[0]?.position || ''}</Text>
 
         {info.qrCodeData ? (
-          <View style={{ width: 60, height: 60, marginBottom: 15 }}>
+          <View style={{ width: 60, height: 60, marginBottom: 5 }}>
             <Image src={info.qrCodeData} style={{ width: '100%', height: '100%' }} />
           </View>
         ) : null}
