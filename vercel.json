@@ -1,5 +1,11 @@
 {
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist",
   "rewrites": [
+    {
+      "source": "/api/gas/(.*)",
+      "destination": "https://script.google.com/macros/s/AKfycbx9Iv_RjSAyLdx7xzkWdSJ2DKk0UphCF8CY4ouqIKfpdVD4WF8QFSro3jJAUZcWuXt1/exec"
+    },
     {
       "source": "/api/gas",
       "destination": "https://script.google.com/macros/s/AKfycbx9Iv_RjSAyLdx7xzkWdSJ2DKk0UphCF8CY4ouqIKfpdVD4WF8QFSro3jJAUZcWuXt1/exec"

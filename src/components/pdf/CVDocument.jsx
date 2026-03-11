@@ -47,11 +47,14 @@ Font.register({
 
 
 const getFontFamily = (f) => {
-  if (f === 'serif') return { regular: 'Times-Roman', bold: 'Times-Bold', italic: 'Times-Italic' };
-  if (f === 'sans') return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
+  // Note: for built-in PDF fonts, italic is handled via fontStyle, not a separate family name.
+  // 'Times-Roman' + fontStyle:'italic' → Times Italic
+  // 'Helvetica'   + fontStyle:'italic' → Helvetica Oblique
+  if (f === 'serif') return { regular: 'Times-Roman', bold: 'Times-Bold', italic: 'Times-Roman' };
+  if (f === 'sans') return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
   if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
   if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
-  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
+  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
 };
 
 const SIZE_BODY    = 10; // Reduced from 11

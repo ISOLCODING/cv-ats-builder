@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:vercel": "cross-env VITE_BUILD_TARGET=pages vite build --outDir dist",
     "build:pages": "cross-env VITE_BUILD_TARGET=pages vite build",
     "preview": "vite preview",
     "deploy": "node scripts/deploy.js",
