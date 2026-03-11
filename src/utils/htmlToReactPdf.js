@@ -65,7 +65,7 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 2 } }, // Dikurangi dari 3
+        { key, style: { marginBottom: 1.2 } }, // Dikurangi dari 3
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();
@@ -87,7 +87,7 @@ function parseBlock(node, base, key) {
       const items = Array.from(node.querySelectorAll('li'));
       return ce(
         View,
-        { key, style: { marginBottom: 2 } }, // Dikurangi dari 3
+        { key, style: { marginBottom: 1.2 } }, // Dikurangi dari 3
         ...items.map((li, j) => {
           const inlines = parseInlines(Array.from(li.childNodes), base);
           const text    = li.textContent.trim();
