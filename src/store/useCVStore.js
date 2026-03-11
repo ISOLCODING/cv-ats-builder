@@ -15,6 +15,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { translateCVContent } from '../services/groq';
+
 
 // Default shape untuk cvData
 const defaultCVData = {
@@ -133,8 +135,6 @@ const useCVStore = create(
       translateCVData: async (targetLang) => {
         set({ isSaving: true });
         try {
-          // Dynamic import of groq to avoid cyclic issues or keep it light during initial load
-          const { translateCVContent } = await import('../services/groq');
           const state = get();
           // Strip out base64 images or large payloads that don't need translation to save tokens
           const cvDataToTranslate = { ...state.cvData };
