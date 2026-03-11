@@ -48,7 +48,7 @@ const SIZE_BODY    = 10; // Reduced from 11
 const SIZE_SMALL   = 8;  // Reduced from 9
 const SIZE_HEADER  = 18; // Reduced from 20
 const SIZE_SECTION = 11; // Reduced from 12
-const LINE_HEIGHT  = 1.15; // Tightened from 1.25
+const LINE_HEIGHT  = 1.05; // Aggressively tightened
 
 // ── Layout Styles ─────────────────────────────────────────────
 const styles = {
