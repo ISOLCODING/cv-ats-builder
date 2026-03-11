@@ -63,7 +63,7 @@ const styles = {
     header: {
       borderBottom: '1pt solid #000000',
       paddingBottom: 4, // Reduced from 5
-      marginBottom: 8, // Reduced from 10
+      marginBottom: 2, // Reduced from 10
       textAlign: 'center',
     },
     headerName: {
@@ -112,7 +112,7 @@ const styles = {
       fontWeight: 'bold',
       color: '#0f172a',
       marginBottom: 4,
-      lineHeight: 1.1,
+      lineHeight: 1.02,
     },
     sidebarTitle: {
       fontSize: 10,
@@ -120,7 +120,7 @@ const styles = {
       color: '#3b82f6',
       textTransform: 'uppercase',
       letterSpacing: 1,
-      marginBottom: 20,
+      marginBottom: 5,
     },
     sectionTitle: {
       fontSize: 12,
@@ -130,20 +130,20 @@ const styles = {
       letterSpacing: 1.2,
       borderBottom: '2pt solid #3b82f6',
       paddingBottom: 4,
-      marginBottom: 12,
-      marginTop: 18,
+      marginBottom: 3,
+      marginTop: 6,
     },
     sidebarSectionTitle: {
       fontSize: 9,
       fontWeight: 'bold',
       color: '#1e293b',
       textTransform: 'uppercase',
-      marginTop: 20,
-      marginBottom: 8,
+      marginTop: 8,
+      marginBottom: 2,
       borderBottom: '1pt solid #cbd5e1',
       paddingBottom: 2,
     },
-    contactItem: { marginBottom: 8 },
+    contactItem: { marginBottom: 3 },
     contactLabel: { fontSize: 7, color: '#64748b', textTransform: 'uppercase', marginBottom: 1 },
     contactValue: { fontSize: 8.5, color: '#334155' },
     itemTitle: { fontWeight: 'bold', fontSize: 11, color: '#0f172a' },
@@ -198,13 +198,13 @@ const styles = {
 
 // Common Utility Styles
 const CS = StyleSheet.create({
-  itemBlock: { marginBottom: 3 }, // Reduced from 6
+  itemBlock: { marginBottom: 1.5 }, // Reduced from 6
   itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 1 },
   itemDate: { fontSize: 8, color: '#666666', flexShrink: 0, marginLeft: 10 },
-  bodyText: { fontSize: 9, textAlign: 'justify', lineHeight: 1.1, color: '#333333' },
+  bodyText: { fontSize: 9, textAlign: 'justify', lineHeight: 1.02, color: '#333333' },
   linkText: { fontSize: 9, color: '#0066FF', marginBottom: 2 },
-  bulletList: { marginTop: 4 },
-  bulletRow: { flexDirection: 'row', marginBottom: 2 },
+  bulletList: { marginTop: 0 },
+  bulletRow: { flexDirection: 'row', marginBottom: 0.5 },
   bulletDot: { width: 10, fontSize: 10, color: '#333333' },
   bulletText: { flex: 1, fontSize: 10, textAlign: 'justify' },
 });
