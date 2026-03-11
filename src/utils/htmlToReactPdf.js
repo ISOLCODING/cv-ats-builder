@@ -159,9 +159,9 @@ function parseInline(node, base, key) {
 
     case 'em':
     case 'i': {
+      // Keep base fontFamily, fontStyle:'italic' is enough for built-in PDF fonts.
+      // Times-Roman + italic → Times Italic, Helvetica + italic → Helvetica Oblique
       const s = { ...base, fontStyle: 'italic' };
-      if (base.fontFamily === 'Times-Roman') s.fontFamily = 'Times-Italic';
-      if (base.fontFamily === 'Helvetica') s.fontFamily = 'Helvetica-Oblique';
       return ce(Text, { key, style: s }, ...parseInlines(children, s));
     }
 
