@@ -39,7 +39,7 @@ const getFontFamily = (f) => {
 };
 
 const SIZE_BODY    = 11; // Reduced from 12
-const LINE_HEIGHT  = 1.35; // Reduced from 1.5
+const LINE_HEIGHT  = 1.18; // Reduced from 1.35
 const MARGIN_PAGE  = 50; // Reduced from 72 (1 inch) to fit better
 
 const S = StyleSheet.create({

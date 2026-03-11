@@ -56,7 +56,7 @@ function parseBlock(node, base, key) {
       if (!content) return null;
       return ce(
         Text,
-        { key, style: { ...base, marginBottom: 2 } }, // Dikurangi dari 3
+        { key, style: { ...base, marginBottom: 1.2 } }, // Dikurangi dari 2
         ...(inlines.length ? inlines : [content])
       );
     }

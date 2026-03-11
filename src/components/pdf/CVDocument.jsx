@@ -48,7 +48,7 @@ const SIZE_BODY    = 10; // Reduced from 11
 const SIZE_SMALL   = 8;  // Reduced from 9
 const SIZE_HEADER  = 18; // Reduced from 20
 const SIZE_SECTION = 11; // Reduced from 12
-const LINE_HEIGHT  = 1.25; // Tightened from 1.4
+const LINE_HEIGHT  = 1.15; // Tightened from 1.25
 
 // ── Layout Styles ─────────────────────────────────────────────
 const styles = {
@@ -62,8 +62,8 @@ const styles = {
     },
     header: {
       borderBottom: '1pt solid #000000',
-      paddingBottom: 5, // Reduced from 8
-      marginBottom: 10, // Reduced from 15
+      paddingBottom: 4, // Reduced from 5
+      marginBottom: 8, // Reduced from 10
       textAlign: 'center',
     },
     headerName: {
@@ -81,9 +81,9 @@ const styles = {
       fontSize: SIZE_SECTION,
       textTransform: 'uppercase',
       borderBottom: '1pt solid #000000',
-      marginTop: 8, // Reduced from 12
-      marginBottom: 4, // Reduced from 6
-      paddingBottom: 1, // Reduced from 2
+      marginTop: 6, // Reduced from 8
+      marginBottom: 3, // Reduced from 4
+      paddingBottom: 1,
     },
     itemTitle: { fontSize: 10, fontWeight: 'bold' },
     itemSubtitle: { fontSize: 10, fontStyle: 'italic', marginBottom: 2 },
