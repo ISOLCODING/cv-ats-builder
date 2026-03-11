@@ -44,11 +44,11 @@ const getFontFamily = (f) => {
   return { regular: 'Helvetica', bold: 'Helvetica', italic: 'Helvetica' };
 };
 
-const SIZE_BODY = 11;
+const SIZE_BODY = 10;
 const SIZE_SMALL = 8;
-const SIZE_HEADER = 18;
-const SIZE_SECTION = 11;
-const LINE_HEIGHT = 1.4;
+const SIZE_HEADER = 13;
+const SIZE_SECTION = 10;
+const LINE_HEIGHT = 1.2;
 const PRIMARY_COLOR = '#000000';
 const SECONDARY_COLOR = '#4B5563';
 
@@ -59,13 +59,13 @@ const styles = {
     page: {
       fontSize:        SIZE_BODY,
       color:           '#000000',
-      padding: 80,
+      padding: 10,
       backgroundColor: '#ffffff',
     },
     header: {
       borderBottom: '1pt solid #000000',
-      paddingBottom: 12,
-      marginBottom: 24,
+      paddingBottom: 4,
+      marginBottom: 4,
       textAlign: 'center',
     },
     headerName: {
@@ -84,7 +84,7 @@ const styles = {
       fontSize: SIZE_SECTION,
       textTransform: 'uppercase',
       borderBottom: '1pt solid #000000',
-      marginTop: 16,
+      marginTop: 10,
       marginBottom: 8,
       paddingBottom: 1,
     },
