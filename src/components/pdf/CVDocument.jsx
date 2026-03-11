@@ -44,11 +44,11 @@ const getFontFamily = (f) => {
   return { regular: 'Helvetica', bold: 'Helvetica', italic: 'Helvetica' };
 };
 
-const SIZE_BODY = 9;
+const SIZE_BODY = 10;
 const SIZE_SMALL = 8;
 const SIZE_HEADER = 18;
 const SIZE_SECTION = 11;
-const LINE_HEIGHT = 1.15;
+const LINE_HEIGHT = 1.12;
 
 // ── Layout Styles ─────────────────────────────────────────────
 const styles = {
@@ -468,7 +468,7 @@ const ModernCreative = ({ data, SGlobal }) => {
 
         <View style={{ marginBottom: 10 }}>
           <View style={S.sidebarSectionTitle}><Text>{getTranslation(data.lang, 'sec.contact', 'Contact')}</Text></View>
-          {[
+          {[ 
             { label: 'Email', val: info.email },
             { label: 'Telepon', val: info.phone },
             { label: 'Lokasi', val: info.location },
