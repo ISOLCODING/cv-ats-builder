@@ -139,7 +139,7 @@ export function useGAS() {
           saveToDrive: 'gsSaveToDrive',
           listHistory: 'gsListHistory',
           updateStatus: 'gsUpdateStatus',
-          callGemini: 'gsCallGemini',
+          callAI: 'gsCallAI',
         };
 
         const gasFunction = functionMap[action];
@@ -171,7 +171,7 @@ export function useGAS() {
           case 'updateStatus':
             args = [payload.id, payload.status];
             break;
-          case 'callGemini':
+          case 'callAI':
             args = [payload.prompt, payload.isJson];
             break;
           case 'listCVs':

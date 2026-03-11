@@ -11,7 +11,7 @@ import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
 import useCVStore from '../../store/useCVStore';
 import { calculateATSScore, getScoreLabel } from '../../utils/atsScore';
-import { optimizeCV } from '../../services/gemini';
+import { optimizeCV } from '../../services/groq';
 
 // ── ATS Score animated ring ────────────────────────────────────
 function ScoreRing({ score }) {

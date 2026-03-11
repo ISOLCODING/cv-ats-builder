@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Target, Search, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, BarChart3, Info } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
-import { useGemini } from '../../hooks/useGemini';
+import { useGroq } from '../../hooks/useGroq';
 import { Sparkles, RefreshCw } from 'lucide-react';
 
 export default function ATSChecker({ onBack, onNext }) {
@@ -12,7 +12,7 @@ export default function ATSChecker({ onBack, onNext }) {
     atsResult, setATSResult, showToast,
     updateSummary, updateSkills, coverLetter 
   } = useCVStore();
-  const { analyzeATSAI, optimizeCVAI } = useGemini();
+  const { analyzeATSAI, optimizeCVAI } = useGroq();
   const [analyzing, setAnalyzing] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
 
@@ -53,7 +53,7 @@ export default function ATSChecker({ onBack, onNext }) {
       showToast('success', 'CV dioptimalkan otomatis! Menganalisis ulang...');
       
       // Trigger re-analysis to show new score
-      const newResult = await analyzeATS({ 
+      const newResult = await analyzeATSAI({ 
         cvData: { ...cvData, summary: optimizedSummary, skills: { ...cvData.skills, technical: merged } }, 
         jobDescription,
         coverLetter

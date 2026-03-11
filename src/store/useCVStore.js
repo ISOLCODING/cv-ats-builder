@@ -133,8 +133,8 @@ const useCVStore = create(
       translateCVData: async (targetLang) => {
         set({ isSaving: true });
         try {
-          // Dynamic import of gemini to avoid cyclic issues or keep it light during initial load
-          const { translateCVContent } = await import('../services/gemini');
+          // Dynamic import of groq to avoid cyclic issues or keep it light during initial load
+          const { translateCVContent } = await import('../services/groq');
           const state = get();
           // Strip out base64 images or large payloads that don't need translation to save tokens
           const cvDataToTranslate = { ...state.cvData };
@@ -174,7 +174,7 @@ const useCVStore = create(
             }
           }));
 
-          get().showToast('success', `Translasi CV ke bahasa ${targetLang.toUpperCase()} berhasil menggunakan Gemini 2.5 Flash!`);
+          get().showToast('success', `Translasi CV ke bahasa ${targetLang.toUpperCase()} berhasil menggunakan Groq AI!`);
         } catch (err) {
           // Tetap ganti bahasa UI meskipun translasi konten CV dari AI gagal karena limit
           set((prev) => ({

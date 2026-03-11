@@ -284,7 +284,7 @@ export default function App() {
               ) : (
                 <div className="relative w-full h-full flex items-center justify-center">
                   <img
-                    src="/logo.png"
+                    src={`${import.meta.env.BASE_URL}logo.png`}
                     alt="Logo"
                     className="w-full h-full object-cover"
                     onError={(e) => {

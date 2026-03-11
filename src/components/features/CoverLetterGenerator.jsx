@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
-import { useGemini } from '../../hooks/useGemini';
+import { useGroq } from '../../hooks/useGroq';
 import RichEditor from '../ui/RichEditor';
 
 export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   const { cvData, coverLetter, updateCoverLetter, setCoverLetterContent, showToast } = useCVStore();
-  const { generateCoverLetterAI } = useGemini();
+  const { generateCoverLetterAI } = useGroq();
   const [generating, setGenerating] = useState(false);
 
   // Otomatis pindah preview ke 'Surat Lamaran' saat masuk step ini
@@ -46,7 +46,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
           <FileText className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Surat Lamaran (AI 2.5)</h2>
+          <h2 className="text-xl font-bold text-slate-900">Surat Lamaran (AI Powered)</h2>
           <p className="text-sm text-slate-500">Auto-generate dari data CV Anda</p>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
               leftIcon={<Wand2 className="w-4 h-4" />}
               className="w-full shadow-lg shadow-blue-200"
             >
-              {coverLetter.status === 'generated' ? 'Regenerate Surat Baru' : 'Generate dengan AI 2.5'}
+              {coverLetter.status === 'generated' ? 'Regenerate Surat Baru' : 'Generate dengan AI'}
             </Button>
           </div>
         </div>

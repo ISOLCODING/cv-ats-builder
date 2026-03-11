@@ -1,13 +1,12 @@
-// src/hooks/useGemini.js
+// src/hooks/useGroq.js
 import { useCallback } from 'react';
 import { useGAS } from './useGAS';
 
 /**
- * useGemini Hook
- * Wrapper untuk memanggil Gemini AI via GAS Backend (Mode Production)
- * atau fallback ke Direct Fetch (Mode Local).
+ * useGroq Hook
+ * Wrapper untuk memanggil AI (Groq/Gemini) via GAS Backend
  */
-export function useGemini() {
+export function useGroq() {
   const { callGAS } = useGAS();
 
   /**
@@ -15,7 +14,7 @@ export function useGemini() {
    */
   const callAIProxy = useCallback(async (prompt, isJson = false) => {
     try {
-      const res = await callGAS('callGemini', { prompt, isJson });
+      const res = await callGAS('callAI', { prompt, isJson });
       
       if (res && res.success) {
         return res.data; // Mengandung teks respon AI

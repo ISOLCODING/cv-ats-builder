@@ -99,8 +99,8 @@ function doPost(e) {
         response = handleUpdateStatus(requestBody);
         break;
 
-      case 'callGemini':
-        response = gsCallGemini(requestBody.prompt, requestBody.isJson);
+      case 'callAI':
+        response = gsCallAI(requestBody.prompt, requestBody.isJson);
         break;
       
       case 'resetHistory':

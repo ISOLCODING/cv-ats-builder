@@ -1,114 +1,79 @@
 /**
  * gas/ai.gs
  * ============================================================
- * Service untuk komunikasi dengan Gemini AI API via Google Apps Script.
- *
- * ⚠️  PENTING: Setiap kali mengubah file ini, wajib buat versi baru
- *     di Deploy → Manage Deployments → Edit → New Version → Deploy
+ * Service untuk komunikasi dengan AI (Groq Primary) via GAS.
  * ============================================================
  */
 
-var AIService = (function () {
+var GroqService = (function () {
+  var MODEL = 'llama-3.3-70b-versatile'; // Model powerfull dari Groq
 
-  var MODEL = 'gemini-2.5-flash'; // ← Model aktif
-
-  // ── Private: Ambil API Key dari Script Properties ──────────
   function getApiKey() {
-    var key = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
-    if (!key) {
-      Utils.log('⚠️ GEMINI_API_KEY tidak ditemukan di Script Properties.');
-      throw new Error('Konfigurasi API AI belum lengkap. Hubungi admin.');
-    }
-    return key;
+    return PropertiesService.getScriptProperties().getProperty('GROQ_API_KEY');
   }
 
-  // ── Private: Validasi prompt ───────────────────────────────
-  function validatePrompt(prompt) {
-    if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
-      throw new Error('Prompt tidak boleh kosong.');
-    }
-  }
-
-  // ── Public: Panggil Gemini API ─────────────────────────────
-  function callGemini(prompt, isJson) {
+  function callGroq(prompt, isJson) {
     var apiKey = getApiKey();
-    validatePrompt(prompt);
+    if (!apiKey) throw new Error('GROQ_API_KEY tidak ditemukan di Script Properties.');
 
-    var url =
-      'https://generativelanguage.googleapis.com/v1beta/models/' +
-      MODEL + ':generateContent?key=' + apiKey;
-
+    var url = 'https://api.groq.com/openai/v1/chat/completions';
     var payload = {
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 8192,
-      },
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2
     };
 
     if (isJson) {
-      payload.generationConfig.response_mime_type = 'application/json';
+      payload.response_format = { type: 'json_object' };
     }
 
     var options = {
       method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + apiKey },
       contentType: 'application/json',
       payload: JSON.stringify(payload),
-      muteHttpExceptions: true,
+      muteHttpExceptions: true
     };
 
-    try {
-      var response     = UrlFetchApp.fetch(url, options);
-      var responseCode = response.getResponseCode();
-      var responseBody = response.getContentText();
-
-      if (responseCode !== 200) {
-        var errObj = Utils.safeJsonParse(responseBody);
-        var errMsg = (errObj && errObj.error && errObj.error.message)
-          ? errObj.error.message
-          : 'Gemini API Error (HTTP ' + responseCode + ')';
-        Utils.log('[AIService] Error response: ' + responseBody);
-        throw new Error(errMsg);
-      }
-
-      var data = JSON.parse(responseBody);
-      var text = data.candidates[0].content.parts[0].text;
-
-      if (!text) throw new Error('AI tidak memberikan respon yang valid.');
-
-      return text;
-
-    } catch (e) {
-      Utils.logError(e, 'AIService.callGemini [model: ' + MODEL + ']');
-      throw e;
+    var response = UrlFetchApp.fetch(url, options);
+    var body = response.getContentText();
+    
+    if (response.getResponseCode() !== 200) {
+      throw new Error('Groq Error: ' + body);
     }
+
+    var data = JSON.parse(body);
+    return data.choices[0].message.content;
   }
 
-  return { 
-    callGemini: callGemini,
-    getModelName: function() { return MODEL; }
-  };
-
+  return { callGroq: callGroq };
 })();
 
-// ── Global Wrapper (dipanggil dari frontend) ──────────────────
+// ── Global Wrapper ──────────────────────────────────────────
 
-function gsCallGemini(prompt, isJson) {
+function gsCallAI(prompt, isJson) {
+  // Hanya gunakan Groq (Gemini dihapus sesuai permintaan)
   try {
-    var result = AIService.callGemini(prompt, isJson);
-    return Utils.successResponse('AI responded successfully', result);
+    var groqKey = PropertiesService.getScriptProperties().getProperty('GROQ_API_KEY');
+    if (!groqKey) {
+      return Utils.errorResponse('GROQ_API_KEY tidak ditemukan. Silakan tambahkan di Settings GAS.');
+    }
+    
+    Utils.log('Using Groq AI (' + 'llama-3.3-70b-versatile' + ')...');
+    var result = GroqService.callGroq(prompt, isJson);
+    return Utils.successResponse('Groq responded successfully', result);
   } catch (e) {
+    Utils.logError(e, 'gsCallAI');
     return Utils.errorResponse(e.message);
   }
 }
 
-/**
- * Diagnostic: Cek model apa yang sedang aktif di server
- */
 function gsGetActiveModel() {
+  var groqKey = PropertiesService.getScriptProperties().getProperty('GROQ_API_KEY');
   return {
-    model: AIService.getModelName(),
-    timestamp: new Date().toISOString(),
-    version: 52 // Kita naikkan angka ini setiap deploy untuk verifikasi
+    provider: 'Groq',
+    model: 'llama-3.3-70b-versatile',
+    active: !!groqKey,
+    timestamp: new Date().toISOString()
   };
 }

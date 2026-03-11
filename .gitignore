@@ -3,6 +3,8 @@ node_modules/
 
 # ── Build output ─────────────────────────────────────────────────
 dist/
+dist-pages/
+
 
 # ── Env / secrets (JANGAN commit file ini!) ──────────────────────
 .env

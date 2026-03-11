@@ -2,7 +2,7 @@ const GAS_ENDPOINT = import.meta.env.VITE_GAS_ENDPOINT || '';
 
 // ─── Core: Panggil AI via GAS Backend ────────────────────────────────────────
 
-async function callGemini(prompt, isJson = false) {
+async function callAIService(prompt, isJson = false) {
   const isGASEnv =
     typeof window !== 'undefined' &&
     typeof window.google?.script !== 'undefined';
@@ -18,7 +18,7 @@ async function callGemini(prompt, isJson = false) {
             res.success ? resolve(res.data) : reject(new Error(res.message))
           )
           .withFailureHandler((err) => reject(new Error(err.message)))
-          .gsCallGemini(prompt, isJson);
+          .gsCallAI(prompt, isJson);
       });
     } else {
       // Jalur local dev via GAS Endpoint
@@ -29,7 +29,7 @@ async function callGemini(prompt, isJson = false) {
       const res = await fetch(GAS_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'callGemini', prompt, isJson }),
+        body: JSON.stringify({ action: 'callAI', prompt, isJson }),
       });
 
       const data = await res.json();
@@ -52,7 +52,7 @@ async function callGemini(prompt, isJson = false) {
 
     return rawText;
   } catch (error) {
-    console.error('[Gemini] Error:', error.message);
+    console.error('[AI Service] Error:', error.message);
     throw error;
   }
 }
@@ -65,7 +65,7 @@ export async function generateCoverLetter({ cvData, tone, jobPosition, company, 
     : 'Dengan hormat,';
 
   const prompt = `
-Tuliskan SURAT LAMARAN KERJA (Cover Letter) dalam format HTML menggunakan tag <p> dan <strong>.
+Tuliskan SURAT LAMARAN KERJA (Cover Letter) dalam bahasa Indonesia dalam format HTML menggunakan tag <p> dan <strong>.
 
 DATA PELAMAR:
 Nama       : ${cvData.personalInfo.name}
@@ -82,7 +82,7 @@ ATURAN:
 - Hanya tulis isi badan surat (body) saja.
   `.trim();
 
-  return callGemini(prompt);
+  return callAIService(prompt);
 }
 
 // ─── ATS Checker ─────────────────────────────────────────────────────────────
@@ -105,8 +105,8 @@ FORMAT JSON WAJIB:
 {
   "score": <number 0-100>,
   "breakdown": {
-    "keywordMatch": <number>,
-    "formatScore" : <number>,
+    "keywordMatch": <number>
+    "formatScore" : <number>
     "relevance"   : <number>
   },
   "matchedKeywords"    : ["..."],
@@ -117,7 +117,7 @@ FORMAT JSON WAJIB:
   `.trim();
 
   try {
-    return JSON.parse(await callGemini(prompt, true));
+    return JSON.parse(await callAIService(prompt, true));
   } catch (error) {
     console.warn('[ATS] Fallback aktif:', error.message);
     return {
@@ -163,7 +163,7 @@ FORMAT JSON:
   `.trim();
 
   try {
-    return JSON.parse(await callGemini(prompt, true));
+    return JSON.parse(await callAIService(prompt, true));
   } catch (error) {
     console.error('[OptimizeCV] Error:', error.message);
     throw new Error('Gagal mengolah optimasi AI. Pastikan input tidak terlalu panjang.');
@@ -213,7 +213,7 @@ FORMAT OUTPUT:
   `.trim();
 
   try {
-    const raw = await callGemini(prompt, true);
+    const raw = await callAIService(prompt, true);
     try {
       return JSON.parse(raw);
     } catch {
@@ -223,7 +223,7 @@ FORMAT OUTPUT:
       throw new Error('Response AI bukan JSON valid');
     }
   } catch (error) {
-    console.error('[Translate] Error:', error.message);
+    console.error('[Translate AI] Error:', error.message);
     throw new Error('Gagal menerjemahkan konten. ' + error.message);
   }
 }

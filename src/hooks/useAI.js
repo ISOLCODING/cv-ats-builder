@@ -1,13 +1,13 @@
-// src/hooks/useGemini.js
+// src/hooks/useAI.js
 import { useCallback } from 'react';
 import { useGAS } from './useGAS';
 
 /**
- * useGemini Hook
+ * useAI Hook
  * Wrapper untuk memanggil Gemini AI via GAS Backend (Mode Production)
  * atau fallback ke Direct Fetch (Mode Local).
  */
-export function useGemini() {
+export function useAI() {
   const { callGAS } = useGAS();
 
   /**
@@ -15,7 +15,7 @@ export function useGemini() {
    */
   const callAIProxy = useCallback(async (prompt, isJson = false) => {
     try {
-      const res = await callGAS('callGemini', { prompt, isJson });
+      const res = await callGAS('callAI', { prompt, isJson });
       
       if (res && res.success) {
         return res.data; // Mengandung teks respon AI
