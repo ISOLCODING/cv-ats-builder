@@ -67,7 +67,7 @@ const styles = {
       textAlign: 'center',
     },
     headerName: {
-      fontFamily: FONT_BOLD,
+      fontWeight: 'bold',
       fontSize: SIZE_HEADER,
       textTransform: 'uppercase',
       letterSpacing: 2,
@@ -93,7 +93,6 @@ const styles = {
   modern_creative: StyleSheet.create({
     page: {
       flexDirection: 'row',
-      fontFamily: 'Helvetica',
       fontSize: 10,
       color: '#334155',
     },
@@ -110,14 +109,14 @@ const styles = {
     },
     sidebarName: {
       fontSize: 22,
-      fontFamily: 'Helvetica-Bold',
+      fontWeight: 'bold',
       color: '#0f172a',
       marginBottom: 4,
       lineHeight: 1.1,
     },
     sidebarTitle: {
       fontSize: 10,
-      fontFamily: 'Helvetica-Bold',
+      fontWeight: 'bold',
       color: '#3b82f6',
       textTransform: 'uppercase',
       letterSpacing: 1,
@@ -125,7 +124,7 @@ const styles = {
     },
     sectionTitle: {
       fontSize: 12,
-      fontFamily: 'Helvetica-Bold',
+      fontWeight: 'bold',
       color: '#0f172a',
       textTransform: 'uppercase',
       letterSpacing: 1.2,
@@ -136,7 +135,7 @@ const styles = {
     },
     sidebarSectionTitle: {
       fontSize: 9,
-      fontFamily: 'Helvetica-Bold',
+      fontWeight: 'bold',
       color: '#1e293b',
       textTransform: 'uppercase',
       marginTop: 20,
@@ -147,14 +146,13 @@ const styles = {
     contactItem: { marginBottom: 8 },
     contactLabel: { fontSize: 7, color: '#64748b', textTransform: 'uppercase', marginBottom: 1 },
     contactValue: { fontSize: 8.5, color: '#334155' },
-    itemTitle: { fontFamily: 'Helvetica-Bold', fontSize: 11, color: '#0f172a' },
+    itemTitle: { fontWeight: 'bold', fontSize: 11, color: '#0f172a' },
     itemSubtitle: { fontSize: 10, color: '#3b82f6', marginBottom: 2 },
   }),
 
   // ── 3. Minimalist (Elegant & Sophisticated) ──
   minimalist: StyleSheet.create({
     page: {
-      fontFamily: 'Helvetica',
       fontSize: 10.5,
       color: '#444444',
       padding: 50,
@@ -166,7 +164,7 @@ const styles = {
     },
     headerName: {
       fontSize: 26,
-      fontFamily: 'Helvetica-Bold',
+      fontWeight: 'bold',
       color: '#111111',
       letterSpacing: -0.5,
     },
@@ -184,7 +182,7 @@ const styles = {
     },
     sectionTitle: {
       fontSize: 10,
-      fontFamily: 'Helvetica-Bold',
+      fontWeight: 'bold',
       color: '#000000',
       textTransform: 'uppercase',
       letterSpacing: 3,
@@ -193,7 +191,7 @@ const styles = {
       borderTop: '0.5pt solid #eeeeee',
       paddingTop: 10,
     },
-    itemTitle: { fontFamily: 'Helvetica-Bold', fontSize: 11, color: '#111111' },
+    itemTitle: { fontWeight: 'bold', fontSize: 11, color: '#111111' },
     itemSubtitle: { fontSize: 10, color: '#222222', marginBottom: 4 },
   })
 };
@@ -341,7 +339,7 @@ const Organizations = ({ organizations, S, lang }) => {
           {group.items.map((org, i) => (
             <View key={org.id || i} style={{ marginLeft: 10, marginBottom: 4 }}>
               <View style={CS.itemHeader}>
-                <Text style={{ ...S.itemSubtitle, fontFamily: FONT_BOLD, color: '#333', fontSize: 10 }}>{org.role}</Text>
+                <Text style={{ ...S.itemSubtitle, fontWeight: 'bold', color: '#333', fontSize: 10 }}>{org.role}</Text>
                 <Text style={CS.itemDate}>{org.period}</Text>
               </View>
               <RichText html={org.contribution} />
