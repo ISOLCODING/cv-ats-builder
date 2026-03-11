@@ -43,6 +43,7 @@ export default defineConfig(({ mode }) => {
           },
       assetsInlineLimit: isPages ? 4096 : 100000000,
       cssCodeSplit: !isPages ? false : true,
+      modulePreload: false,
     },
 
     resolve: {
