@@ -1,13 +1,13 @@
 // src/components/features/CoverLetterGenerator.jsx
 import React, { useState, useEffect } from 'react';
-import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Upload, X, Fingerprint } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
 import Button from '../ui/Button';
 import { useGroq } from '../../hooks/useGroq';
 import RichEditor from '../ui/RichEditor';
 
 export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
-  const { cvData, coverLetter, updateCoverLetter, setCoverLetterContent, showToast } = useCVStore();
+  const { cvData, coverLetter, updateCoverLetter, setCoverLetterContent, updatePersonalInfo, showToast } = useCVStore();
   const { generateCoverLetterAI } = useGroq();
   const [generating, setGenerating] = useState(false);
 
@@ -15,6 +15,26 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   useEffect(() => {
     if (onReady) onReady('letter');
   }, [onReady]);
+
+  const handleSignatureUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      return showToast('error', 'File harus berupa gambar (PNG/JPG)');
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      return showToast('error', 'Ukuran file terlalu besar (maks 2MB)');
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      updatePersonalInfo({ signature: event.target.result });
+      showToast('success', 'Tanda tangan berhasil di-upload!');
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleGenerate = async () => {
     if (!coverLetter.jobPosition) {
@@ -101,6 +121,44 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
               <option value="formal">Formal & Profesional (Standard)</option>
               <option value="semi-formal">Semi-Formal & Friendly</option>
             </select>
+          </div>
+          
+          <div className="space-y-3 pt-2">
+            <label className="text-sm font-bold text-slate-700 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Fingerprint className="w-4 h-4 text-blue-500" /> Tanda Tangan Digital
+              </span>
+              {cvData.personalInfo.signature && (
+                <button 
+                  onClick={() => updatePersonalInfo({ signature: '' })}
+                  className="text-[10px] text-rose-500 hover:underline flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" /> Hapus
+                </button>
+              )}
+            </label>
+            
+            {!cvData.personalInfo.signature ? (
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 hover:border-blue-400 transition-all group">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className="w-8 h-8 text-slate-400 group-hover:text-blue-500 mb-2 transition-colors" />
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Upload Tanda Tangan</p>
+                  <p className="text-[10px] text-slate-400 mt-1">PNG Transparan / JPG (Max 2MB)</p>
+                </div>
+                <input type="file" className="hidden" accept="image/*" onChange={handleSignatureUpload} />
+              </label>
+            ) : (
+              <div className="relative group/sig border-2 border-blue-100 bg-white rounded-2xl p-4 flex items-center justify-center h-32 shadow-sm italic text-slate-400 overflow-hidden">
+                 <img 
+                    src={cvData.personalInfo.signature} 
+                    alt="Tanda Tangan" 
+                    className="max-h-full max-w-full object-contain"
+                 />
+                 <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover/sig:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <span className="bg-white/90 px-3 py-1 rounded-full text-[10px] font-black text-blue-600 shadow-sm border border-blue-100">UKURAN PDF: 120x60px</span>
+                 </div>
+              </div>
+            )}
           </div>
           
           <div className="pt-4">
