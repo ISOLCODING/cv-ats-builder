@@ -18,7 +18,7 @@ const ce = React.createElement;
  * @returns {React.ReactNode|null}
  */
 export function htmlToReactPdf(html, baseStyle = {}) {
-  if (!html || !html.trim()) return null;
+  if (!html || typeof html !== 'string' || !html.trim()) return null;
 
   // Plain text — tidak ada tag HTML
   if (!/<[a-z][\s\S]*>/i.test(html)) {

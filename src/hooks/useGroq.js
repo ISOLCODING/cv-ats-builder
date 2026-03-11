@@ -17,7 +17,12 @@ export function useGroq() {
       const res = await callGAS('callAI', { prompt, isJson });
       
       if (res && res.success) {
-        return res.data; // Mengandung teks respon AI
+        let result = res.data;
+        // Penanganan defensif: Pastikan mengembalikan string jika bukan mode JSON
+        if (!isJson && typeof result !== 'string') {
+          result = typeof result === 'object' ? JSON.stringify(result) : String(result);
+        }
+        return result;
       }
       
       throw new Error(res?.message || 'AI Backend Error');

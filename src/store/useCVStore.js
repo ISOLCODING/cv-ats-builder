@@ -152,11 +152,14 @@ const useCVStore = create(
             targetLang
           });
 
+          // Helper to ensure we only save strings for text content
+          const ensureString = (val, fallback = '') => (typeof val === 'string' ? val : (val && typeof val === 'object' ? JSON.stringify(val) : String(val || fallback)));
+
           // Replace translated fields while keeping non-translated intact like personalInfo
           set((prev) => ({
             cvData: {
               ...prev.cvData,
-              summary: result.cvData.summary || prev.cvData.summary,
+              summary: ensureString(result.cvData.summary, prev.cvData.summary),
               experiences: result.cvData.experiences || prev.cvData.experiences,
               education: result.cvData.education || prev.cvData.education,
               skills: result.cvData.skills || prev.cvData.skills,
@@ -166,7 +169,7 @@ const useCVStore = create(
             },
             coverLetter: {
               ...prev.coverLetter,
-              content: result.coverLetter || prev.coverLetter.content,
+              content: ensureString(result.coverLetter, prev.coverLetter.content),
             },
             appSettings: {
               ...prev.appSettings,

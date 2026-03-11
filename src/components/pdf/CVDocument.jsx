@@ -203,14 +203,14 @@ function fmtDate(d, lang) {
 }
 
 function RichText({ html, style = CS.bodyText }) {
-  if (!html?.trim()) return null;
+  if (!html || typeof html !== 'string' || !html.trim()) return null;
   const nodes = htmlToReactPdf(html, style);
   return <View>{nodes}</View>;
 }
 
 // ── Shared Sections ──────────────────────────────────────────
 
-const Summary = ({ summary, S, lang }) => summary?.trim() ? (
+const Summary = ({ summary, S, lang }) => (summary && typeof summary === 'string' && summary.trim()) ? (
   <View style={{ marginBottom: 10 }}>
     <Text style={S.sectionTitle}>{getTranslation(lang, 'sec.summary')}</Text>
     <RichText html={summary} style={S.bodyText || CS.bodyText} />
@@ -334,7 +334,7 @@ const Organizations = ({ organizations, S, lang }) => {
 
 
 
-const Skills = ({ skills, S, sidebar = false }) => {
+const Skills = ({ skills, S, lang, sidebar = false }) => {
   const { technical = [], softSkills = [], languages = [] } = skills || {};
   if (!technical.length && !softSkills.length && !languages.length) return null;
 
