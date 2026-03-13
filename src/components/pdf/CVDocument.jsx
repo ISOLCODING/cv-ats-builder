@@ -23,7 +23,6 @@ Font.register({
   fonts: [
     { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Regular.ttf', fontWeight: 400 },
     { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Bold.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/gh/googlefonts/roboto-2@main/src/hinted/Roboto-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
   ]
 });
 
@@ -32,7 +31,6 @@ Font.register({
   fonts: [
     { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Regular.ttf', fontWeight: 400 },
     { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Bold.ttf', fontWeight: 700 },
-    { src: 'https://cdn.jsdelivr.net/gh/rst10124492/inter@master/Inter-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
   ]
 });
 
@@ -40,18 +38,18 @@ const getFontFamily = (f) => {
   if (f === 'serif') return { 
     regular: 'Times-Roman', 
     bold: 'Times-Bold', 
-    italic: 'Times-Italic',
-    boldItalic: 'Times-BoldItalic'
+    italic: 'Times-Roman',
+    boldItalic: 'Times-Bold'
   };
   if (f === 'sans') return { 
     regular: 'Helvetica', 
     bold: 'Helvetica-Bold', 
-    italic: 'Helvetica-Oblique',
-    boldItalic: 'Helvetica-BoldOblique'
+    italic: 'Helvetica',
+    boldItalic: 'Helvetica-Bold'
   };
   if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
   if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
-  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
+  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
 };
 
 const SIZE_BODY = 10;
@@ -99,7 +97,7 @@ const styles = {
       paddingBottom: 1,
     },
     itemTitle: { fontSize: 10, fontWeight: 'bold' },
-    itemSubtitle: { fontSize: 10, fontStyle: 'italic', marginBottom: 2 },
+    itemSubtitle: { fontSize: 10, marginBottom: 2 },
   }),
 
   // ── 2. Modern Creative (Dynamic 2-Column Sidebar) ──
@@ -338,7 +336,7 @@ const Projects = ({ data, lang, S, SGlobal }) => {
         <View key={p.id || i} style={CS.itemBlock}>
           <View style={CS.itemHeader}>
             <Text style={S.itemTitle || CS.itemTitle}>{p.name}</Text>
-            <Text style={{ ...CS.itemDate, fontStyle: 'italic' }}>{p.techStack}</Text>
+            <Text style={{ ...CS.itemDate }}>{p.techStack}</Text>
           </View>
           {p.link ? <Text style={CS.linkText}>{p.link}</Text> : null}
           <RichText html={p.description} />
@@ -551,7 +549,7 @@ export const CVDocument = ({ cvData }) => {
       fontFamily: themeFont.bold,
     },
     italic: {
-      fontFamily: themeFont.italic,
+      fontFamily: themeFont.regular,
     }
   });
 

@@ -79,7 +79,7 @@ const StandardATSView = ({ data, lang, font }) => {
                 <span>{edu.degree} {edu.field ? `- ${edu.field}` : ''}</span>
                 <span className="font-normal text-[10pt] tabular-nums">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
               </div>
-              <p className="italic text-[11pt]">{edu.institution}</p>
+              <p className="text-[11pt]">{edu.institution}</p>
               {edu.gpa && <p className="text-[10pt]">GPA: {edu.gpa}</p>}
               {edu.description && (
                 <div className="mt-1 text-[10pt]"><RichContent html={edu.description} fontFamily={font} /></div>
@@ -114,7 +114,7 @@ const StandardATSView = ({ data, lang, font }) => {
                 <span>{exp.position} {exp.type && `(${getTranslation(lang, `type.${exp.type}`)})`}</span>
                 <span className="font-normal tabular-nums">{formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : formatDate(exp.endDate, lang)}</span>
               </div>
-              <p className="italic mb-1">{exp.company}</p>
+              <p className="mb-1">{exp.company}</p>
               <RichContent html={exp.description} fontFamily={font} />
             </div>
           ))}
@@ -128,7 +128,7 @@ const StandardATSView = ({ data, lang, font }) => {
             <div key={i} className="mb-3">
               <div className="flex justify-between items-baseline font-bold text-[11pt]">
                 <span>{p.name}</span>
-                <span className="font-normal text-[10pt] italic">{p.techStack}</span>
+                <span className="font-normal text-[10pt]">{p.techStack}</span>
               </div>
               {p.link && <p className="text-[9pt] text-blue-600 underline mb-1">{p.link}</p>}
               <RichContent html={p.description} fontFamily={font} />
@@ -146,7 +146,7 @@ const StandardATSView = ({ data, lang, font }) => {
               {group.items.map((org, i) => (
                 <div key={i} className="mb-2 pl-4 border-l-2 border-slate-100 last:mb-0">
                   <div className="flex justify-between items-baseline">
-                    <span className="font-bold italic text-[10pt]">{org.role}</span>
+                    <span className="font-bold text-[10pt]">{org.role}</span>
                     <span className="text-[10pt]">{org.period}</span>
                   </div>
                   {org.contribution && (
@@ -262,7 +262,7 @@ const ModernCreativeView = ({ data, lang, font }) => {
                     <h4 className="text-[13px] font-black text-slate-900">{edu.degree} {edu.field ? `di ${edu.field}` : ''}</h4>
                     <span className="text-[10px] font-bold text-slate-400 tabular-nums">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
                   </div>
-                  <p className="text-[12px] font-bold text-slate-500 italic">{edu.institution}</p>
+                  <p className="text-[12px] font-bold text-slate-500">{edu.institution}</p>
                   {edu.gpa && <p className="text-[11px] text-slate-400 font-medium">GPA: {edu.gpa}</p>}
                   {edu.description && (
                     <div className="text-[11px] text-slate-500 leading-relaxed mt-1"><RichContent html={edu.description} fontFamily={font} /></div>
@@ -377,7 +377,7 @@ const MinimalistView = ({ data, lang, font }) => {
 
       {summary && (
         <div className="mb-14 text-center max-w-xl mx-auto">
-          <div className="text-[15px] leading-relaxed text-slate-500 italic opacity-80 underline underline-offset-8 decoration-slate-100">
+          <div className="text-[15px] leading-relaxed text-slate-500 opacity-80 underline underline-offset-8 decoration-slate-100">
             <RichContent html={summary} fontFamily={font} />
           </div>
         </div>
@@ -448,7 +448,7 @@ const MinimalistView = ({ data, lang, font }) => {
                   {exp.position}
                   {exp.type && <span className="ml-3 text-[9px] font-black text-slate-300 uppercase tracking-widest">{getTranslation(lang, `type.${exp.type}`)}</span>}
                 </h4>
-                <p className="text-xs text-slate-400 font-medium italic mb-3">{exp.company}</p>
+                <p className="text-xs text-slate-400 font-medium mb-3">{exp.company}</p>
                 <div className="text-[13px] text-slate-500"><RichContent html={exp.description} fontFamily={font} /></div>
               </div>
             </div>

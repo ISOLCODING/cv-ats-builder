@@ -150,10 +150,8 @@ function parseInline(node, base, key) {
 
     case 'em':
     case 'i': {
-      // Keep base fontFamily, fontStyle:'italic' is enough for built-in PDF fonts.
-      // Times-Roman + italic → Times Italic, Helvetica + italic → Helvetica Oblique
-      const s = { ...base, fontStyle: 'italic' };
-      return ce(Text, { key, style: s }, ...parseInlines(children, s));
+      // User requested to not use italics to avoid PDF export issues.
+      return ce(Text, { key, style: base }, ...parseInlines(children, base));
     }
 
     case 'u':

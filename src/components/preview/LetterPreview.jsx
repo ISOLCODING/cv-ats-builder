@@ -83,7 +83,7 @@ export default function LetterPreview() {
         {content ? (
           <div dangerouslySetInnerHTML={{ __html: content }} />
         ) : (
-          <p style={{ color: '#999', fontStyle: 'italic' }}>Isi surat lamaran akan tampil di sini setelah digenerate...</p>
+          <p style={{ color: '#999' }}>Isi surat lamaran akan tampil di sini setelah digenerate...</p>
         )}
       </div>
 
