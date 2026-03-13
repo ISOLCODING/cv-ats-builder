@@ -409,7 +409,11 @@ const useCVStore = create(
       })),
 
       // ── Full CV Data ──────────────────────────────────────
-      setCVData: (cvData) => set({ cvData }),
+      setCVData: (data) => {
+        if (data && typeof data === 'object') {
+          set({ cvData: data });
+        }
+      },
       
       resetCVData: () => set({
         cvData: defaultCVData,
@@ -436,6 +440,64 @@ const useCVStore = create(
       setIsSaving: (isSaving) => set({ isSaving }),
       setIsLoading: (isLoading) => set({ isLoading }),
       setSavedCVId: (id) => set({ savedCVId: id }),
+
+      // ── Settings Cloud-Sync ──────────────────────────────
+      syncSettings: async (method = "get") => {
+        const { appSettings } = get();
+        try {
+          const endpoint = typeof window !== 'undefined' && window.google?.script ? (import.meta.env.VITE_GAS_ENDPOINT || '') : '/api/gas';
+          const response = await fetch(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ action: "syncSettings", method, settings: appSettings })
+          });
+          const res = await response.json();
+          if (res.success && method === "get" && res.data) {
+            set({ appSettings: { ...appSettings, ...res.data } });
+          }
+          return res;
+        } catch (err) {
+          console.error("Settings sync failed:", err);
+          return { success: false };
+        }
+      },
+
+      // ── Analytics Logging ────────────────────────────────
+      logAnalytics: async (analyticsData) => {
+        try {
+          const endpoint = typeof window !== 'undefined' && window.google?.script ? (import.meta.env.VITE_GAS_ENDPOINT || '') : '/api/gas';
+          await fetch(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ action: "logAnalytics", analyticsData })
+          });
+        } catch (err) {
+          console.error("Analytics log failed:", err);
+        }
+      },
+
+      // ── Portfolio Publishing ───────────────────────────
+      publishPortfolio: async (isPublic) => {
+        const { savedCVId, showToast } = get();
+        if (!savedCVId) {
+          showToast("error", "Simpan CV Anda terlebih dahulu!");
+          return { success: false };
+        }
+        try {
+          const endpoint = typeof window !== 'undefined' && window.google?.script ? (import.meta.env.VITE_GAS_ENDPOINT || '') : '/api/gas';
+          const response = await fetch(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ action: "publishPortfolio", id: savedCVId, isPublic })
+          });
+          const res = await response.json();
+          if (res.success) {
+            showToast("success", isPublic ? "CV berhasil di-publish ke publik!" : "CV kini bersifat privat.");
+          }
+          return res;
+        } catch (err) {
+          console.error("Publish failed:", err);
+          return { success: false };
+        }
+      },
+
 
       // ── Toast ─────────────────────────────────────────────
       showToast: (type, message) => {

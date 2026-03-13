@@ -86,6 +86,17 @@ async function callGASViaFetch(payload) {
       body: JSON.stringify(payload),
     });
 
+    // Jika Proxy 404, coba tembak langsung sebagai last resort
+    if (response.status === 404 && !isGASEnvironment()) {
+      console.warn('📡 Proxy 404, attempting direct fetch fallback...');
+      const fallbackResponse = await fetch(GAS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      });
+      if (fallbackResponse.ok) return await fallbackResponse.json();
+    }
+
     if (response.ok) {
       const result = await response.json();
       return result;
@@ -99,6 +110,13 @@ async function callGASViaFetch(payload) {
     
     // Fallback: Jika gagal CORS (TypeError), kita beri mockup agar UI tidak mati
     const isListAction = payload.action && payload.action.toLowerCase().includes('list');
+    const isLoadAction = payload.action && payload.action.toLowerCase().includes('load');
+    
+    // Jangan beri success: true untuk load action jika datanya tidak ada
+    if (isLoadAction) {
+      throw new Error('Gagal memuat data dari cloud. Periksa koneksi atau URL GAS.');
+    }
+
     return { 
       success: true, 
       isMock: true, 

@@ -524,7 +524,7 @@ const MinimalistView = ({ data, lang, font }) => {
 // ── Main CVPreview ──────────────────────────────────────────
 const CVPreview = forwardRef(function CVPreview(_, ref) {
   const { cvData, appSettings } = useCVStore();
-  const template = cvData.selectedTemplate || 'standard_ats';
+  const template = cvData?.selectedTemplate || 'standard_ats';
   const lang = appSettings?.language || 'id';
   const selectedFont = appSettings?.fontFamily || 'serif';
   const getPreviewFont = (f) => {
@@ -536,7 +536,7 @@ const CVPreview = forwardRef(function CVPreview(_, ref) {
   };
   const fontStyle = { fontFamily: getPreviewFont(selectedFont) };
 
-  const isEmpty = !cvData.personalInfo?.name && !cvData.summary && !cvData.experiences?.length;
+  const isEmpty = !cvData?.personalInfo?.name && !cvData?.summary && !cvData?.experiences?.length;
 
   return (
     <div ref={ref} id="cv-preview-content" style={fontStyle} className="w-[794px] min-h-[1123px] bg-white shadow-master relative">

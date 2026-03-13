@@ -37,7 +37,7 @@ const FONTS = [
 
 export default function TemplateSelector({ onNext }) {
   const { cvData, setTemplate, appSettings, setFontFamily } = useCVStore();
-  const selected = cvData.selectedTemplate || 'standard_ats';
+  const selected = cvData?.selectedTemplate || 'standard_ats';
   const selectedFont = appSettings?.fontFamily || 'serif';
 
   return (
