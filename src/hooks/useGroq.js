@@ -10,7 +10,7 @@ export function useGroq() {
   const { callGAS } = useGAS();
 
   /**
-   * callAIPRoxy — Proxy pemanggilan AI ke backend
+   * callAIProxy — Proxy pemanggilan AI ke backend
    */
   const callAIProxy = useCallback(async (prompt, isJson = false) => {
     try {
@@ -88,7 +88,6 @@ export function useGroq() {
       const response = await callAIProxy(prompt, true);
       return JSON.parse(response);
     } catch (e) {
-      // Fallback data jika AI gagal
       return {
         score: 50,
         breakdown: { keywordMatch: 50, formatScore: 80, relevance: 40 },
@@ -131,9 +130,66 @@ export function useGroq() {
     return JSON.parse(response);
   }, [callAIProxy]);
 
+  /**
+   * improveContentAI — Tingkatkan kualitas konten teks (Summary/Experience)
+   * Sekarang mendukung mode XYZ Formula untuk Experience
+   */
+  const improveContentAI = useCallback(async ({ type, content, cvData, mode = 'standard' }) => {
+    let specificInstructions = '';
+    const typeLower = type.toLowerCase();
+    const isProfile = typeLower.includes('summary') || typeLower.includes('profil') || typeLower.includes('profile');
+    const isExperience = typeLower.includes('experience') || typeLower.includes('pengalaman');
+    
+    if (mode === 'xyz' && isExperience) {
+      specificInstructions = `
+        GUNAKAN GOOGLE XYZ FORMULA: "Berhasil mencapai [X] yang diukur dengan [Y], dengan melakukan [Z]".
+        - Fokus pada ANGKA dan HASIL NYATA.
+        - Buat maksimal 3-4 poin saja.
+        - FORMAT: Gunakan tag HTML <ul> dan <li>.
+      `;
+    } else if (isProfile) {
+      specificInstructions = `
+        - Tulis dalam bentuk PARAGRAF (BUKAN BULLET POINTS).
+        - Gunakan gaya bahasa "Human-like Professional": Tidak kaku, tidak menggunakan kata-kata klise AI (seperti "I hope this finds you well", "delve", "comprehensive"), tapi tetap berwibawa.
+        - Jelaskan value proposition secara elegan.
+        - FORMAT: Gunakan tag HTML <p> saja.
+      `;
+    } else if (isExperience) {
+      specificInstructions = `
+        - Berikan narasi yang mendalam namun tetap to-the-point.
+        - Fokus pada dampak strategis.
+        - Buat maksimal 3-4 poin saja.
+        - FORMAT: Gunakan tag HTML <ul> dan <li>.
+      `;
+    } else {
+      specificInstructions = `
+        - BUAT SANGAT RINGKAS DAN PADAT.
+        - Maksimal 2-3 poin pendek saja.
+        - FORMAT: Gunakan tag HTML <ul> dan <li>.
+      `;
+    }
+
+    const prompt = `
+      Tugas: Tingkatkan penulisan untuk "${type}" CV dengan gaya bahasa Manusia (Professional Human Tone).
+      
+      KONTEN SAAT INI:
+      "${content}"
+      
+      INSTRUKSI WAJIB:
+      ${specificInstructions}
+      1. JANGAN GUNAKAN MARKDOWN SEPERTI **. Gunakan tag <strong> jika perlu penekanan pada kata kunci penting.
+      2. KELUARKAN HASIL HANYA DALAM KODE HTML.
+      3. OUTPUT HANYA HASIL PERBAIKAN TANPA PENJELASAN.
+      4. Bahasa: Indonesia.
+    `;
+
+    return await callAIProxy(prompt);
+  }, [callAIProxy]);
+
   return {
     generateCoverLetterAI,
     analyzeATSAI,
-    optimizeCVAI
+    optimizeCVAI,
+    improveContentAI
   };
 }
