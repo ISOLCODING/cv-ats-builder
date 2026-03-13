@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
+import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
 
 // ── helpers ──────────────────────────────────────────────────
@@ -219,16 +220,25 @@ function ExperienceEntryForm({ initial = null, onSave, onCancel }) {
         </div>
       </div>
 
-      {/* Description TipTap */}
-      <RichEditor
-        label="Deskripsi Pekerjaan / Pencapaian"
-        value={desc}
-        onChange={setDesc}
-        placeholder="• Kembangkan fitur X menggunakan React yang meningkatkan konversi 15%&#10;• Kelola tim 3 developer dan deliver sprint tepat waktu&#10;• Implementasi CI/CD pipeline, memangkas waktu deploy dari 30 menit → 5 menit"
-        minHeight={130}
-        maxLength={1500}
-        helper="Gunakan bullet points. Sertakan angka/metric jika ada untuk meningkatkan ATS score."
-      />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="form-label !mb-0">Deskripsi Pekerjaan / Pencapaian</label>
+          <MagicWriter 
+            type="Experience Description"
+            content={desc}
+            onApply={setDesc}
+          />
+        </div>
+        <RichEditor
+          label={null}
+          value={desc}
+          onChange={setDesc}
+          placeholder="• Kembangkan fitur X menggunakan React yang meningkatkan konversi 15%&#10;• Kelola tim 3 developer dan deliver sprint tepat waktu&#10;• Implementasi CI/CD pipeline, memangkas waktu deploy dari 30 menit → 5 menit"
+          minHeight={130}
+          maxLength={1500}
+          helper="Gunakan bullet points. Sertakan angka/metric jika ada untuk meningkatkan ATS score."
+        />
+      </div>
 
       {/* Tip magang */}
       <div className="flex gap-2 p-3 bg-white rounded-xl border border-blue-100 text-xs text-blue-700">

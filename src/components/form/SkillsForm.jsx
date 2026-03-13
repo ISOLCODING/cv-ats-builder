@@ -185,8 +185,14 @@ function SkillTagInput({ category, skills = [], onAdd, onRemove }) {
 
 // ── Main export ───────────────────────────────────────────────
 export default function SkillsForm({ onNext, onBack }) {
-  const { cvData, addSkill, removeSkill } = useCVStore();
+  const { cvData, addSkill, removeSkill, atsResult } = useCVStore();
   const { skills } = cvData;
+  const { missingKeywords = [] } = atsResult;
+
+  // Filter missing keywords to find skills that look like technical skills
+  // (Filter out things that might be soft skills or general phrases if possible, 
+  // or just show them all in a 'Missing Keywords' nudge section)
+  const nudges = missingKeywords.filter(kw => !skills.technical?.includes(kw));
 
   const total = ['technical','softSkills','languages'].reduce(
     (acc, k) => acc + (skills[k]?.length || 0), 0
@@ -210,8 +216,44 @@ export default function SkillsForm({ onNext, onBack }) {
         )}
       </div>
 
+      {/* Smart Gap Analysis & Skill Nudges */}
+      {nudges.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-[2.5rem] mb-6 shadow-sm"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 flex items-center justify-center text-white">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-black text-indigo-900 text-sm uppercase tracking-widest leading-none">Smart Gap Analysis</h3>
+              <p className="text-[10px] font-bold text-indigo-400 mt-1 uppercase tracking-wider">Missing keywords from active Job Description</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {nudges.map((nudge) => (
+              <button
+                key={nudge}
+                onClick={() => addSkill('technical', nudge)}
+                className="group flex items-center gap-2 px-4 py-2 bg-white border border-indigo-100 rounded-xl text-xs font-bold text-indigo-600 hover:border-indigo-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95 translate-y-0"
+              >
+                <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
+                {nudge}
+              </button>
+            ))}
+          </div>
+          
+          <p className="mt-4 text-[10px] text-indigo-400 italic">
+            *Klik untuk menambahkan keyword ini ke daftar Technical Skills Anda untuk meningkatkan ATS score.
+          </p>
+        </motion.div>
+      )}
+
       {/* Warning jika kurang */}
-      {total < 5 && total > 0 && (
+      {total < 5 && total > 0 && !nudges.length && (
         <div className="warning-box mb-5 flex gap-2.5">
           <span className="flex-shrink-0 text-lg">💡</span>
           <div>

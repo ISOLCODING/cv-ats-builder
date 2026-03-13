@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
+import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
 
 function OrgCard({ org, onEdit, onDelete }) {
@@ -69,13 +70,23 @@ function OrgEntryForm({ initial = null, onSave, onCancel }) {
           <input {...register('period', { required: 'Periode wajib diisi' })} className="form-input" placeholder="2022 - 2023" />
         </div>
       </div>
-      <RichEditor
-        label="Kontribusi / Pencapaian"
-        value={desc}
-        onChange={setDesc}
-        placeholder="Deskripsikan apa yang kamu kerjakan..."
-        minHeight={100}
-      />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="form-label !mb-0">Kontribusi / Pencapaian</label>
+          <MagicWriter 
+            type="Organization"
+            content={desc}
+            onApply={setDesc}
+          />
+        </div>
+        <RichEditor
+          label={null}
+          value={desc}
+          onChange={setDesc}
+          placeholder="Deskripsikan apa yang kamu kerjakan..."
+          minHeight={100}
+        />
+      </div>
       <div className="flex gap-2 justify-end pt-1">
         <Button variant="ghost" size="sm" onClick={onCancel}>Batal</Button>
         <Button size="sm" onClick={handleSubmit(onSubmit)}>Simpan</Button>

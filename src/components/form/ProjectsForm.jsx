@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
+import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
 
 function ProjectCard({ project, onEdit, onDelete }) {
@@ -71,13 +72,23 @@ function ProjectEntryForm({ initial = null, onSave, onCancel }) {
           <input {...register('link')} className="form-input" placeholder="https://github.com/..." />
         </div>
       </div>
-      <RichEditor
-        label="Deskripsi Singkat"
-        value={desc}
-        onChange={setDesc}
-        placeholder="Deskripsikan fitur atau peran kamu dalam proyek ini..."
-        minHeight={100}
-      />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="form-label !mb-0">Deskripsi Singkat</label>
+          <MagicWriter 
+            type="Project"
+            content={desc}
+            onApply={setDesc}
+          />
+        </div>
+        <RichEditor
+          label={null}
+          value={desc}
+          onChange={setDesc}
+          placeholder="Deskripsikan fitur atau peran kamu dalam proyek ini..."
+          minHeight={100}
+        />
+      </div>
       <div className="flex gap-2 justify-end pt-1">
         <Button variant="ghost" size="sm" onClick={onCancel}>Batal</Button>
         <Button size="sm" onClick={handleSubmit(onSubmit)}>Simpan</Button>

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
+import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
 
 function fmtDate(d) {
@@ -244,15 +245,25 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
       </div>
 
       {/* Description TipTap */}
-      <RichEditor
-        label="Deskripsi / Prestasi (opsional)"
-        value={desc}
-        onChange={setDesc}
-        placeholder="• Ketua Himpunan Mahasiswa Teknik Informatika 2022&#10;• Juara 2 Hackathon Nasional 2023&#10;• Thesis: Implementasi Machine Learning untuk Prediksi Churn"
-        minHeight={100}
-        maxLength={800}
-        helper="Isi dengan prestasi, kegiatan organisasi, atau topik tugas akhir."
-      />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="form-label !mb-0">Deskripsi / Prestasi (opsional)</label>
+          <MagicWriter 
+            type="Education"
+            content={desc}
+            onApply={setDesc}
+          />
+        </div>
+        <RichEditor
+          label={null}
+          value={desc}
+          onChange={setDesc}
+          placeholder="• Ketua Himpunan Mahasiswa Teknik Informatika 2022&#10;• Juara 2 Hackathon Nasional 2023&#10;• Thesis: Implementasi Machine Learning untuk Prediksi Churn"
+          minHeight={100}
+          maxLength={800}
+          helper="Isi dengan prestasi, kegiatan organisasi, atau topik tugas akhir."
+        />
+      </div>
 
       <div className="flex gap-2 justify-end pt-1">
         <Button variant="ghost" size="sm" onClick={onCancel}>Batal</Button>

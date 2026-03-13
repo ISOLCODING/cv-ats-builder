@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
+import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
 import { calculateATSScore, getScoreLabel } from '../../utils/atsScore';
 import { optimizeCV } from '../../services/groq';
@@ -166,17 +167,26 @@ export default function SummaryForm({ onBack, onNext }) {
         </div>
       </div>
 
-      {/* TipTap rich editor untuk summary */}
-      <RichEditor
-        label="Summary CV"
-        required
-        value={cvData.summary}
-        onChange={updateSummary}
-        placeholder="Tulis ringkasan profesional Anda: siapa Anda, apa keahlian utama, dan nilai apa yang Anda bawa. Idealnya 3–5 kalimat padat."
-        minHeight={180}
-        maxLength={1200}
-        helper="Gunakan bold untuk highlight skill kunci. Hindari kata sifat subjektif (rajin, jujur). Fokus pada pencahaian terukur."
-      />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="form-label !mb-0">Summary CV <span className="text-red-500 ml-0.5">*</span></label>
+          <MagicWriter 
+            type="Professional Summary"
+            content={cvData.summary}
+            onApply={updateSummary}
+          />
+        </div>
+        <RichEditor
+          label={null}
+          required={false}
+          value={cvData.summary}
+          onChange={updateSummary}
+          placeholder="Tulis ringkasan profesional Anda: siapa Anda, apa keahlian utama, dan nilai apa yang Anda bawa. Idealnya 3–5 kalimat padat."
+          minHeight={180}
+          maxLength={1200}
+          helper="Gunakan bold untuk highlight skill kunci. Hindari kata sifat subjektif (rajin, jujur). Fokus pada pencahaian terukur."
+        />
+      </div>
 
       {/* Template suggestions */}
       <div>

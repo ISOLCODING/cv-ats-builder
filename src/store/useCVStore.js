@@ -483,5 +483,3 @@ const useCVStore = create(
 function generateId() {
   return Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
 }
-
-export default useCVStore;
