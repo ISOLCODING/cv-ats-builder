@@ -22,6 +22,7 @@ import ATSChecker from './components/features/ATSChecker';
 import EmailSender from './components/features/EmailSender';
 import HistoryDashboard from './components/features/HistoryDashboard';
 import SettingsPage from './components/features/SettingsPage';
+import KeywordHeatmap from './components/features/KeywordHeatmap';
 import CVPreview        from './components/preview/CVPreview';
 import LetterPreview from './components/preview/LetterPreview';
 import useCVStore       from './store/useCVStore';
@@ -187,6 +188,20 @@ export default function App() {
     }
   }, [favicon, appName]);
 
+  // ── Navigation Guard ──────────────────────────────────────
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // Basic check: if name or summary exists, warn. 
+      // Ideally we'd have an isDirty flag, but checking content is safer for now.
+      if (cvData.personalInfo.name || cvData.summary) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [cvData]);
+
   const handleSave = useCallback(async () => {
     if (!cvData.personalInfo.email) return showToast('error', 'Email is required to save progress');
     setIsSaving(true);
@@ -217,7 +232,9 @@ export default function App() {
           cvData.personalInfo,
           coverLetter.jobPosition,
           cvData.education,
-          setExportPct
+          setExportPct,
+          coverLetter.hrdName,
+          coverLetter.company
         );
         showToast('success', 'Letter Exported Successfully!');
       }
@@ -252,6 +269,8 @@ export default function App() {
       <AnimatePresence>
         {toast && <Toast toast={toast} onClose={clearToast} />}
       </AnimatePresence>
+
+      <KeywordHeatmap />
 
       <AnimatePresence>
         {showLoadModal && (

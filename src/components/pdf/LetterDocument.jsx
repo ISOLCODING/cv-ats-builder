@@ -31,11 +31,21 @@ Font.register({
 });
 
 const getFontFamily = (f) => {
-  if (f === 'serif') return { regular: 'Times-Roman', bold: 'Times-Roman', italic: 'Times-Roman' };
-  if (f === 'sans') return { regular: 'Helvetica', bold: 'Helvetica', italic: 'Helvetica' };
+  if (f === 'serif') return { 
+    regular: 'Times-Roman', 
+    bold: 'Times-Bold', 
+    italic: 'Times-Italic',
+    boldItalic: 'Times-BoldItalic'
+  };
+  if (f === 'sans') return { 
+    regular: 'Helvetica', 
+    bold: 'Helvetica-Bold', 
+    italic: 'Helvetica-Oblique',
+    boldItalic: 'Helvetica-BoldOblique'
+  };
   if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
   if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
-  return { regular: 'Helvetica', bold: 'Helvetica', italic: 'Helvetica' };
+  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica-Oblique' };
 };
 
 const SIZE_BODY    = 10;

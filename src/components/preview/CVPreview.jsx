@@ -77,7 +77,7 @@ const StandardATSView = ({ data, lang, font }) => {
             <div key={i} className="mb-3">
               <div className="flex justify-between items-baseline font-bold text-[11pt]">
                 <span>{edu.degree} {edu.field ? `- ${edu.field}` : ''}</span>
-                <span className="font-normal text-[10pt]">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
+                <span className="font-normal text-[10pt] tabular-nums">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
               </div>
               <p className="italic text-[11pt]">{edu.institution}</p>
               {edu.gpa && <p className="text-[10pt]">GPA: {edu.gpa}</p>}
@@ -112,7 +112,7 @@ const StandardATSView = ({ data, lang, font }) => {
             <div key={i} className="mb-4">
               <div className="flex justify-between items-baseline font-bold text-[11pt]">
                 <span>{exp.position} {exp.type && `(${getTranslation(lang, `type.${exp.type}`)})`}</span>
-                <span className="font-normal">{formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : formatDate(exp.endDate, lang)}</span>
+                <span className="font-normal tabular-nums">{formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Present') : formatDate(exp.endDate, lang)}</span>
               </div>
               <p className="italic mb-1">{exp.company}</p>
               <RichContent html={exp.description} fontFamily={font} />
@@ -166,7 +166,7 @@ const StandardATSView = ({ data, lang, font }) => {
             <div key={i} className="mb-2">
               <div className="flex justify-between items-baseline font-bold">
                 <span>{c.name}</span>
-                <span className="font-normal">{c.year}</span>
+                <span className="font-normal tabular-nums">{c.year}</span>
               </div>
               <p className="text-[10pt]">{c.issuer}</p>
             </div>
@@ -260,7 +260,7 @@ const ModernCreativeView = ({ data, lang, font }) => {
                 <div key={i} className="space-y-1.5">
                   <div className="flex justify-between items-baseline">
                     <h4 className="text-[13px] font-black text-slate-900">{edu.degree} {edu.field ? `di ${edu.field}` : ''}</h4>
-                    <span className="text-[10px] font-bold text-slate-400">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
+                    <span className="text-[10px] font-bold text-slate-400 tabular-nums">{formatDate(edu.startDate, lang)} – {formatDate(edu.endDate, lang)}</span>
                   </div>
                   <p className="text-[12px] font-bold text-slate-500 italic">{edu.institution}</p>
                   {edu.gpa && <p className="text-[11px] text-slate-400 font-medium">GPA: {edu.gpa}</p>}
@@ -285,7 +285,7 @@ const ModernCreativeView = ({ data, lang, font }) => {
                       {exp.position}
                       {exp.type && <span className="ml-2 text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tighter align-middle">{getTranslation(lang, `type.${exp.type}`)}</span>}
                     </h4>
-                    <span className="text-[9px] font-black text-slate-400 bg-slate-50 border border-slate-100 px-2 py-1 rounded-full uppercase tracking-tighter">
+                    <span className="text-[9px] font-black text-slate-400 bg-slate-50 border border-slate-100 px-2 py-1 rounded-full uppercase tracking-tighter tabular-nums">
                       {formatDate(exp.startDate, lang)} – {exp.isCurrent ? getTranslation(lang, 'sec.present', 'Sekarang') : formatDate(exp.endDate, lang)}
                     </span>
                   </div>
@@ -558,6 +558,7 @@ const CVPreview = forwardRef(function CVPreview(_, ref) {
 
       {/* Global Preview Styles */}
       <style>{`
+        #cv-preview-content .cv-rich { text-align: justify; text-justify: inter-word; }
         #cv-preview-content .cv-rich ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin: 0.5rem 0 !important; }
         #cv-preview-content .cv-rich ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin: 0.5rem 0 !important; }
         #cv-preview-content .cv-rich li { margin-bottom: 0.25rem !important; }
