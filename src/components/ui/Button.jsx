@@ -2,19 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const variantClass = {
-  primary: 'bg-[#0066FF] text-white shadow-xl hover:bg-[#0052CC] border border-transparent shadow-blue-500/20',
-  secondary: 'bg-[#E3F2FD] text-[#0066FF] border-2 border-[#E3F2FD] hover:bg-[#E3F2FD]/80 hover:border-[#BBDEFB]',
-  outline: 'bg-transparent text-[#0066FF] border-2 border-[#E3F2FD] hover:border-[#0066FF] hover:bg-[#E3F2FD]/10',
-  ghost: 'bg-transparent text-[#0066FF]/70 hover:text-[#0066FF] hover:bg-[#E3F2FD]/20',
-  danger: 'bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100',
-  gold: 'bg-[#4E8EA2] text-white shadow-lg hover:bg-[#6EA2B3] border border-[#4E8EA2]/50'
+  primary: 'bg-slate-900 text-white shadow-2xl shadow-slate-900/20 hover:bg-slate-800 border-none',
+  secondary: 'bg-white text-slate-900 border-2 border-slate-100 hover:border-blue-500 hover:text-blue-600 shadow-sm hover:shadow-blue-500/10',
+  outline: 'bg-transparent text-slate-900 border-2 border-slate-200 hover:border-slate-900 hover:bg-slate-50',
+  ghost: 'bg-transparent text-slate-400 hover:text-slate-900 hover:bg-slate-100',
+  danger: 'bg-rose-50 text-rose-600 border-2 border-rose-50 hover:border-rose-200 hover:bg-rose-100',
+  gold: 'bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/20 hover:brightness-110'
 };
 
 const sizeClass = {
-  sm: 'px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl',
-  md: 'px-8 py-5 text-xs font-black uppercase tracking-widest rounded-[1.2rem]',
-  lg: 'px-14 py-7 text-base font-black uppercase tracking-widest rounded-full',
-  icon: 'p-4 w-12 h-12 rounded-2xl flex items-center justify-center',
+  sm: 'px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] rounded-xl',
+  md: 'px-8 py-4 text-[10px] font-black uppercase tracking-[0.25em] rounded-[1.25rem]',
+  lg: 'px-12 py-5 text-xs font-black uppercase tracking-[0.3em] rounded-2xl',
+  icon: 'p-4 w-14 h-14 rounded-2xl flex items-center justify-center',
 };
 
 export default function Button({
@@ -44,7 +44,7 @@ export default function Button({
       className={`
         relative inline-flex items-center justify-center gap-3
         transition-all duration-300 select-none
-        outline-none focus:ring-4 focus:ring-blue-500/10
+        outline-none focus:ring-4 focus:ring-blue-500/10 font-display
         ${variantClass[variant] || variantClass.primary} 
         ${sizeClass[size] || ''} 
         ${disabled || loading ? 'opacity-50 grayscale cursor-not-allowed' : 'cursor-pointer'}

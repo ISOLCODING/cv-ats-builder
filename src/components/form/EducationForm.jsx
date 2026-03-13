@@ -6,8 +6,10 @@ import { useForm } from 'react-hook-form';
 import {
   GraduationCap, Plus, Trash2, Pencil, ChevronRight,
   ChevronLeft, BookOpen, Calendar, Award, CheckCircle2,
-  ExternalLink, Link as LinkIcon, ChevronUp, ChevronDown, GripVertical
+  ExternalLink, Link as LinkIcon, ChevronUp, ChevronDown, GripVertical,
+  Info
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
 import MagicWriter from '../ui/MagicWriter';
@@ -42,16 +44,27 @@ const DEGREES = [
 // ── Empty state ───────────────────────────────────────────────
 function EmptyEducation({ onAdd }) {
   return (
-    <div className="flex flex-col items-center justify-center py-10 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-blue-50 border-2 border-dashed border-blue-200 flex items-center justify-center mb-4">
-        <GraduationCap className="w-7 h-7 text-blue-300" />
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center py-12 px-6 text-center glass-card border-dashed border-2 border-slate-200"
+    >
+      <div className="w-20 h-20 rounded-3xl bg-blue-50/50 flex items-center justify-center mb-6 shadow-inner">
+        <GraduationCap className="w-8 h-8 text-blue-500" />
       </div>
-      <p className="font-semibold text-slate-800 mb-1">Belum ada riwayat pendidikan</p>
-      <p className="text-sm text-slate-500 mb-5">Tambahkan pendidikan formal maupun sertifikasi</p>
-      <Button onClick={onAdd} leftIcon={<Plus className="w-4 h-4" />} size="sm">
+      <h3 className="font-display font-bold text-slate-800 text-lg mb-2">Belum ada riwayat pendidikan</h3>
+      <p className="text-sm text-slate-500 max-w-sm mb-6 leading-relaxed">
+        Pendidikan formal, bootcamp, atau kursus online dapat membantu recruiter memahami latar belakang akademis Anda.
+      </p>
+      <Button 
+        onClick={onAdd} 
+        variant="primary"
+        className="shadow-lg shadow-blue-200"
+        leftIcon={<Plus className="w-4 h-4" />}
+      >
         Tambah Pendidikan
       </Button>
-    </div>
+    </motion.div>
   );
 }
 
@@ -59,76 +72,104 @@ function EmptyEducation({ onAdd }) {
 function EducationCard({ edu, index, total, onEdit, onDelete, onMoveUp, onMoveDown }) {
   const dateStr = `${fmtDate(edu.startDate)}${edu.endDate ? ` – ${fmtDate(edu.endDate)}` : ''}`;
   return (
-    <div className="entry-card group animate-fade-up">
-      {/* Order & Icon */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex flex-col items-center gap-0.5 pt-0.5 entry-card-actions">
-          <button type="button" onClick={onMoveUp} disabled={index === 0}
-            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke atas">
-            <ChevronUp className="w-3.5 h-3.5" />
+    <motion.div 
+      layout
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="glass-card group relative p-4 sm:p-5 hover:border-blue-300 transition-all duration-300"
+    >
+      <div className="flex gap-4">
+        {/* Sorting Controls */}
+        <div className="hidden sm:flex flex-col items-center gap-1 self-start pt-1">
+          <button 
+            type="button" 
+            onClick={onMoveUp} 
+            disabled={index === 0}
+            className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-20 transition-colors"
+          >
+            <ChevronUp className="w-4 h-4 text-slate-400" />
           </button>
-          <GripVertical className="w-4 h-4 text-slate-300" />
-          <button type="button" onClick={onMoveDown} disabled={index === total - 1}
-            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke bawah">
-            <ChevronDown className="w-3.5 h-3.5" />
+          <div className="w-px h-8 bg-slate-100" />
+          <button 
+            type="button" 
+            onClick={onMoveDown} 
+            disabled={index === total - 1}
+            className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-20 transition-colors"
+          >
+            <ChevronDown className="w-4 h-4 text-slate-400" />
           </button>
         </div>
-        <div className="entry-card-icon">
-          <GraduationCap className="w-5 h-5 text-blue-600" />
-        </div>
-      </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h4 className="font-bold text-slate-900 text-sm truncate">
-              {edu.degree}{edu.field && `, ${edu.field}`}
-            </h4>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <BookOpen className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-              <span className="text-sm text-slate-600 truncate">{edu.institution}</span>
-            </div>
-            <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-              {dateStr && (
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-slate-400" />
-                  <span className="text-xs text-slate-400">{dateStr}</span>
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <h4 className="font-display font-bold text-slate-900 text-base leading-tight">
+                {edu.degree}{edu.field && `, ${edu.field}`}
+              </h4>
+              
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="font-medium">{edu.institution}</span>
                 </div>
-              )}
-              {edu.gpa && (
-                <div className="flex items-center gap-1">
-                  <Award className="w-3 h-3 text-amber-400" />
-                  <span className="text-xs text-slate-500">IPK: <strong className="text-slate-700">{edu.gpa}</strong></span>
-                </div>
-              )}
-            </div>
-            {edu.description && (
-              <p className="text-xs text-slate-400 mt-1 line-clamp-1">{stripHtml(edu.description)}</p>
-            )}
-          </div>
+                {dateStr && (
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{dateStr}</span>
+                  </div>
+                )}
+                {edu.gpa && (
+                  <div className="flex items-center gap-1.5 text-slate-500">
+                    <Award className="w-3.5 h-3.5 text-amber-500" />
+                    <span className="font-semibold">IPK: {edu.gpa}</span>
+                  </div>
+                )}
+              </div>
 
-          <div className="flex gap-1 flex-shrink-0 items-start">
-            {edu.link && (
-              <a 
-                href={edu.link} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="btn btn-ghost btn-icon w-8 h-8 text-blue-500 hover:bg-blue-50"
-                title="Lihat Sertifikat"
+              {edu.description && (
+                <div 
+                  className="text-xs text-slate-500 line-clamp-1 mt-2 leading-relaxed opacity-70"
+                  dangerouslySetInnerHTML={{ __html: stripHtml(edu.description) }}
+                />
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-1 self-end sm:self-start bg-slate-50/50 p-1 rounded-xl border border-slate-100">
+              {edu.link && (
+                <a 
+                  href={edu.link} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="p-2 rounded-lg text-blue-500 hover:bg-white hover:shadow-sm transition-all"
+                  title="Lihat Kredential"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
+              <button 
+                type="button" 
+                onClick={onEdit}
+                className="p-2 rounded-lg text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
+                title="Edit"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-            <button type="button" onClick={onEdit} className="btn btn-secondary btn-icon w-8 h-8">
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
-            <button type="button" onClick={onDelete} className="btn btn-ghost btn-icon w-8 h-8 text-red-400 hover:bg-red-50">
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button 
+                type="button" 
+                onClick={onDelete}
+                className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                title="Hapus"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -153,11 +194,23 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
   };
 
   return (
-    <div className="bg-blue-50/50 border border-blue-200 rounded-2xl p-5 space-y-4 animate-scale-in">
-      <h3 className="font-bold text-blue-900 text-sm flex items-center gap-2">
-        <GraduationCap className="w-4 h-4 text-blue-600" />
-        {isEdit ? 'Edit Pendidikan' : 'Tambah Pendidikan Baru'}
-      </h3>
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-blue-50/40 border border-blue-100 rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden"
+    >
+      <div className="absolute top-0 right-0 p-8 opacity-5">
+        <GraduationCap className="w-24 h-24 text-blue-900" />
+      </div>
+
+      <div className="relative">
+        <h3 className="font-display font-bold text-blue-900 text-lg flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
+            <GraduationCap className="w-4 h-4" />
+          </div>
+          {isEdit ? 'Edit Pendidikan' : 'Tambah Pendidikan Baru'}
+        </h3>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Jenjang */}
@@ -272,7 +325,7 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
           {isEdit ? 'Simpan Perubahan' : 'Tambahkan'}
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -333,35 +386,42 @@ export default function EducationForm({ onNext, onBack }) {
       )}
 
       {!editTarget && (
-        <>
-          {education.length === 0 && !showForm ? (
-            <EmptyEducation onAdd={() => setShowForm(true)} />
-          ) : (
-            <div className="space-y-3 mb-5">
-              {education.map((edu, i) => (
-                <EducationCard
-                  key={edu.id}
-                  edu={edu}
-                  index={i}
-                  total={education.length}
-                  onEdit={() => handleEdit(edu)}
-                  onDelete={() => removeEducation(edu.id)}
-                  onMoveUp={() => handleMoveUp(i)}
-                  onMoveDown={() => handleMoveDown(i)}
-                />
-              ))}
-              {!showForm && (
-                <button
-                  type="button"
-                  onClick={() => setShowForm(true)}
-                  className="btn-add-dashed"
-                >
-                  <Plus className="w-5 h-5" /> TAMBAH PENDIDIKAN LAGI
-                </button>
-              )}
-            </div>
-          )}
-        </>
+        <div className="relative">
+          <AnimatePresence mode="popLayout">
+            {education.length === 0 && !showForm ? (
+              <EmptyEducation key="empty" onAdd={() => setShowForm(true)} />
+            ) : (
+              <div className="space-y-4 mb-8">
+                {education.map((edu, i) => (
+                  <EducationCard
+                    key={edu.id}
+                    edu={edu}
+                    index={i}
+                    total={education.length}
+                    onEdit={() => handleEdit(edu)}
+                    onDelete={() => removeEducation(edu.id)}
+                    onMoveUp={() => handleMoveUp(i)}
+                    onMoveDown={() => handleMoveDown(i)}
+                  />
+                ))}
+                {!showForm && (
+                  <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    className="w-full py-4 border-2 border-dashed border-slate-200 rounded-[2rem] text-slate-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2 font-display font-bold text-sm tracking-wide group"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </div>
+                    TAMBAH PENDIDIKAN LAGI
+                  </motion.button>
+                )}
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
       )}
 
       {!showForm && !editTarget && (

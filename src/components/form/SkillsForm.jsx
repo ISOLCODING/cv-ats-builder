@@ -3,6 +3,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Cpu, Heart, Languages, X, Plus, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import useCVStore from '../../store/useCVStore';
 
@@ -98,15 +99,15 @@ function SkillTagInput({ category, skills = [], onAdd, onRemove }) {
   return (
     <div className="p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm space-y-4 hover:border-blue-200 hover:shadow-indigo transition-all duration-300 group/skill">
       {/* Category header */}
-      <div className="flex items-center gap-2.5">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${cfg.colors.bg}`}>
-          <Icon className={`w-4 h-4 ${cfg.colors.header}`} />
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${cfg.colors.bg} shadow-soft`}>
+          <Icon className={`w-5 h-5 ${cfg.colors.header}`} />
         </div>
         <div className="flex-1">
-          <p className="text-sm font-bold text-slate-800 leading-none">{cfg.label}</p>
-          <p className="text-xs text-slate-400 mt-0.5">{cfg.desc}</p>
+          <p className="text-sm font-display font-bold text-slate-800 leading-none">{cfg.label}</p>
+          <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">{cfg.desc}</p>
         </div>
-        <span className={`${cfg.colors.badge} text-xs`}>{skills.length}</span>
+        <span className={`${cfg.colors.badge} text-xs font-bold px-3 py-1`}>{skills.length}</span>
       </div>
 
       {/* Tags display */}
@@ -221,32 +222,41 @@ export default function SkillsForm({ onNext, onBack }) {
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-[2.5rem] mb-6 shadow-sm"
+          className="p-6 sm:p-8 bg-gradient-to-br from-indigo-50/50 to-blue-50/50 border border-indigo-100 rounded-[2.5rem] mb-6 shadow-sm overflow-hidden relative"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 flex items-center justify-center text-white">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-black text-indigo-900 text-sm uppercase tracking-widest leading-none">Smart Gap Analysis</h3>
-              <p className="text-[10px] font-bold text-indigo-400 mt-1 uppercase tracking-wider">Missing keywords from active Job Description</p>
+          <div className="absolute top-0 right-0 p-8 opacity-5">
+            <Sparkles className="w-24 h-24 text-indigo-900" />
+          </div>
+
+          <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 flex items-center justify-center text-white">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-display font-black text-indigo-900 text-sm uppercase tracking-widest leading-none">Smart Gap Analysis</h3>
+                <p className="text-[10px] font-bold text-indigo-400 mt-1.5 uppercase tracking-wider">Missing keywords from active Job Description</p>
+              </div>
             </div>
           </div>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5 relative">
             {nudges.map((nudge) => (
-              <button
+              <motion.button
                 key={nudge}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => addSkill('technical', nudge)}
-                className="group flex items-center gap-2 px-4 py-2 bg-white border border-indigo-100 rounded-xl text-xs font-bold text-indigo-600 hover:border-indigo-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95 translate-y-0"
+                className="group flex items-center gap-2 px-4 py-2 bg-white border border-indigo-100 rounded-xl text-xs font-bold text-indigo-600 hover:border-indigo-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95"
               >
                 <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
                 {nudge}
-              </button>
+              </motion.button>
             ))}
           </div>
           
-          <p className="mt-4 text-[10px] text-indigo-400 italic">
+          <p className="mt-6 text-[10px] text-indigo-400 font-medium italic flex items-center gap-1.5">
+            <Info className="w-3 h-3" />
             *Klik untuk menambahkan keyword ini ke daftar Technical Skills Anda untuk meningkatkan ATS score.
           </p>
         </motion.div>

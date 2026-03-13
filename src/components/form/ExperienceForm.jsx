@@ -8,6 +8,7 @@ import {
   ChevronLeft, Building2, Calendar, GripVertical,
   CheckCircle2, ChevronUp, ChevronDown, Info
 } from 'lucide-react';
+import { motion, Reorder, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
 import MagicWriter from '../ui/MagicWriter';
@@ -29,19 +30,27 @@ function stripHtml(html = '') {
 // ── Empty state ───────────────────────────────────────────────
 function EmptyExperience({ onAdd }) {
   return (
-    <div className="flex flex-col items-center justify-center py-10 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-blue-50 border-2 border-dashed border-blue-200 flex items-center justify-center mb-4">
-        <Briefcase className="w-7 h-7 text-blue-300" />
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col items-center justify-center py-12 px-6 text-center glass-card border-dashed border-2 border-slate-200"
+    >
+      <div className="w-20 h-20 rounded-3xl bg-blue-50/50 flex items-center justify-center mb-6 shadow-inner">
+        <Briefcase className="w-8 h-8 text-blue-500" />
       </div>
-      <p className="font-semibold text-slate-800 mb-1">Belum ada pengalaman kerja</p>
-      <p className="text-sm text-slate-500 mb-1">
-        Belum punya pengalaman kerja? <strong>Magang / internship</strong> juga bisa ditambahkan!
+      <h3 className="font-display font-bold text-slate-800 text-lg mb-2">Belum ada pengalaman kerja</h3>
+      <p className="text-sm text-slate-500 max-w-sm mb-6 leading-relaxed">
+        Belum punya pengalaman kerja? <span className="text-blue-600 font-semibold">Magang / internship</span> juga bisa ditambahkan untuk memperkuat profil Anda di mata recruiter.
       </p>
-      <p className="text-xs text-slate-400 mb-5">Freelance, voluntary, dan part-time juga diterima oleh kebanyakan ATS.</p>
-      <Button onClick={onAdd} leftIcon={<Plus className="w-4 h-4" />} size="sm">
-        Tambah Pengalaman
+      <Button 
+        onClick={onAdd} 
+        variant="primary"
+        className="shadow-lg shadow-blue-200"
+        leftIcon={<Plus className="w-4 h-4" />}
+      >
+        Tambah Pengalaman Pertama
       </Button>
-    </div>
+    </motion.div>
   );
 }
 
@@ -52,67 +61,99 @@ function ExperienceCard({ exp, index, total, onEdit, onDelete, onMoveUp, onMoveD
     : `${fmtDate(exp.startDate)}${exp.endDate ? ` – ${fmtDate(exp.endDate)}` : ''}`;
 
   return (
-    <div className="entry-card group animate-fade-up">
-      {/* Order & Icon */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex flex-col items-center gap-0.5 pt-0.5 entry-card-actions">
-          <button type="button" onClick={onMoveUp} disabled={index === 0}
-            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke atas">
-            <ChevronUp className="w-3.5 h-3.5" />
+    <motion.div 
+      layout
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="glass-card group relative p-4 sm:p-5 hover:border-blue-300 transition-all duration-300"
+    >
+      <div className="flex gap-4">
+        {/* Sorting Controls - Hidden on mobile, shown as drag handle maybe? For now just keep buttons */}
+        <div className="hidden sm:flex flex-col items-center gap-1 self-start pt-1">
+          <button 
+            type="button" 
+            onClick={onMoveUp} 
+            disabled={index === 0}
+            className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-20 transition-colors"
+          >
+            <ChevronUp className="w-4 h-4 text-slate-400" />
           </button>
-          <GripVertical className="w-4 h-4 text-slate-300" />
-          <button type="button" onClick={onMoveDown} disabled={index === total - 1}
-            className="btn btn-ghost btn-icon p-0.5 disabled:opacity-20" title="Pindah ke bawah">
-            <ChevronDown className="w-3.5 h-3.5" />
+          <div className="w-px h-8 bg-slate-100" />
+          <button 
+            type="button" 
+            onClick={onMoveDown} 
+            disabled={index === total - 1}
+            className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-20 transition-colors"
+          >
+            <ChevronDown className="w-4 h-4 text-slate-400" />
           </button>
         </div>
-        <div className="entry-card-icon">
-          <Briefcase className="w-5 h-5 text-blue-600" />
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="font-display font-bold text-slate-900 text-base leading-tight">
+                  {exp.position || '—'}
+                </h4>
+                <div className="flex gap-1.5">
+                  {exp.isCurrent && (
+                    <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-100">
+                      Active
+                    </span>
+                  )}
+                  {exp.type === 'internship' && (
+                    <span className="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-purple-100">
+                      Intern
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <Building2 className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="font-medium">{exp.company}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>{dateStr}</span>
+                </div>
+              </div>
+
+              {exp.description && (
+                <div 
+                  className="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: stripHtml(exp.description) }}
+                />
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-1 self-end sm:self-start bg-slate-50/50 p-1 rounded-xl border border-slate-100">
+              <button 
+                type="button" 
+                onClick={onEdit}
+                className="p-2 rounded-lg text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
+                title="Edit"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button 
+                type="button" 
+                onClick={onDelete}
+                className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                title="Hapus"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-bold text-slate-900 text-sm truncate">{exp.position || '—'}</h4>
-              {exp.isCurrent && (
-                <span className="badge badge-blue text-[10px] flex-shrink-0">Saat ini</span>
-              )}
-              {exp.type === 'internship' && (
-                <span className="badge badge-purple text-[10px] flex-shrink-0">Magang</span>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <Building2 className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-              <span className="text-sm text-slate-600 truncate">{exp.company}</span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-              <span className="text-xs text-slate-400">{dateStr}</span>
-            </div>
-            {exp.description && (
-              <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">
-                {stripHtml(exp.description)}
-              </p>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-1 flex-shrink-0">
-            <button type="button" onClick={onEdit}
-              className="btn btn-secondary btn-icon w-8 h-8" title="Edit">
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
-            <button type="button" onClick={onDelete}
-              className="btn btn-ghost btn-icon w-8 h-8 text-red-400 hover:bg-red-50" title="Hapus">
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -143,11 +184,23 @@ function ExperienceEntryForm({ initial = null, onSave, onCancel }) {
   };
 
   return (
-    <div className="bg-blue-50/50 border border-blue-200 rounded-2xl p-5 space-y-4 animate-scale-in">
-      <h3 className="font-bold text-blue-900 text-sm flex items-center gap-2">
-        <Briefcase className="w-4 h-4 text-blue-600" />
-        {isEdit ? 'Edit Pengalaman' : 'Tambah Pengalaman Baru'}
-      </h3>
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-blue-50/40 border border-blue-100 rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden"
+    >
+      <div className="absolute top-0 right-0 p-8 opacity-5">
+        <Briefcase className="w-24 h-24 text-blue-900" />
+      </div>
+
+      <div className="relative">
+        <h3 className="font-display font-bold text-blue-900 text-lg flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
+            <Briefcase className="w-4 h-4" />
+          </div>
+          {isEdit ? 'Edit Pengalaman' : 'Tambah Pengalaman Baru'}
+        </h3>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Posisi */}
@@ -261,7 +314,7 @@ function ExperienceEntryForm({ initial = null, onSave, onCancel }) {
           {isEdit ? 'Simpan Perubahan' : 'Tambahkan'}
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -341,36 +394,43 @@ export default function ExperienceForm({ onNext, onBack }) {
 
       {/* List / Empty */}
       {!editTarget && (
-        <>
-          {experiences.length === 0 && !showForm ? (
-            <EmptyExperience onAdd={() => setShowForm(true)} />
-          ) : (
-            <div className="space-y-3 mb-5">
-              {experiences.map((exp, i) => (
-                <ExperienceCard
-                  key={exp.id}
-                  exp={exp}
-                  index={i}
-                  total={experiences.length}
-                  onEdit={() => handleEdit(exp)}
-                  onDelete={() => removeExperience(exp.id)}
-                  onMoveUp={() => handleMoveUp(i)}
-                  onMoveDown={() => handleMoveDown(i)}
-                />
-              ))}
+        <div className="relative">
+          <AnimatePresence mode="popLayout">
+            {experiences.length === 0 && !showForm ? (
+              <EmptyExperience key="empty" onAdd={() => setShowForm(true)} />
+            ) : (
+              <div className="space-y-4 mb-8">
+                {experiences.map((exp, i) => (
+                  <ExperienceCard
+                    key={exp.id}
+                    exp={exp}
+                    index={i}
+                    total={experiences.length}
+                    onEdit={() => handleEdit(exp)}
+                    onDelete={() => removeExperience(exp.id)}
+                    onMoveUp={() => handleMoveUp(i)}
+                    onMoveDown={() => handleMoveDown(i)}
+                  />
+                ))}
 
-              {!showForm && (
-                <button
-                  type="button"
-                  onClick={() => setShowForm(true)}
-                  className="btn-add-dashed"
-                >
-                  <Plus className="w-5 h-5" /> TAMBAH PENGALAMAN LAGI
-                </button>
-              )}
-            </div>
-          )}
-        </>
+                {!showForm && (
+                  <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    className="w-full py-4 border-2 border-dashed border-slate-200 rounded-[2rem] text-slate-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2 font-display font-bold text-sm tracking-wide group"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </div>
+                    TAMBAH PENGALAMAN LAGI
+                  </motion.button>
+                )}
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
       )}
 
       {/* Navigation */}

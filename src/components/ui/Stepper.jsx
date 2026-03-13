@@ -28,14 +28,14 @@ export default function Stepper({ currentStep, onStepClick }) {
   return (
     <div className="relative">
       {/* ── Royal Stepper ─────────────────────────── */}
-      <div className="hidden lg:flex items-center justify-between relative px-6">
+      <div className="hidden lg:flex items-center justify-between relative px-10">
         {/* Connection Line */}
-        <div className="absolute top-[1.4rem] left-16 right-16 h-[4px] bg-slate-100 rounded-full z-0 overflow-hidden">
+        <div className="absolute top-[1.6rem] left-20 right-20 h-[2px] bg-slate-100 rounded-full z-0 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
-            transition={{ duration: 1, ease: "circOut" }}
-            className="h-full bg-[#0A4174] shadow-[0_0_20px_rgba(10, 65, 116, 0.4)]"
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="h-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.3)]"
           />
         </div>
 
@@ -50,34 +50,42 @@ export default function Stepper({ currentStep, onStepClick }) {
               key={step.id}
               type="button"
               onClick={() => isClickable && onStepClick?.(step.id)}
-              className={`relative z-10 flex flex-col items-center gap-4 transition-all duration-500 outline-none group ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
-              style={{ width: '80px' }} // Adjusted width for more steps
+              className={`relative z-10 flex flex-col items-center gap-5 transition-all duration-500 outline-none group ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+              style={{ width: '90px' }}
             >
               <div className="relative">
                 <motion.div
                   initial={false}
                   animate={{
-                    scale: isActive ? 1.25 : 1,
-                    backgroundColor: isActive ? "#0066FF" : isCompleted ? "#0066FF" : "#ffffff",
-                    borderColor: isActive ? "#ffffff" : "#E3F2FD"
+                    scale: isActive ? 1.3 : 1,
+                    backgroundColor: isActive ? "#0f172a" : isCompleted ? "#2563eb" : "#ffffff",
+                    borderColor: isActive ? "#0f172a" : isCompleted ? "#2563eb" : "#f1f5f9"
                   }}
-                  className={`w-10 h-10 rounded-2xl flex items-center justify-center border-2 transition-all duration-300 ${isActive ? 'shadow-[0_10px_25px_-5px_rgba(0,102,255,0.5)] text-white ring-4 ring-blue-50' : isCompleted ? 'text-white' : 'text-[#BBDEFB]'
-                    }`}
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 ${
+                    isActive 
+                      ? 'shadow-2xl shadow-slate-900/20 text-white' 
+                      : isCompleted 
+                        ? 'text-white shadow-lg shadow-blue-500/10' 
+                        : 'text-slate-300'
+                  }`}
                 >
                   {isCompleted ? (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}><Check className="w-4 h-4 stroke-[4]" /></motion.div>
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}><Check className="w-5 h-5 stroke-[4]" /></motion.div>
                   ) : (
-                    <Icon className={`w-4 h-4 ${isActive ? 'animate-pulse' : ''}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'animate-pulse' : ''}`} />
                   )}
                 </motion.div>
+                
                 {isActive && (
-                  <motion.div layoutId="royal-sparkle" className="absolute -top-1 -right-1 text-[#4E8EA2] bg-white rounded-full p-0.5 shadow-md border border-[#BDD8E9]">
-                    <Stars className="w-2.5 h-2.5 fill-current" />
+                  <motion.div layoutId="royal-sparkle" className="absolute -top-1.5 -right-1.5 text-blue-500 bg-white rounded-full p-1 shadow-xl border border-blue-50">
+                    <Stars className="w-3 h-3 fill-current" />
                   </motion.div>
                 )}
               </div>
+              
               <div className="flex flex-col items-center">
-                <p className={`text-[8px] font-black tracking-tighter uppercase transition-all duration-300 text-center leading-tight whitespace-nowrap ${isActive ? 'text-[#0066FF]' : isCompleted ? 'text-[#0066FF]/70' : 'text-slate-300'
+                <p className={`text-[9px] font-black tracking-[0.1em] uppercase transition-all duration-500 text-center leading-tight whitespace-nowrap font-display ${
+                  isActive ? 'text-slate-900' : isCompleted ? 'text-blue-600' : 'text-slate-300'
                 }`}>
                   {step.label}
                 </p>
@@ -88,31 +96,36 @@ export default function Stepper({ currentStep, onStepClick }) {
       </div>
 
       {/* ── Mobile Tactical View ──────────────── */}
-      <div className="lg:hidden flex flex-col gap-5">
-        <div className="flex items-center justify-between px-4">
-          <div className="space-y-1 text-left">
-            <div className="flex items-center gap-2.5">
-              <span className="px-3 py-1 rounded-xl bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wider">
-                Phase {currentStep.toString().padStart(2, '0')}
-              </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"></div>
+      <div className="lg:hidden">
+        <div className="bg-white/50 backdrop-blur-xl border border-white/50 rounded-[2.5rem] p-6 shadow-xl shadow-slate-900/5">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2 text-left">
+              <div className="flex items-center gap-3">
+                <span className="px-4 py-1.5 rounded-full bg-blue-600 text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20">
+                  Step {currentStep.toString().padStart(2, '0')}
+                </span>
+                <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></div>
+              </div>
+              <h4 className="text-2xl font-black text-slate-900 tracking-tighter uppercase font-display italic">
+                {STEPS[currentStep - 1]?.label}
+              </h4>
             </div>
-            <h4 className="text-xl font-black text-slate-900 tracking-tighter uppercase tabular-nums">
-              {STEPS[currentStep - 1]?.label}
-            </h4>
-          </div>
 
-          <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
-            <svg className="w-12 h-12 transform -rotate-90">
-              <circle cx="24" cy="24" r="20" fill="transparent" stroke="#f1f5f9" strokeWidth="4" />
-              <motion.circle
-                cx="24" cy="24" r="20" fill="transparent" stroke="#2563eb" strokeWidth="4"
-                strokeDasharray="125.66"
-                animate={{ strokeDashoffset: 125.66 - (125.66 * currentStep / totalSteps) }}
-                transition={{ duration: 1, ease: "easeOut" }}
+            <div className="relative w-20 h-20 flex items-center justify-center">
+              <svg className="w-20 h-20 transform -rotate-90">
+                <circle cx="40" cy="40" r="32" fill="transparent" stroke="#f1f5f9" strokeWidth="6" />
+                <motion.circle
+                  cx="40" cy="40" r="32" fill="transparent" stroke="#2563eb" strokeWidth="6"
+                  strokeDasharray="201.06"
+                  animate={{ strokeDashoffset: 201.06 - (201.06 * currentStep / totalSteps) }}
+                  transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                  strokeLinecap="round"
                 />
-            </svg>
-            <span className="absolute text-[10px] font-black text-slate-900">{Math.round((currentStep / totalSteps) * 100)}%</span>
+              </svg>
+              <div className="absolute flex flex-col items-center">
+                <span className="text-xs font-black text-slate-900 font-display">{Math.round((currentStep / totalSteps) * 100)}%</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

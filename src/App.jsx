@@ -282,15 +282,15 @@ export default function App() {
       </AnimatePresence>
 
       {/* ── Top Navigation (Royal Blue) ──────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
+      <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-2 sm:p-4">
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="glass-card shadow-master rounded-full px-8 py-3.5 flex items-center gap-12 border-white/80"
+          className="glass-card shadow-master rounded-3xl lg:rounded-full px-4 sm:px-8 py-3 flex items-center justify-between lg:justify-start gap-4 lg:gap-12 border-white/80 w-full max-w-7xl mx-auto"
         >
           {/* Brand */}
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => { setActiveTab('editor'); setCurrentStep(1); }}>
-            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center relative overflow-hidden transition-all duration-500 ${appLogo ? 'bg-transparent' : 'bg-[#0066FF] shadow-blue'}`}>
+          <div className="flex items-center gap-3 sm:gap-4 cursor-pointer group flex-shrink-0" onClick={() => { setActiveTab('editor'); setCurrentStep(1); }}>
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-[1.25rem] flex items-center justify-center relative overflow-hidden transition-all duration-700 group-hover:rotate-6 ${appLogo ? 'bg-transparent' : 'bg-gradient-to-br from-blue-600 to-indigo-700 shadow-indigo'}`}>
               {appLogo ? (
                 <motion.img
                   key={appLogo}
@@ -302,29 +302,20 @@ export default function App() {
                 />
               ) : (
                 <div className="relative w-full h-full flex items-center justify-center">
-                  <img
-                    src={`${import.meta.env.BASE_URL}logo.png`}
-                    alt="Logo"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      if (e.target.nextSibling) e.target.nextSibling.classList.remove('hidden');
-                    }}
-                  />
-                  <Stars className="w-6 h-6 fill-current text-white/90 hidden" />
+                  <Stars className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-white/90" />
                 </div>
               )}
             </div>
-            <div>
-              <p className="text-sm font-black text-slate-900 tracking-tighter uppercase leading-none">{appName}</p>
-              <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest leading-none mt-1.5 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-amber-400"></span> Royal Protocol
+            <div className="hidden xs:block">
+              <p className="text-sm sm:text-lg font-black text-slate-900 tracking-tighter uppercase leading-none font-display">{appName}</p>
+              <p className="text-[8px] sm:text-[9px] font-black text-blue-600/60 uppercase tracking-[0.3em] leading-none mt-1 sm:mt-2 flex items-center gap-1.5 px-0.5">
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Elite
               </p>
             </div>
           </div>
 
-          {/* Nav Tabs */}
-          <div className="flex items-center gap-2 p-1.5 bg-slate-50 shadow-inner rounded-full">
+          {/* Nav Tabs - Responsive Visibility */}
+          <div className="hidden md:flex items-center gap-1.5 p-1.5 bg-slate-100/50 backdrop-blur-md shadow-inner rounded-full border border-slate-200/50">
             {[
               { id: 'editor', icon: <LayoutDashboard className="w-4 h-4" /> },
               { id: 'history', icon: <History className="w-4 h-4" /> },
@@ -333,84 +324,79 @@ export default function App() {
               <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                variants={navItemVariants}
-                animate={activeTab === tab.id ? 'active' : 'inactive'}
-                className="px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2.5 transition-all"
+                className={`px-4 lg:px-6 py-2 rounded-full text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all duration-500 ${activeTab === tab.id ? 'bg-white text-blue-600 shadow-master scale-105' : 'text-slate-400 hover:text-slate-600 hover:bg-white/50'}`}
               >
                 {tab.icon}
-                {tab.id === 'editor' ? 'DASHBOARD' : tab.id === 'history' ? 'RIWAYAT' : 'PENGATURAN'}
+                <span className="hidden lg:block">{tab.id === 'editor' ? 'BUILDER' : tab.id === 'history' ? 'ARCHIVE' : 'SYSTEM'}</span>
               </motion.button>
             ))}
           </div>
 
           {/* Quick Actions */}
-          <div className="flex items-center gap-4 border-l border-slate-100 pl-10 ml-2">
+          <div className="flex items-center gap-2 sm:gap-4 md:border-l border-slate-200/60 md:pl-6 lg:pl-8 ml-auto lg:ml-2">
             
-            {/* Language Toggle */}
-            <div className="flex items-center bg-slate-50 rounded-full p-1 shadow-inner relative">
+            {/* Mobile View Toggle (Editor vs Preview) - Visible only on mobile/tablet */}
+            <div className="xl:hidden flex items-center bg-slate-100/50 rounded-2xl p-1 border border-slate-200/40">
+               <button 
+                 onClick={() => setPreviewType(previewType === 'preview_only' ? 'cv' : 'preview_only')}
+                 className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${previewType === 'preview_only' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}
+               >
+                 <Eye className="w-4 h-4" />
+               </button>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
               <button
-                onClick={() => language !== 'id' && translateCVData('id')}
-                disabled={isSaving}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all z-10 
-                  ${language === 'id' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-400 hover:text-slate-600'}`}
+                onClick={() => setShowLoadModal(true)}
+                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl sm:rounded-2xl transition-all border border-transparent hover:border-blue-100"
+                title="Cloud Restore"
               >
-                ID
+                <Cloud className="w-5 h-5" />
               </button>
               <button
-                onClick={() => language !== 'en' && translateCVData('en')}
+                onClick={handleSave}
                 disabled={isSaving}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-wider transition-all z-10 
-                  ${language === 'en' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl sm:rounded-2xl transition-all border ${isSaving ? 'bg-blue-50 border-blue-100 text-blue-400' : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 hover:border-emerald-100'}`}
+                title="Save"
               >
-                EN
+                {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
               </button>
             </div>
 
             <button
-              onClick={() => setShowLoadModal(true)}
-              className="p-3.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
-              title="Cloud Restore"
-            >
-              <Cloud className="w-5.5 h-5.5" />
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className={`p-3.5 rounded-2xl transition-all flex items-center justify-center ${isSaving ? 'bg-blue-50 text-blue-400' : 'text-slate-400 hover:text-amber-500 hover:bg-amber-50'}`}
-            >
-              {isSaving ? <RefreshCw className="w-5.5 h-5.5 animate-spin" /> : <Save className="w-5.5 h-5.5" />}
-            </button>
-            <button
               onClick={handleExport}
               disabled={exporting}
-              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/20 hover:bg-blue-700 transition-all font-black uppercase tracking-widest text-[10px] active:scale-95 disabled:opacity-50"
+              className="relative group flex items-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-slate-900 shadow-2xl shadow-slate-900/40 hover:bg-slate-800 transition-all active:scale-[0.98] disabled:opacity-50 overflow-hidden"
             >
-              {exporting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />}
-              {exporting ? `${exportPct}%` : 'Cetak PDF'}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              {exporting ? <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin relative z-10 text-blue-400" /> : <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 relative z-10" />}
+              <span className="relative z-10 text-white font-black uppercase tracking-[0.2em] text-[8px] sm:text-[10px] whitespace-nowrap">
+                {exporting ? `${exportPct}%` : 'Cetak'}
+              </span>
             </button>
           </div>
         </motion.div>
       </header>
 
       {/* ── Main Canvas ───────────────────────────────────── */}
-      <main className="pt-36 pb-24 px-8 max-w-[1920px] mx-auto">
-        <div className="flex flex-col xl:flex-row gap-16 items-start justify-center">
+      <main className="pt-28 sm:pt-36 pb-24 px-4 sm:px-8 max-w-[1920px] mx-auto">
+        <div className="flex flex-col xl:flex-row gap-8 lg:gap-16 items-start justify-center">
 
-          {/* Left: Dynamic Workspace */}
-          <div className="w-full xl:max-w-4xl space-y-12">
+          {/* Left: Dynamic Workspace (Hidden when mobile is in preview mode) */}
+          <div className={`w-full xl:max-w-4xl space-y-8 lg:space-y-12 ${previewType === 'preview_only' ? 'hidden xl:block' : 'block'}`}>
             <AnimatePresence mode="wait">
               {activeTab === 'editor' && (
-                <motion.div key="editor" {...pageTransition} className="space-y-10">
+                <motion.div key="editor" {...pageTransition} className="space-y-8 lg:space-y-10">
                   {/* Stepper HUD */}
-                  <div className="glass-card p-10 rounded-[3.5rem] shadow-master border-white/60">
+                  <div className="glass-card p-6 sm:p-10 rounded-3xl sm:rounded-[3.5rem] shadow-master border-white/60">
                     <Stepper currentStep={currentStep} onStepClick={setCurrentStep} />
                   </div>
 
                   {/* Contextual Form Workspace */}
-                  <div className="glass-card p-14 rounded-[4rem] shadow-master border-white/80 min-h-[600px] relative overflow-hidden group">
+                  <div className="glass-card p-6 sm:p-14 rounded-3xl sm:rounded-[4rem] shadow-master border-white/80 min-h-[400px] sm:min-h-[600px] relative overflow-hidden group">
                     {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-blue-50/40 rounded-full blur-3xl -mr-40 -mt-40 transition-transform group-hover:scale-125 duration-1000"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-50/30 rounded-full blur-3xl -ml-32 -mb-32 transition-transform duration-1000"></div>
+                    <div className="absolute top-0 right-0 w-40 sm:w-80 h-40 sm:h-80 bg-blue-50/40 rounded-full blur-3xl -mr-20 -mt-20 sm:-mr-40 sm:-mt-40 transition-transform group-hover:scale-125 duration-1000"></div>
+                    <div className="absolute bottom-0 left-0 w-32 sm:w-64 h-32 sm:h-64 bg-amber-50/30 rounded-full blur-3xl -ml-16 -mb-16 sm:-ml-32 sm:-mb-32 transition-transform duration-1000"></div>
 
                     <div className="relative z-10">
                       {renderCurrentStep()}
@@ -427,7 +413,7 @@ export default function App() {
 
               {activeTab === 'settings' && (
                 <motion.div key="settings" {...pageTransition}>
-                  <div className="glass-card p-14 rounded-[3.5rem] shadow-master border-white/80 min-h-[600px]">
+                  <div className="glass-card p-8 sm:p-14 rounded-3xl sm:rounded-[3.5rem] shadow-master border-white/80 min-h-[400px] sm:min-h-[600px]">
                     <SettingsPage />
                   </div>
                 </motion.div>
@@ -441,41 +427,41 @@ export default function App() {
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="w-full xl:w-[820px] sticky top-32 space-y-6"
+              className={`w-full xl:w-[820px] xl:sticky xl:top-32 space-y-6 ${previewType === 'preview_only' ? 'block' : 'hidden xl:block'}`}
             >
               {/* Preview Controls Bar */}
-              <div className="glass-card p-4 rounded-[2rem] flex items-center justify-between shadow-blue border-white/80">
-                <div className="flex items-center gap-4 px-3">
-                  <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200">
-                    <Eye className="w-5 h-5" />
+              <div className="glass-card p-3 sm:p-4 rounded-2xl sm:rounded-[2rem] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-blue border-white/80">
+                <div className="flex items-center gap-4 px-3 self-start sm:self-auto">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20">
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-[0.25em] text-blue-900">Pratinjau CV</span>
+                  <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-slate-900 font-display">Pratinjau CV</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 p-1 bg-slate-50 rounded-2xl">
+                <div className="flex items-center gap-1.5 p-1 bg-slate-50 rounded-xl sm:rounded-2xl w-full sm:w-auto overflow-x-auto no-scrollbar">
                   {['cv', 'letter', 'all'].map(t => (
                     <button
                       key={t}
                       onClick={() => setPreviewType(t)}
-                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${previewType === t ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
+                      className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap ${previewType === t ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
                     >
-                      {t}
+                      {t === 'cv' ? 'RESUME' : t === 'letter' ? 'LETTER' : 'FULL'}
                     </button>
                   ))}
                 </div>
 
-                <div className="flex items-center gap-1 border-l border-slate-100 pl-4 ml-2">
-                  <button onClick={() => setZoom(z => Math.max(0.4, z - 0.1))} className="p-2.5 text-slate-400 hover:text-blue-600 transition-colors"><ZoomOut className="w-5 h-5" /></button>
-                  <span className="text-xs font-black text-slate-500 w-12 text-center">{Math.round(zoom * 100)}%</span>
-                  <button onClick={() => setZoom(z => Math.min(1.2, z + 0.1))} className="p-2.5 text-slate-400 hover:text-blue-600 transition-colors"><ZoomIn className="w-5 h-5" /></button>
+                <div className="flex items-center gap-1 border-t sm:border-t-0 sm:border-l border-slate-100 pt-3 sm:pt-0 sm:pl-4 sm:ml-2 w-full sm:w-auto justify-center">
+                  <button onClick={() => setZoom(z => Math.max(0.4, z - 0.1))} className="p-2 text-slate-400 hover:text-blue-600 transition-colors"><ZoomOut className="w-5 h-5" /></button>
+                  <span className="text-[10px] font-black text-slate-500 w-12 text-center tabular-nums">{Math.round(zoom * 100)}%</span>
+                  <button onClick={() => setZoom(z => Math.min(1.2, z + 0.1))} className="p-2 text-slate-400 hover:text-blue-600 transition-colors"><ZoomIn className="w-5 h-5" /></button>
                 </div>
               </div>
 
               {/* Rendering Engine Container */}
-              <div className="glass-card p-6 rounded-[3rem] overflow-hidden shadow-master bg-white border-slate-100 h-[calc(100vh-280px)] relative group">
-                <div className="absolute inset-0 bg-mesh opacity-20 pointer-events-none"></div>
+              <div className="glass-card p-2 sm:p-6 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-master bg-white border-slate-100 flex-1 h-[calc(100vh-280px)] xl:h-[calc(100vh-280px)] relative group">
+                <div className="absolute inset-0 bg-mesh opacity-10 pointer-events-none"></div>
                 <div 
-                  className="w-full h-full overflow-auto scroll-smooth p-6 flex justify-center custom-scrollbar"
+                  className="w-full h-full overflow-auto scroll-smooth p-4 sm:p-6 flex justify-center custom-scrollbar"
                 >
                   <motion.div
                     layout
@@ -485,16 +471,16 @@ export default function App() {
                       width: '794px',
                       flexShrink: 0
                     }}
-                    className="flex flex-col gap-16"
+                    className="flex flex-col gap-12 sm:gap-16"
                   >
                     {previewType === 'all' ? (
                       <>
-                        <div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]"><LetterPreview /></div>
-                        <div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)]"><CVPreview ref={cvPreviewRef} /></div>
+                        <div className="shadow-preview"><LetterPreview /></div>
+                        <div className="shadow-preview"><CVPreview ref={cvPreviewRef} /></div>
                       </>
                     ) : (
-                        <div className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] bg-white">
-                        {previewType === 'cv' ? <CVPreview ref={cvPreviewRef} /> : <LetterPreview />}
+                        <div className="shadow-preview bg-white">
+                        {previewType === 'cv' || previewType === 'preview_only' ? <CVPreview ref={cvPreviewRef} /> : <LetterPreview />}
                         </div>
                     )}
                   </motion.div>
@@ -505,6 +491,17 @@ export default function App() {
 
         </div>
       </main>
+
+      {/* Floating Action Button for Mobile Preview Toggle */}
+      <div className="xl:hidden fixed bottom-6 right-6 z-[60]">
+        <button
+          onClick={() => setPreviewType(previewType === 'preview_only' ? 'cv' : 'preview_only')}
+          className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 ${previewType === 'preview_only' ? 'bg-slate-900 text-white rotate-[360deg]' : 'bg-blue-600 text-white'}`}
+        >
+          {previewType === 'preview_only' ? <LayoutDashboard className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+        </button>
+      </div>
+
 
       <footer className="py-16 border-t border-slate-100 bg-white/50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 flex flex-col items-center gap-8">
