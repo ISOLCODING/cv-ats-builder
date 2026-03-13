@@ -144,14 +144,15 @@ function parseInline(node, base, key) {
   switch (tag) {
     case 'strong':
     case 'b': {
-      const s = { ...base, fontWeight: 'bold' };
+      const s = { ...base, fontWeight: 'bold', fontStyle: 'normal' };
       return ce(Text, { key, style: s }, ...parseInlines(children, s));
     }
 
     case 'em':
     case 'i': {
-      // User requested to not use italics to avoid PDF export issues.
-      return ce(Text, { key, style: base }, ...parseInlines(children, base));
+      // Force normal style to avoid PDF errors.
+      const s = { ...base, fontStyle: 'normal' };
+      return ce(Text, { key, style: s }, ...parseInlines(children, s));
     }
 
     case 'u':

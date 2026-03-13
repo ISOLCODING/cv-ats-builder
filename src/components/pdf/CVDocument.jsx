@@ -35,21 +35,20 @@ Font.register({
 });
 
 const getFontFamily = (f) => {
-  if (f === 'serif') return { 
-    regular: 'Times-Roman', 
-    bold: 'Times-Bold', 
-    italic: 'Times-Roman',
-    boldItalic: 'Times-Bold'
+  const fonts = {
+    serif: { regular: 'Times-Roman', bold: 'Times-Bold' },
+    sans: { regular: 'Helvetica', bold: 'Helvetica-Bold' },
+    tahoma: { regular: 'Inter', bold: 'Inter' },
+    inter: { regular: 'Inter', bold: 'Inter' },
+    roboto: { regular: 'Roboto', bold: 'Roboto' }
   };
-  if (f === 'sans') return { 
-    regular: 'Helvetica', 
-    bold: 'Helvetica-Bold', 
-    italic: 'Helvetica',
-    boldItalic: 'Helvetica-Bold'
+  const selected = fonts[f] || fonts.serif;
+  return {
+    regular: selected.regular,
+    bold: selected.bold,
+    italic: selected.regular,
+    boldItalic: selected.bold
   };
-  if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
-  if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
-  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
 };
 
 const SIZE_BODY = 10;
@@ -544,12 +543,16 @@ export const CVDocument = ({ cvData }) => {
     global: {
       fontFamily: themeFont.regular,
       lineHeight: LINE_HEIGHT,
+      fontStyle: 'normal',
     },
     bold: {
       fontFamily: themeFont.bold,
+      fontWeight: 'bold',
+      fontStyle: 'normal',
     },
     italic: {
       fontFamily: themeFont.regular,
+      fontStyle: 'normal',
     }
   });
 

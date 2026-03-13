@@ -1,0 +1,31 @@
+src/components/features/ATSChecker.jsx:139:                    <p className="text-blue-100 text-sm italic">"{atsResult.experienceRelevance}"</p>
+src/components/features/CoverLetterGenerator.jsx:151:              <div className="relative group/sig border-2 border-blue-100 bg-white rounded-2xl p-4 flex items-center justify-center h-32 shadow-sm italic text-slate-400 overflow-hidden">
+src/components/features/KeywordHeatmap.jsx:121:            <p className="text-[9px] text-slate-400 leading-tight italic">
+src/components/features/SettingsPage.jsx:49:          <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">
+src/components/form/CertificationsForm.jsx:120:            <div className="text-center py-10 text-slate-400 text-sm italic">Belum ada sertifikasi.</div>
+src/components/form/OrganizationsForm.jsx:130:            <div className="text-center py-10 text-slate-400 text-sm italic">Belum ada data organisasi.</div>
+src/components/form/PersonalInfoForm.jsx:83:            <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Informasi <span className="text-blue-600">Pribadi</span></h2>
+src/components/form/ProjectsForm.jsx:132:            <div className="text-center py-10 text-slate-400 text-sm italic">Belum ada proyek.</div>
+src/components/form/SkillsForm.jsx:115:          <span className="text-xs text-slate-400 self-center italic">Belum ada — tambahkan di bawah</span>
+src/components/form/SkillsForm.jsx:249:          <p className="mt-4 text-[10px] text-indigo-400 italic">
+src/components/form/TemplateSelector.jsx:34:  { id: 'tahoma', name: 'Tahoma / Verdana', desc: 'Humanist & Profesional', class: 'font-sans italic' },
+src/components/form/TemplateSelector.jsx:52:            <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Pilih <span className="text-blue-600">Desain CV</span></h2>
+src/components/form/TemplateSelector.jsx:105:            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight italic">Tipografi <span className="text-blue-600">& Font</span></h3>
+src/components/pdf/CVDocument.jsx:41:    italic: 'Times-Roman',
+src/components/pdf/CVDocument.jsx:47:    italic: 'Helvetica',
+src/components/pdf/CVDocument.jsx:50:  if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
+src/components/pdf/CVDocument.jsx:51:  if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
+src/components/pdf/CVDocument.jsx:52:  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
+src/components/pdf/CVDocument.jsx:268:          <Text style={[S.itemSubtitle || CS.itemSubtitle, SGlobal.italic]}>{exp.company}</Text>
+src/components/pdf/CVDocument.jsx:551:    italic: {
+src/components/pdf/LetterDocument.jsx:35:    italic: 'Times-Roman',
+src/components/pdf/LetterDocument.jsx:41:    italic: 'Helvetica',
+src/components/pdf/LetterDocument.jsx:44:  if (f === 'tahoma' || f === 'inter') return { regular: 'Inter', bold: 'Inter', italic: 'Inter' };
+src/components/pdf/LetterDocument.jsx:45:  if (f === 'roboto') return { regular: 'Roboto', bold: 'Roboto', italic: 'Roboto' };
+src/components/pdf/LetterDocument.jsx:46:  return { regular: 'Helvetica', bold: 'Helvetica-Bold', italic: 'Helvetica' };
+src/components/ui/MagicWriter.jsx:123:                    <div className="p-6 rounded-3xl bg-white/5 border border-white/10 text-white/60 text-sm leading-relaxed min-h-[200px] max-h-[400px] overflow-y-auto italic custom-scrollbar">
+src/components/ui/RichEditor.jsx:23:  italic: (
+src/components/ui/RichEditor.jsx:167:            active={editor.isActive('italic')}
+src/components/ui/RichEditor.jsx:170:            {icons.italic}
+src/utils/htmlToReactPdf.js:126:// ── Inline nodes (bold, italic, dll.) ───────────────────────
+src/utils/htmlToReactPdf.js:153:      // User requested to not use italics to avoid PDF export issues.
