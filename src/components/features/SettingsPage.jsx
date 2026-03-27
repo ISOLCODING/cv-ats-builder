@@ -33,7 +33,7 @@ export default function SettingsPage() {
     updateSettings({
       appLogo: '',
       favicon: '',
-      appName: 'CV Master'
+      appName: 'CV ATS Builder'
     });
     showToast('info', 'Pengaturan berhasil dikembalikan.');
   };

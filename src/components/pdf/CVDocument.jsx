@@ -560,7 +560,7 @@ export const CVDocument = ({ cvData }) => {
     <Document
       title={`CV - ${cvData.personalInfo?.name || 'Professional'}`}
       author={cvData.personalInfo?.name || ''}
-      creator="CV Master Royal"
+      creator="CV ATS Builder"
     >
       {template === 'standard_ats' && <StandardATS data={cvData} SGlobal={SGlobal} />}
       {template === 'modern_creative' && <ModernCreative data={cvData} SGlobal={SGlobal} />}

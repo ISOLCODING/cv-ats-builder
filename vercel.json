@@ -4,11 +4,11 @@
   "rewrites": [
     {
       "source": "/api/gas/(.*)",
-      "destination": "https://script.google.com/macros/s/AKfycbx9Iv_RjSAyLdx7xzkWdSJ2DKk0UphCF8CY4ouqIKfpdVD4WF8QFSro3jJAUZcWuXt1/exec"
+      "destination": "https://script.google.com/macros/s/AKfycbx2ujOUQYFyarAuhp12022yMacMOAsk7Vwit0c9U5ZE6knX-pWh1RHt4ST0E6WBV2HH/exec"
     },
     {
       "source": "/api/gas",
-      "destination": "https://script.google.com/macros/s/AKfycbx9Iv_RjSAyLdx7xzkWdSJ2DKk0UphCF8CY4ouqIKfpdVD4WF8QFSro3jJAUZcWuXt1/exec"
+      "destination": "https://script.google.com/macros/s/AKfycbx2ujOUQYFyarAuhp12022yMacMOAsk7Vwit0c9U5ZE6knX-pWh1RHt4ST0E6WBV2HH/exec"
     },
     {
       "source": "/(.*)",

@@ -174,7 +174,7 @@ export default function App() {
 
   const appSettings = useCVStore(state => state.appSettings);
   const appLogo = appSettings?.appLogo;
-  const appName = appSettings?.appName || 'CV Master';
+  const appName = appSettings?.appName || 'CV ATS Builder';
   const favicon = appSettings?.favicon;
   const language = appSettings?.language || 'id';
 
@@ -450,7 +450,7 @@ export default function App() {
               {activeTab === 'editor' && (
                 <motion.div key="editor" {...pageTransition} className="space-y-12 lg:space-y-16">
                   {/* Stepper HUD */}
-                  <div className="card !p-10 !rounded-[2.5rem]">
+                  <div className="card !p-4 sm:!p-10 !rounded-[2rem] sm:!rounded-[2.5rem] overflow-x-auto custom-scrollbar">
                     <Stepper currentStep={currentStep} onStepClick={setCurrentStep} />
                   </div>
 

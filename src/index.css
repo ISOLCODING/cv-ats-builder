@@ -407,8 +407,10 @@ select.form-input {
 
 /* ── Mobile Optimizations ─────────────────────────────────── */
 @media (max-width: 640px) {
-  .card { @apply p-4 rounded-2xl; }
-  .toast-wrap { @apply left-4 right-4 bottom-20; }
+  .card { @apply p-5 rounded-2xl; }
+  .section-header { @apply pb-4 mb-6; }
+  .form-input { @apply py-3.5; }
+  .toast-wrap { @apply left-4 right-4 bottom-24; }
   .toast { min-width: unset; @apply w-full; }
   .preview-window::-webkit-scrollbar { display: none; }
   .preview-window { -ms-overflow-style: none; scrollbar-width: none; }

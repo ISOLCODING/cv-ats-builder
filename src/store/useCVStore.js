@@ -68,7 +68,7 @@ const defaultCVData = {
 
 // Default Settings (Royal Branding)
 const defaultSettings = {
-  appName: 'CV Master',
+  appName: 'CV ATS Builder',
   appLogo: '', // Base64
   favicon: '', // Base64
   primaryColor: '#2563eb',

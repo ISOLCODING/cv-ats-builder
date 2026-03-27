@@ -26,7 +26,7 @@ export default function AuthPage() {
         <div className="p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-              CV Master
+              CV ATS Builder
             </h1>
             <p className="text-slate-500 mt-2">
               {isLogin ? 'Masuk untuk mengelola CV Anda' : 'Buat akun untuk memulai'}
