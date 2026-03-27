@@ -153,13 +153,24 @@ export default function EmailSender({ onBack }) {
 
   return (
     <div className="space-y-6 animate-fade-in pb-10">
-      <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-        <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
-          <Send className="w-5 h-5" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">Kirim Lamaran</h2>
-          <p className="text-sm text-slate-500">Kirim CV & Surat ke HRD (Otomatis simpan ke Cloud)</p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 pb-12 border-b border-slate-100">
+        <div className="space-y-6">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center shadow-premium group relative overflow-hidden">
+               <Send size={28} className="group-hover:scale-110 transition-transform relative z-10" />
+               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+             </div>
+             <div className="space-y-1">
+               <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Tahap 12</span>
+               <h2 className="text-4xl md:text-5xl font-display font-light text-slate-900 tracking-tight italic text-left">
+                 Transmisi <span className="text-slate-400">Final</span>
+               </h2>
+             </div>
+          </div>
+          <p className="text-sm font-medium text-slate-400 max-w-xl leading-relaxed italic px-2">
+            Eksekusi protokol pengarsipan dan transmisi final untuk portofolio profesional Anda.
+          </p>
         </div>
       </div>
 
@@ -223,10 +234,10 @@ export default function EmailSender({ onBack }) {
                   value={emailInfo.jobType}
                   onChange={(e) => setEmailInfo({ ...emailInfo, jobType: e.target.value })}
                 >
-                  <option value="Fulltime">Fulltime</option>
-                  <option value="Intern">Intern</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Freelance">Freelance</option>
+                  <option value="Fulltime">Penuh Waktu (Full-time)</option>
+                  <option value="Intern">Magang (Internship)</option>
+                  <option value="Contract">Kontrak (Contract)</option>
+                  <option value="Freelance">Lepas (Freelance)</option>
                 </select>
               </div>
               <div className="space-y-1">
@@ -277,8 +288,8 @@ export default function EmailSender({ onBack }) {
             <Eye className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-800">Preview Sebelum Kirim</p>
-            <p className="text-xs text-slate-500">Pastikan CV & Surat Lamaran sudah sesuai</p>
+            <p className="text-sm font-bold text-slate-800">Pratinjau Pra-Pengiriman</p>
+            <p className="text-xs text-slate-500">Pastikan CV & Surat Lamaran telah terverifikasi</p>
           </div>
         </div>
         <Button 
@@ -286,7 +297,7 @@ export default function EmailSender({ onBack }) {
           onClick={() => setShowPreview(!showPreview)}
           className="w-full md:w-auto"
         >
-          {showPreview ? 'Tutup Preview' : 'Tampilkan Preview'}
+          {showPreview ? 'Tutup Pratinjau' : 'Tampilkan Pratinjau'}
         </Button>
       </div>
 
@@ -295,7 +306,7 @@ export default function EmailSender({ onBack }) {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             <div className="space-y-3">
               <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <FileCode className="w-4 h-4 text-blue-500" /> Preview CV (PDF Mode)
+                <FileCode className="w-4 h-4 text-blue-500" /> Pratinjau CV (Mode PDF)
               </p>
               <div className="h-[600px] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
                  <PDFViewer width="100%" height="100%" showToolbar={false} className="border-none">
@@ -306,7 +317,7 @@ export default function EmailSender({ onBack }) {
             
             <div className="space-y-3">
               <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <StickyNote className="w-4 h-4 text-orange-500" /> Preview Surat Lamaran (PDF Mode)
+                <StickyNote className="w-4 h-4 text-orange-500" /> Pratinjau Surat Lamaran (Mode PDF)
               </p>
               <div className="h-[600px] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
                  <PDFViewer width="100%" height="100%" showToolbar={false} className="border-none">
@@ -337,7 +348,7 @@ export default function EmailSender({ onBack }) {
         <div className="glass-card p-6 rounded-[2rem] border-slate-200/60 bg-white/50 space-y-4">
           <div className="flex items-center gap-3 text-emerald-600 mb-2">
             <CheckCircle2 className="w-5 h-5" />
-            <h3 className="font-black text-xs uppercase tracking-widest">Checklist Sebelum Kirim</h3>
+            <h3 className="font-black text-xs uppercase tracking-widest">Daftar Verifikasi Pra-Transmisi</h3>
           </div>
           <ul className="space-y-2.5">
             {[
@@ -358,7 +369,7 @@ export default function EmailSender({ onBack }) {
         <div className="glass-card p-6 rounded-[2rem] border-amber-200/60 bg-amber-50/30 space-y-4">
           <div className="flex items-center gap-3 text-amber-600 mb-2">
             <Lightbulb className="w-5 h-5" />
-            <h3 className="font-black text-xs uppercase tracking-widest">Tips Interview Kilat</h3>
+            <h3 className="font-black text-xs uppercase tracking-widest">Wawasan Wawancara Strategis</h3>
           </div>
           <div className="space-y-3">
             <div className="p-3 bg-white/80 rounded-xl border border-amber-100 shadow-sm text-xs text-amber-900">
@@ -375,22 +386,25 @@ export default function EmailSender({ onBack }) {
       </div>
 
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-10">
-        <Button
+        <button
           onClick={handleSendEmail}
-          loading={sending}
-          variant="primary"
-          size="lg"
-          leftIcon={<Send className="w-5 h-5" />}
-          className="w-full md:w-64 shadow-blue"
+          disabled={sending}
+          className="group flex items-center gap-8 px-12 py-6 rounded-full bg-slate-900 text-white shadow-premium hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50"
         >
-          Kirim Lamaran Sekarang
-        </Button>
+          <span className="text-sm font-bold uppercase tracking-[0.3em] text-white/90 group-hover:text-white transition-colors">
+            {sending ? 'Transmisi Berjalan...' : 'Kirim Lamaran Sekarang'}
+          </span>
+          <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+            <Send size={24} className={sending ? 'animate-pulse' : 'group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform'} />
+          </div>
+        </button>
       </div>
 
-      <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+      <div className="flex items-center justify-between pt-12 border-t border-slate-100 mt-16 px-4">
         <Button
           variant="ghost"
           onClick={onBack}
+          className="rounded-full px-8 h-14 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900"
           leftIcon={<ChevronLeft className="w-4 h-4" />}
         >
           Kembali

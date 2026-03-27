@@ -4,27 +4,34 @@ import {
   Award, Plus, Trash2, Pencil, ChevronRight,
   ChevronLeft, Building2, Calendar, GripVertical,
   CheckCircle2, ChevronUp, ChevronDown, Link as LinkIcon,
-  ExternalLink, Sparkles
+  ExternalLink, Sparkles, ShieldCheck, Medal, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import useCVStore from '../../store/useCVStore';
 
-function EmptyCertifications() {
+function EmptyCertifications({ onAdd }) {
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-16 px-6 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-200"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center py-24 px-10 text-center bg-white border border-dashed border-slate-200 rounded-[3rem] hover:border-slate-400 transition-colors duration-700"
     >
-      <div className="w-20 h-20 bg-white rounded-3xl shadow-soft flex items-center justify-center mb-6 relative">
-        <div className="absolute inset-0 bg-blue-500/5 blur-xl rounded-full" />
-        <Award className="w-10 h-10 text-blue-500 relative z-10" />
+      <div className="w-24 h-24 rounded-[2.5rem] bg-slate-50 flex items-center justify-center mb-10 relative group-hover:scale-110 transition-transform duration-700">
+        <Award className="w-10 h-10 text-slate-300" />
+        <div className="absolute inset-x-0 -bottom-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
       </div>
-      <h3 className="text-xl font-display font-black text-slate-800 mb-2">Professional Credentials</h3>
-      <p className="text-slate-500 text-center max-w-sm text-sm leading-relaxed mb-8">
-        Showcase your certifications and licenses to stand out to recruiters and pass ATS filters.
+      <h3 className="text-3xl font-bold text-slate-900 tracking-tight font-display mb-4 italic">Belum Ada Kredensial Profesional</h3>
+      <p className="text-base font-medium text-slate-400 max-w-sm mb-12 leading-relaxed">
+        Validasi keahlian Anda dengan sertifikasi dan lisensi yang membedakan profil profesional Anda.
       </p>
+      <button 
+        onClick={onAdd} 
+        className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-slate-200 hover:bg-black transition-all font-bold text-[11px] uppercase tracking-[0.3em] active:scale-95"
+      >
+        <Plus size={18} />
+        Inisialisasi Kredensial
+      </button>
     </motion.div>
   );
 }
@@ -33,68 +40,64 @@ function CertCard({ cert, onEdit, onDelete }) {
   return (
     <motion.div 
       layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -2 }}
-      className="group relative bg-white border border-slate-100 p-5 rounded-[2rem] shadow-soft hover:shadow-xl hover:border-blue-200 transition-all duration-300 overflow-hidden"
+      className="group relative pl-12 md:pl-20 pb-16 last:pb-0"
     >
-      <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/20" />
-      
-      <div className="flex gap-4">
-        <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-          <Award className="w-6 h-6 text-blue-600" />
-        </div>
+      {/* Vertical Timeline Line */}
+      <div className="absolute left-[23px] md:left-[43px] top-0 bottom-0 w-px bg-slate-100 group-last:bg-gradient-to-b group-last:from-slate-100 group-last:to-transparent"></div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4">
+      {/* Timeline Node Icon (Award) */}
+      <div className={`absolute left-0 md:left-5 top-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 z-10 border-4 border-white shadow-premium bg-slate-50 text-slate-300 group-hover:bg-slate-900 group-hover:text-white group-hover:scale-110 group-active:scale-95`}>
+        <ShieldCheck size={20} />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative pt-1">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 group-hover:translate-x-2 transition-transform duration-500">
+          <div className="space-y-4 flex-1">
             <div className="space-y-1">
-              <h4 className="font-display font-black text-slate-800 text-base leading-tight">
-                {cert.name || 'Untitled Certification'}
+              <h4 className="font-display font-bold text-slate-900 text-2xl tracking-tight leading-tight italic">
+                {cert.name || 'Kredensial Tanpa Judul'}
               </h4>
-              
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1">
-                <div className="flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">{cert.issuer}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">{cert.year}</span>
-                </div>
+              <div className="flex items-center gap-3 text-sm font-semibold text-slate-400">
+                <span className="text-slate-900 uppercase tracking-wider">{cert.issuer}</span>
+                <span className="w-1 h-1 rounded-full bg-slate-200" />
+                <span className="italic font-medium uppercase tracking-widest">{cert.year}</span>
               </div>
-
-              {cert.link && (
-                <motion.a 
-                  href={cert.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ x: 2 }}
-                  className="inline-flex items-center gap-1.5 mt-2.5 text-blue-500 hover:text-blue-600 transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span className="text-[10px] font-black uppercase tracking-widest border-b border-blue-500/20 pb-0.5">Verify Document</span>
-                </motion.a>
-              )}
             </div>
 
-            <div className="flex gap-2">
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+            {cert.link && (
+               <a 
+                href={cert.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 hover:bg-white hover:border-slate-200 transition-all group/link"
+              >
+                <LinkIcon size={12} className="group-hover/link:rotate-45 transition-transform" />
+                Verifikasi Protokol
+              </a>
+            )}
+          </div>
+
+          {/* Action HUD - Appears on Hover */}
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
+            <div className="flex items-center bg-white border border-slate-100 rounded-2xl p-1.5 shadow-premium">
+              <button 
+                type="button" 
                 onClick={onEdit}
-                className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
               >
-                <Pencil className="w-4 h-4" />
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                <Pencil size={18} />
+              </button>
+              <button 
+                type="button" 
                 onClick={onDelete}
-                className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-all"
               >
-                <Trash2 className="w-4 h-4" />
-              </motion.button>
+                <Trash2 size={18} />
+              </button>
             </div>
           </div>
         </div>
@@ -112,69 +115,106 @@ function CertEntryForm({ initial = null, onSave, onCancel }) {
     onSave({ ...data, id: initial?.id || Date.now().toString() });
   };
 
+  const inputCls = (hasErr) => 
+    `w-full px-6 py-4.5 rounded-2xl bg-white border transition-all outline-none font-semibold text-slate-700 text-sm placeholder:text-slate-300 placeholder:font-medium
+     ${hasErr ? 'border-rose-100 bg-rose-50/10 focus:border-rose-300' : 'border-slate-50 focus:border-slate-900 focus:shadow-premium'}`;
+
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-blue-50/40 border border-blue-100 rounded-[2.5rem] p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-slate-50/50 border border-slate-100 rounded-[3rem] p-10 sm:p-14 space-y-12 relative overflow-hidden"
     >
-      <div className="absolute top-0 right-0 p-8 opacity-5">
-        <Sparkles className="w-24 h-24 text-blue-500" />
+      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-900 shadow-sm relative overflow-hidden group/award">
+               <Award size={26} className="z-10 group-hover/award:scale-110 transition-transform duration-500" />
+               <div className="absolute inset-x-0 -bottom-1 h-1 bg-slate-900/10" />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-slate-900 text-3xl tracking-tight italic">
+                {initial ? 'Penyesuaian Kredensial' : 'Penghargaan Akademik Baru'}
+              </h3>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 mt-2">
+                {initial ? 'Kalibrasi verifikasi profesional' : 'Legitimasi keahlian teknis Anda'}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="relative">
-        <h3 className="text-lg font-display font-black text-blue-900 flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center">
-            <Award className="w-5 h-5 text-blue-600" />
-          </div>
-          {initial ? 'Update Credential' : 'Add New Certification'}
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Certification Name</label>
-            <input 
-              {...register('name', { required: 'Name is required' })} 
-              className="form-input text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-12" 
-              placeholder="e.g. AWS Certified Solutions Architect" 
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Issuing Organization</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Judul Sertifikasi</label>
+          <input 
+            {...register('name', { required: 'Name is required' })} 
+            className={inputCls(errors.name)} 
+            placeholder="misal: Arsitek Profesional" 
+          />
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Lembaga Penerbit</label>
+          <div className="relative group/field">
+            <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
             <input 
               {...register('issuer', { required: 'Issuer is required' })} 
-              className="form-input text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-12" 
-              placeholder="e.g. Amazon Web Services" 
+              className={`${inputCls(errors.issuer)} pl-14`}
+              placeholder="misal: AWS, Microsoft, BNSP" 
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Date Issued / Year</label>
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Tahun Penerbitan</label>
+          <div className="relative group/field">
+            <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
             <input 
               {...register('year', { required: 'Year is required' })} 
-              className="form-input text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-12" 
+              className={`${inputCls(errors.year)} pl-14`}
               placeholder="e.g. 2024" 
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Verification URL (Optional)</label>
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Referensi Verifikasi</label>
+          <div className="relative group/field">
+            <LinkIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
             <input 
               {...register('link')} 
-              className="form-input text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-12" 
-              placeholder="https://..." 
+              className={`${inputCls(false)} pl-14`}
+              placeholder="https://verify.org/id/..." 
             />
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-blue-100">
-          <Button variant="secondary" onClick={onCancel} className="px-6">Cancel</Button>
-          <Button 
-            onClick={handleSubmit(onSubmit)} 
-            className="px-8 shadow-xl shadow-blue-500/20"
-            leftIcon={<CheckCircle2 className="w-4 h-4" />}
-          >
-            Save Credential
-          </Button>
-        </div>
+      <div className="p-10 bg-white border border-slate-100 rounded-[3rem] shadow-sm flex items-start gap-8">
+         <div className="w-14 h-14 rounded-[1.5rem] bg-slate-900 flex items-center justify-center text-white shrink-0 shadow-lg shadow-slate-200">
+           <Zap size={24} />
+         </div>
+         <div className="space-y-2">
+           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-900">Integritas Kredensial</p>
+           <p className="text-base text-slate-400 font-medium leading-relaxed italic">
+             Sertifikasi profesional adalah bukti konkret dari dedikasi Anda terhadap pengembangan diri yang terukur secara industri.
+           </p>
+         </div>
+      </div>
+
+      <div className="flex gap-6 justify-end pt-10 border-t border-slate-100">
+        <button 
+          type="button"
+          onClick={onCancel}
+          className="px-8 py-4 rounded-xl text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-slate-900 transition-colors"
+        >
+          Batalkan
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-slate-300 hover:bg-black transition-all active:scale-95 text-[11px] font-bold uppercase tracking-[0.3em]"
+        >
+          {initial ? 'Perbarui Data' : 'Simpan Kredensial'}
+        </button>
       </div>
     </motion.div>
   );
@@ -192,31 +232,43 @@ export default function CertificationsForm({ onNext, onBack }) {
     setShowForm(false); setEditTarget(null);
   };
 
+  const handleEdit = (c) => {
+    setEditTarget(c);
+    setShowForm(false);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+  };
+
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="relative">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-3xl bg-blue-600 shadow-xl shadow-blue-200 flex items-center justify-center -rotate-3 hover:rotate-0 transition-transform duration-500">
-              <Award className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-display font-black text-slate-800 tracking-tight">Certifications</h2>
-              <p className="text-slate-500 font-medium font-display uppercase tracking-[0.2em] text-[10px]">Verify your elite status</p>
-            </div>
+    <div className="animate-fade-up space-y-16">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 pb-12 border-b border-slate-100">
+        <div className="space-y-6">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center shadow-premium group relative overflow-hidden">
+               <Award size={28} className="group-hover:scale-110 transition-transform relative z-10" />
+               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+             </div>
+             <div className="space-y-1">
+               <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Step 09</span>
+               <h2 className="text-4xl md:text-5xl font-display font-light text-slate-900 tracking-tight italic text-left">
+                 Validasi <span className="text-slate-400">Industri</span>
+               </h2>
+             </div>
           </div>
-          
-          {!showForm && !editTarget && (
-            <Button 
-              onClick={() => setShowForm(true)} 
-              variant="primary"
-              className="hidden sm:flex shadow-xl shadow-blue-500/20"
-              leftIcon={<Plus className="w-4 h-4" />}
-            >
-              Add New
-            </Button>
-          )}
+          <p className="text-sm font-medium text-slate-400 max-w-xl leading-relaxed italic px-2">
+            Legitimasikan keahlian Anda melalui sertifikasi dan lisensi yang diakui secara global.
+          </p>
         </div>
+
+        {!showForm && !editTarget && (
+          <button 
+            onClick={() => setShowForm(true)} 
+            className="flex items-center gap-4 px-8 py-4 rounded-2xl border border-slate-100 hover:border-slate-900 hover:bg-slate-50 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 transition-all shadow-sm group shrink-0"
+          >
+            <Plus size={16} className="text-slate-900 group-hover:rotate-90 transition-transform" />
+            Tambah Arsip
+          </button>
+        )}
       </div>
 
       <AnimatePresence mode="wait">
@@ -232,51 +284,60 @@ export default function CertificationsForm({ onNext, onBack }) {
             key="list"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-4"
+            className="space-y-8"
           >
             {certifications.length === 0 ? (
-              <EmptyCertifications />
+              <EmptyCertifications onAdd={() => setShowForm(true)} />
             ) : (
-              certifications.map((c) => (
-                <CertCard 
-                  key={c.id} 
-                  cert={c} 
-                  onEdit={() => setEditTarget(c)} 
-                  onDelete={() => removeCertification(c.id)} 
-                />
-              ))
+              <div className="space-y-10">
+                {certifications.map((c) => (
+                  <CertCard 
+                    key={c.id} 
+                    cert={c} 
+                    onEdit={() => handleEdit(c)} 
+                    onDelete={() => removeCertification(c.id)} 
+                  />
+                ))}
+                
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  className="w-full py-16 border border-dashed border-slate-200 rounded-[3rem] bg-slate-50/30 text-slate-400 hover:border-slate-900 hover:text-slate-900 hover:bg-white transition-all flex flex-col items-center justify-center gap-4 group shadow-sm hover:shadow-premium duration-700"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 group-hover:border-slate-300 flex items-center justify-center transition-all shadow-sm">
+                    <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500" />
+                  </div>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-60 group-hover:opacity-100">Tambah Kredensial Berikutnya</span>
+                </button>
+              </div>
             )}
-            
-            <motion.button 
-              whileHover={{ scale: 1.01, backgroundColor: 'rgba(255,255,255,1)' }}
-              whileTap={{ scale: 0.99 }}
-              onClick={() => setShowForm(true)}
-              className="w-full flex items-center justify-center gap-3 py-6 rounded-[2.5rem] border-2 border-dashed border-slate-200 text-slate-400 font-display font-black uppercase tracking-widest text-xs hover:border-blue-400 hover:text-blue-500 transition-all duration-300"
-            >
-              <Plus className="w-5 h-5" />
-              Add More Certification
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between pt-8 border-t border-slate-100">
-        <Button 
-          variant="secondary" 
-          onClick={onBack} 
-          className="px-8"
-          leftIcon={<ChevronLeft className="w-4 h-4" />}
-        >
-          Previous
-        </Button>
-        <Button 
-          onClick={onNext} 
-          className="px-10 shadow-xl shadow-blue-500/20"
-          rightIcon={<ChevronRight className="w-4 h-4" />}
-        >
-          Next Step: Projects
-        </Button>
-      </div>
+      {/* Navigation */}
+      {!showForm && !editTarget && (
+        <div className="flex justify-between items-center pt-12 border-t border-slate-100 mt-8">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            className="rounded-full px-8 h-14 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900"
+            leftIcon={<ChevronLeft className="w-4 h-4" />}
+          >
+            Kembali
+          </Button>
+          
+          <button
+            onClick={onNext}
+            className="group flex items-center gap-8 px-10 py-5 rounded-full bg-slate-900 text-white shadow-premium hover:bg-black transition-all active:scale-[0.98]"
+          >
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/90 group-hover:text-white transition-colors">Inisialisasi Tahap 10</span>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

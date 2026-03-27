@@ -106,7 +106,39 @@ function doPost(e) {
       case 'resetHistory':
         response = handleResetHistory(requestBody);
         break;
+
+      // -- Authentication & Admin System --
+      case 'register':
+        response = SheetsDB.registerUser(SPREADSHEET_ID, requestBody.name, requestBody.email, requestBody.password);
+        break;
       
+      case 'login':
+        response = SheetsDB.authenticateUser(SPREADSHEET_ID, requestBody.email, requestBody.password);
+        break;
+      
+      case 'requestPremium':
+        response = SheetsDB.requestPremium(SPREADSHEET_ID, requestBody.email, requestBody.paymentProof);
+        break;
+        
+      case 'adminListUsers':
+        response = { success: true, data: SheetsDB.getAllUsers(SPREADSHEET_ID) };
+        break;
+        
+      case 'adminApproveUser':
+        response = SheetsDB.approvePremium(SPREADSHEET_ID, requestBody.email);
+        break;
+      
+      case 'adminRejectUser':
+        response = SheetsDB.rejectPremium(SPREADSHEET_ID, requestBody.email, requestBody.reason);
+        break;
+      
+      case 'adminFixDatabase':
+        response = SheetsDB.fixUserColumns(SPREADSHEET_ID);
+        break;
+      
+      case 'getUserProfile':
+        response = SheetsDB.getUserProfile(SPREADSHEET_ID, requestBody.email);
+        break;
       default:
         response.message = 'Action tidak dikenal: ' + action;
     }

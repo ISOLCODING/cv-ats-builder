@@ -5,9 +5,9 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   GraduationCap, Plus, Trash2, Pencil, ChevronRight,
-  ChevronLeft, BookOpen, Calendar, Award, CheckCircle2,
-  ExternalLink, Link as LinkIcon, ChevronUp, ChevronDown, GripVertical,
-  Info
+  ChevronLeft, BookOpen, Calendar, Award,
+  ExternalLink, Link as LinkIcon, ChevronUp, ChevronDown, 
+  Info, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
@@ -45,25 +45,25 @@ const DEGREES = [
 function EmptyEducation({ onAdd }) {
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center py-12 px-6 text-center glass-card border-dashed border-2 border-slate-200"
+      className="flex flex-col items-center justify-center py-24 px-10 text-center bg-white border border-dashed border-slate-200 rounded-[3rem] hover:border-slate-400 transition-colors duration-700"
     >
-      <div className="w-20 h-20 rounded-3xl bg-blue-50/50 flex items-center justify-center mb-6 shadow-inner">
-        <GraduationCap className="w-8 h-8 text-blue-500" />
+      <div className="w-24 h-24 rounded-[2.5rem] bg-slate-50 flex items-center justify-center mb-10 relative group-hover:scale-110 transition-transform duration-700">
+        <GraduationCap className="w-10 h-10 text-slate-300" />
+        <div className="absolute inset-x-0 -bottom-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
       </div>
-      <h3 className="font-display font-bold text-slate-800 text-lg mb-2">Belum ada riwayat pendidikan</h3>
-      <p className="text-sm text-slate-500 max-w-sm mb-6 leading-relaxed">
-        Pendidikan formal, bootcamp, atau kursus online dapat membantu recruiter memahami latar belakang akademis Anda.
+      <h3 className="text-3xl font-bold text-slate-900 tracking-tight font-display mb-4 italic">Belum Ada Riwayat Pendidikan</h3>
+      <p className="text-base font-medium text-slate-400 max-w-sm mb-12 leading-relaxed">
+        Landasan akademik Anda memberikan konteks esensial bagi keahlian Anda. Dokumentasikan riwayat pendidikan Anda.
       </p>
-      <Button 
+      <button 
         onClick={onAdd} 
-        variant="primary"
-        className="shadow-lg shadow-blue-200"
-        leftIcon={<Plus className="w-4 h-4" />}
+        className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-slate-200 hover:bg-black transition-all font-bold text-[11px] uppercase tracking-[0.3em] active:scale-95"
       >
+        <Plus size={18} />
         Tambah Pendidikan
-      </Button>
+      </button>
     </motion.div>
   );
 }
@@ -77,93 +77,92 @@ function EducationCard({ edu, index, total, onEdit, onDelete, onMoveUp, onMoveDo
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="glass-card group relative p-4 sm:p-5 hover:border-blue-300 transition-all duration-300"
+      className="group relative pl-12 md:pl-20 pb-16 last:pb-0"
     >
-      <div className="flex gap-4">
-        {/* Sorting Controls */}
-        <div className="hidden sm:flex flex-col items-center gap-1 self-start pt-1">
-          <button 
-            type="button" 
-            onClick={onMoveUp} 
-            disabled={index === 0}
-            className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-20 transition-colors"
-          >
-            <ChevronUp className="w-4 h-4 text-slate-400" />
-          </button>
-          <div className="w-px h-8 bg-slate-100" />
-          <button 
-            type="button" 
-            onClick={onMoveDown} 
-            disabled={index === total - 1}
-            className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-20 transition-colors"
-          >
-            <ChevronDown className="w-4 h-4 text-slate-400" />
-          </button>
-        </div>
+      {/* Vertical Timeline Line */}
+      <div className="absolute left-[23px] md:left-[43px] top-0 bottom-0 w-px bg-slate-100 group-last:bg-gradient-to-b group-last:from-slate-100 group-last:to-transparent"></div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-            <div className="min-w-0 space-y-1">
-              <h4 className="font-display font-bold text-slate-900 text-base leading-tight">
-                {edu.degree}{edu.field && `, ${edu.field}`}
-              </h4>
-              
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <BookOpen className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="font-medium">{edu.institution}</span>
-                </div>
-                {dateStr && (
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{dateStr}</span>
-                  </div>
-                )}
+      {/* Timeline Node Icon (Graduation) */}
+      <div className={`absolute left-0 md:left-5 top-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 z-10 border-4 border-white shadow-premium ${
+        index === 0 ? 'bg-slate-900 text-white shadow-xl shadow-slate-200 scale-110' : 'bg-slate-50 text-slate-300 group-hover:bg-white group-hover:text-slate-900'
+      }`}>
+        <GraduationCap size={20} className={index === 0 ? 'animate-bounce' : ''} />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative pt-1">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 group-hover:translate-x-2 transition-transform duration-500">
+          <div className="space-y-4 flex-1">
+            <div className="space-y-1">
+              <div className="flex items-center gap-4 flex-wrap">
+                <h4 className="font-display font-bold text-slate-900 text-2xl tracking-tight leading-tight italic">
+                  {edu.degree}{edu.field && `, ${edu.field}`}
+                </h4>
                 {edu.gpa && (
-                  <div className="flex items-center gap-1.5 text-slate-500">
-                    <Award className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="font-semibold">IPK: {edu.gpa}</span>
-                  </div>
+                  <span className="bg-slate-50 text-slate-500 text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-slate-100">
+                    Hasil: {edu.gpa}
+                  </span>
                 )}
               </div>
-
-              {edu.description && (
-                <div 
-                  className="text-xs text-slate-500 line-clamp-1 mt-2 leading-relaxed opacity-70"
-                  dangerouslySetInnerHTML={{ __html: stripHtml(edu.description) }}
-                />
-              )}
+              <div className="flex items-center gap-3 text-sm font-semibold text-slate-400">
+                <span className="text-slate-900">{edu.institution}</span>
+                <span className="w-1 h-1 rounded-full bg-slate-200" />
+                <span className="italic font-medium">{dateStr}</span>
+              </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-1 self-end sm:self-start bg-slate-50/50 p-1 rounded-xl border border-slate-100">
+            {edu.description && (
+              <div 
+                className="text-sm text-slate-400 line-clamp-2 leading-relaxed font-medium opacity-80 italic max-w-2xl"
+                dangerouslySetInnerHTML={{ __html: stripHtml(edu.description) }}
+              />
+            )}
+          </div>
+
+          {/* Action HUD - Appears on Hover */}
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
+            <div className="flex items-center bg-white border border-slate-100 rounded-2xl p-1.5 shadow-premium">
               {edu.link && (
                 <a 
                   href={edu.link} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="p-2 rounded-lg text-blue-500 hover:bg-white hover:shadow-sm transition-all"
-                  title="Lihat Kredential"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-white transition-all"
                 >
-                  <ExternalLink className="w-4 h-4" />
+                  <LinkIcon size={18} />
                 </a>
               )}
+              <div className="w-px h-6 bg-slate-100 mx-1" />
+              <button 
+                type="button" 
+                onClick={onMoveUp} 
+                disabled={index === 0}
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-50 disabled:opacity-30 transition-all text-slate-400 hover:text-slate-900"
+              >
+                <ChevronUp size={18} />
+              </button>
+              <button 
+                type="button" 
+                onClick={onMoveDown} 
+                disabled={index === total - 1}
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-50 disabled:opacity-30 transition-all text-slate-400 hover:text-slate-900"
+              >
+                <ChevronDown size={18} />
+              </button>
+              <div className="w-px h-6 bg-slate-100 mx-1" />
               <button 
                 type="button" 
                 onClick={onEdit}
-                className="p-2 rounded-lg text-slate-600 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
-                title="Edit"
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
               >
-                <Pencil className="w-4 h-4" />
+                <Pencil size={18} />
               </button>
               <button 
                 type="button" 
                 onClick={onDelete}
-                className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
-                title="Hapus"
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-all"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 size={18} />
               </button>
             </div>
           </div>
@@ -193,137 +192,158 @@ function EducationEntryForm({ initial = null, onSave, onCancel }) {
     onSave({ ...data, description: desc, id: initial?.id || Date.now().toString() });
   };
 
+  const inputCls = (hasErr) => 
+    `w-full px-6 py-4.5 rounded-2xl bg-white border transition-all outline-none font-semibold text-slate-700 text-sm placeholder:text-slate-300 placeholder:font-medium
+     ${hasErr ? 'border-rose-100 bg-rose-50/10 focus:border-rose-300' : 'border-slate-50 focus:border-slate-900 focus:shadow-premium'}`;
+
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-blue-50/40 border border-blue-100 rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-slate-50/50 border border-slate-100 rounded-[3rem] p-10 sm:p-14 space-y-12 relative overflow-hidden"
     >
-      <div className="absolute top-0 right-0 p-8 opacity-5">
-        <GraduationCap className="w-24 h-24 text-blue-900" />
-      </div>
-
-      <div className="relative">
-        <h3 className="font-display font-bold text-blue-900 text-lg flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
-            <GraduationCap className="w-4 h-4" />
+      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-900 shadow-sm relative overflow-hidden group/cap">
+               <GraduationCap size={26} className="z-10 group-hover/cap:scale-110 transition-transform duration-500" />
+               <div className="absolute inset-x-0 -bottom-1 h-1 bg-slate-900/10" />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-slate-900 text-3xl tracking-tight italic">
+                {isEdit ? 'Sunting Riwayat' : 'Landasan Akademik'}
+              </h3>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 mt-2">
+                {isEdit ? 'Menyesuaikan rekam jejak pendidikan' : 'Memperluas basis pengetahuan personal'}
+              </p>
+            </div>
           </div>
-          {isEdit ? 'Edit Pendidikan' : 'Tambah Pendidikan Baru'}
-        </h3>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Jenjang */}
-        <div className="space-y-1.5">
-          <label className="form-label">Jenjang Pendidikan <span className="text-red-500">*</span></label>
-          <select {...register('degree', { required: true })} className="form-input">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-12">
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Gelar / Kualifikasi</label>
+          <select {...register('degree', { required: true })} className={inputCls(false)}>
             {DEGREES.map((d) => (
               <option key={d.value} value={d.value}>{d.label}</option>
             ))}
           </select>
         </div>
 
-        {/* Field of study */}
-        <div className="space-y-1.5">
-          <label className="form-label">
-            {isNonFormal ? 'Bidang Keahlian / Program' : 'Jurusan / Bidang Studi'}
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">
+            {isNonFormal ? 'Spesialisasi' : 'Bidang Studi / Penjurusan'}
           </label>
           <input
-            placeholder={isNonFormal ? 'Contoh: Fullstack Web, UX Design' : 'Teknik Informatika, Manajemen, dll.'}
+            placeholder="e.g. Distributed Systems"
             {...register('field')}
-            className="form-input"
+            className={inputCls(false)}
           />
         </div>
 
-        {/* Institution */}
-        <div className="sm:col-span-2 space-y-1.5">
-          <label className="form-label">
-            {isNonFormal ? 'Platform / Penyelenggara' : 'Nama Institusi'} <span className="text-red-500">*</span>
+        <div className="sm:col-span-2 space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">
+            {isNonFormal ? 'Platform / Penyelenggara' : 'Nama Institusi / Universitas'}
           </label>
-          <div className="relative">
-            <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
+          <div className="relative group/field">
+            <BookOpen className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
             <input
-              placeholder={isNonFormal ? 'Contoh: Dicoding, Coursera, Udemy' : 'Universitas Indonesia, SMK Negeri 1, dll.'}
+              placeholder={isNonFormal ? 'misal: Coursera, Emeritus' : 'misal: Universitas Indonesia, MIT'}
               {...register('institution', { required: 'Wajib diisi' })}
-              className={`form-input pl-10 ${errors.institution ? 'form-input-error' : ''}`}
+              className={`${inputCls(errors.institution)} pl-14`}
             />
           </div>
-          {errors.institution && <p className="form-error">{errors.institution.message}</p>}
         </div>
 
-        {/* Start date */}
-        <div className="space-y-1.5">
-          <label className="form-label">Tahun Masuk</label>
-          <input type="month" {...register('startDate')} className="form-input" />
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Tanggal Mulai</label>
+            <input type="month" {...register('startDate')} className={inputCls(false)} />
+          </div>
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Tanggal Lulus / Selesai</label>
+             <input type="month" {...register('endDate')} className={inputCls(false)} />
+          </div>
         </div>
 
-        {/* End date */}
-        <div className="space-y-1.5">
-          <label className="form-label">Tahun Lulus (estimasi OK)</label>
-          <input type="month" {...register('endDate')} className="form-input" />
-        </div>
-
-        {/* GPA */}
-        <div className="space-y-1.5">
-          <label className="form-label">
-            {isNonFormal ? 'Skor / Predikat (Opsional)' : 'IPK / Nilai Akhir'}
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">
+            {isNonFormal ? 'Skor Performa' : 'IPK / Nilai'}
           </label>
-          <div className="relative">
-            <Award className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
+          <div className="relative group/field">
+            <Award className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
             <input
-              placeholder={isNonFormal ? 'Contoh: 90 / Distinction' : '3.85'}
+              placeholder="misal: 3.90 / 4.00"
               {...register('gpa')}
-              className="form-input pl-10"
+              className={`${inputCls(false)} pl-14`}
             />
           </div>
-          <p className="form-helper">
-            {isNonFormal ? 'Skor ujian atau predikat kelulusan.' : 'Skala 4.0. Kosongkan jika tidak ingin ditampilkan.'}
-          </p>
         </div>
 
-        {/* Link Sertifikat (Only for non-formal) */}
         {isNonFormal && (
-          <div className="space-y-1.5">
-            <label className="form-label">Link Sertifikat (URL)</label>
-            <div className="relative">
-              <LinkIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-blue-400" />
+          <div className="sm:col-span-2 space-y-3">
+            <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">URL Verifikasi Digital</label>
+            <div className="relative group/field">
+              <LinkIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
               <input
-                placeholder="https://credential.com/..."
+                placeholder="https://verify.org/..."
                 {...register('link')}
-                className="form-input pl-10"
+                className={`${inputCls(false)} pl-14`}
               />
             </div>
           </div>
         )}
       </div>
 
-      {/* Description TipTap */}
-      <div className="relative">
-        <div className="flex items-center justify-between mb-2">
-          <label className="form-label !mb-0">Deskripsi / Prestasi (opsional)</label>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">Pencapaian Akademik</label>
           <MagicWriter 
             type="Education"
             content={desc}
             onApply={setDesc}
           />
         </div>
-        <RichEditor
-          label={null}
-          value={desc}
-          onChange={setDesc}
-          placeholder="• Ketua Himpunan Mahasiswa Teknik Informatika 2022&#10;• Juara 2 Hackathon Nasional 2023&#10;• Thesis: Implementasi Machine Learning untuk Prediksi Churn"
-          minHeight={100}
-          maxLength={800}
-          helper="Isi dengan prestasi, kegiatan organisasi, atau topik tugas akhir."
-        />
+        <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden focus-within:border-slate-900 transition-all shadow-sm hover:shadow-md duration-500">
+          <RichEditor
+            label={null}
+            value={desc}
+            onChange={setDesc}
+            placeholder={`• Awarded Outstanding Graduate Excellence.\n• Specialized in Advanced Neural Architectures.\n• Published research on Modern Software Economies.`}
+            minHeight={150}
+            maxLength={2000}
+          />
+        </div>
+        
+        <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm flex items-start gap-6">
+           <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-800 border border-slate-100 shrink-0">
+             <Zap size={20} className="fill-slate-900 opacity-20" />
+           </div>
+           <div className="space-y-1">
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-900">Relevansi Akademik</p>
+             <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
+               Mendokumentasikan penghargaan akademik atau konsentrasi khusus memperkuat profil Anda bagi sistem seleksi berbasis kompetensi.
+             </p>
+           </div>
+        </div>
       </div>
 
-      <div className="flex gap-2 justify-end pt-1">
-        <Button variant="ghost" size="sm" onClick={onCancel}>Batal</Button>
-        <Button type="button" size="sm" onClick={handleSubmit(onSubmit)}
-          leftIcon={<CheckCircle2 className="w-4 h-4" />}>
-          {isEdit ? 'Simpan Perubahan' : 'Tambahkan'}
-        </Button>
+      <div className="flex gap-6 justify-end pt-10 border-t border-slate-100">
+        <button 
+          type="button"
+          onClick={onCancel}
+          className="px-8 py-4 rounded-xl text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-slate-900 transition-colors"
+        >
+          Batalkan
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-slate-300 hover:bg-black transition-all active:scale-95 text-[11px] font-bold uppercase tracking-[0.3em]"
+        >
+          {isEdit ? 'Simpan Perubahan' : 'Simpan Riwayat'}
+        </button>
       </div>
     </motion.div>
   );
@@ -341,7 +361,11 @@ export default function EducationForm({ onNext, onBack }) {
     else { addEducation(data); }
     setShowForm(false);
   };
-  const handleEdit = (edu) => { setEditTarget(edu); setShowForm(false); };
+  const handleEdit = (edu) => { 
+    setEditTarget(edu); 
+    setShowForm(false); 
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+  };
 
   const handleMoveUp = (index) => {
     if (index === 0) return;
@@ -357,41 +381,51 @@ export default function EducationForm({ onNext, onBack }) {
   };
 
   return (
-    <div className="animate-fade-up">
+    <div className="animate-fade-up space-y-16">
       {/* Header */}
-      <div className="section-header">
-        <div className="section-icon">
-          <GraduationCap className="w-5 h-5 text-blue-600" />
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 pb-12 border-b border-slate-100">
+        <div className="space-y-6">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center shadow-premium group relative overflow-hidden">
+               <GraduationCap size={28} className="group-hover:scale-110 transition-transform relative z-10" />
+               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+             </div>
+             <div className="space-y-1">
+               <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Step 04</span>
+               <h2 className="text-4xl md:text-5xl font-display font-light text-slate-900 tracking-tight italic text-left">
+                 Riwayat <span className="text-slate-400">Akademik</span>
+               </h2>
+             </div>
+          </div>
+          <p className="text-sm font-medium text-slate-400 max-w-xl leading-relaxed italic px-2">
+            Arsip kualifikasi akademik, sertifikasi profesional, dan bootcamps spesialisasi Anda.
+          </p>
         </div>
-        <div className="flex-1">
-          <h2 className="text-xl font-bold text-slate-900">Riwayat Pendidikan</h2>
-          <p className="text-sm text-slate-500">Pendidikan formal, bootcamp, dan sertifikasi</p>
-        </div>
+
         {education.length > 0 && !showForm && !editTarget && (
-          <Button size="sm" onClick={() => setShowForm(true)} leftIcon={<Plus className="w-4 h-4" />}>
-            Tambah
-          </Button>
+          <button 
+            onClick={() => setShowForm(true)} 
+            className="flex items-center gap-4 px-8 py-4 rounded-2xl border border-slate-100 hover:border-slate-900 hover:bg-slate-50 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 transition-all shadow-sm group shrink-0"
+          >
+            <Plus size={16} className="text-slate-900 group-hover:rotate-90 transition-transform" />
+            Tambah Kualifikasi
+          </button>
         )}
       </div>
 
-      {showForm && (
-        <div className="mb-4">
-          <EducationEntryForm onSave={handleSave} onCancel={() => setShowForm(false)} />
-        </div>
-      )}
-      {editTarget && (
-        <div className="mb-4">
-          <EducationEntryForm initial={editTarget} onSave={handleSave} onCancel={() => setEditTarget(null)} />
+      {(showForm || editTarget) && (
+        <div className="animate-fade-in">
+          <EducationEntryForm initial={editTarget} onSave={handleSave} onCancel={() => { setShowForm(false); setEditTarget(null); }} />
         </div>
       )}
 
-      {!editTarget && (
+      {!editTarget && !showForm && (
         <div className="relative">
           <AnimatePresence mode="popLayout">
-            {education.length === 0 && !showForm ? (
+            {education.length === 0 ? (
               <EmptyEducation key="empty" onAdd={() => setShowForm(true)} />
             ) : (
-              <div className="space-y-4 mb-8">
+              <div className="space-y-8">
                 {education.map((edu, i) => (
                   <EducationCard
                     key={edu.id}
@@ -404,34 +438,44 @@ export default function EducationForm({ onNext, onBack }) {
                     onMoveDown={() => handleMoveDown(i)}
                   />
                 ))}
-                {!showForm && (
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    type="button"
-                    onClick={() => setShowForm(true)}
-                    className="w-full py-4 border-2 border-dashed border-slate-200 rounded-[2rem] text-slate-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2 font-display font-bold text-sm tracking-wide group"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </div>
-                    TAMBAH PENDIDIKAN LAGI
-                  </motion.button>
-                )}
+                
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  className="w-full py-16 border border-dashed border-slate-200 rounded-[3rem] bg-slate-50/30 text-slate-400 hover:border-slate-900 hover:text-slate-900 hover:bg-white transition-all flex flex-col items-center justify-center gap-4 group shadow-sm hover:shadow-premium duration-700"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 group-hover:border-slate-300 flex items-center justify-center transition-all shadow-sm">
+                    <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500" />
+                  </div>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-60 group-hover:opacity-100">Tambahkan Kualifikasi Selanjutnya</span>
+                </button>
               </div>
             )}
           </AnimatePresence>
         </div>
       )}
 
+      {/* Navigation */}
       {!showForm && !editTarget && (
-        <div className="flex justify-between pt-4 border-t border-blue-50">
-          <Button variant="secondary" onClick={onBack} leftIcon={<ChevronLeft className="w-4 h-4" />}>
+        <div className="flex justify-between items-center pt-12 border-t border-slate-100 mt-8">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            className="rounded-full px-8 h-14 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900"
+            leftIcon={<ChevronLeft className="w-4 h-4" />}
+          >
             Kembali
           </Button>
-          <Button onClick={onNext} rightIcon={<ChevronRight className="w-4 h-4" />}>
-            Lanjut: Skills
-          </Button>
+          
+          <button
+            onClick={onNext}
+            className="group flex items-center gap-8 px-10 py-5 rounded-full bg-slate-900 text-white shadow-premium hover:bg-black transition-all active:scale-[0.98]"
+          >
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/90 group-hover:text-white transition-colors">Inisialisasi Tahap 05</span>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
         </div>
       )}
     </div>

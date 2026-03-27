@@ -113,6 +113,7 @@ const useCVStore = create(
       isLoading: false,
       savedCVId: null,
       toast: null, // { type: 'success'|'error'|'info', message: string }
+      aiSuggestions: { technical: [], softSkills: [] },
 
       // ── Step Navigation ───────────────────────────────────
       setCurrentStep: (step) => set({ currentStep: step }),
@@ -436,6 +437,8 @@ const useCVStore = create(
       
       setJobDescription: (jd) => set({ jobDescription: jd }),
 
+      setAISuggestions: (suggestions) => set({ aiSuggestions: suggestions }),
+
       // ── Async State ───────────────────────────────────────
       setIsSaving: (isSaving) => set({ isSaving }),
       setIsLoading: (isLoading) => set({ isLoading }),
@@ -535,6 +538,7 @@ const useCVStore = create(
         coverLetter: state.coverLetter,
         history: state.history,
         appSettings: state.appSettings,
+        aiSuggestions: state.aiSuggestions,
       }),
     }
 

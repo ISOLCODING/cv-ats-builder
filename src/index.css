@@ -3,12 +3,36 @@
    Pure Tailwind + minimal custom CSS (no class conflicts)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@100;300;400;500;600;700;800;900&display=swap');
 
-@tailwind base;
+@tailwind base; 
 @tailwind components;
 @tailwind utilities;
 
+  :root {
+    /* Base - Clean & Elegant */
+    --background: #F8F9FA;
+    --surface: #FFFFFF;
+    --white: #FFFFFF;
+    
+    /* Accents - Sophisticated */
+    --primary: #5A7A8C;      /* Slate Blue */
+    --primary-dark: #445D6D;
+    --primary-light: #F0F4F7;
+    --secondary: #6C9E7C;    /* Sage Green */
+    --accent: #A28B72;       /* Taupe */
+    
+    /* Text */
+    --text-main: #2D3436;
+    --text-muted: #636E72;
+    --text-light: #B2BEC3;
+    
+    /* Utils */
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+  }
 /* ── Base ─────────────────────────────────────────────────── */
 @layer base {
   html {
@@ -17,12 +41,17 @@
     scroll-behavior: smooth;
   }
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    @apply bg-[#F6F9FC] text-[#1e293b] selection:bg-[#0052FF]/20 selection:text-[#0052FF];
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-[var(--background)] text-[var(--text-main)];
     overflow-x: hidden;
   }
+  ::selection {
+    background-color: rgba(90, 122, 140, 0.1);
+    color: var(--primary);
+  }
   h1, h2, h3, h4, h5, h6, .font-display {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
   }
   * { box-sizing: border-box; }
 }
@@ -32,15 +61,20 @@
 
   /* Card */
   .card {
-    @apply bg-white rounded-3xl shadow-sm border border-slate-100 p-8 transition-all duration-300;
+    @apply bg-white rounded-[var(--radius-lg)] shadow-sm border border-[var(--primary-light)] p-8 transition-all duration-300;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+  }
+  .card:hover {
+    @apply -translate-y-1;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.05);
   }
 
   /* Section header */
   .section-header {
-    @apply flex items-center gap-4 pb-6 mb-8 border-b border-slate-100;
+    @apply flex items-center gap-4 pb-6 mb-8 border-b border-[var(--primary-light)];
   }
   .section-icon {
-    @apply w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600 shadow-inner;
+    @apply w-12 h-12 rounded-[var(--radius-md)] bg-[var(--primary-light)] flex items-center justify-center flex-shrink-0 text-[var(--primary)] shadow-inner;
   }
 
   /* Stepper circle */
@@ -53,15 +87,19 @@
     @apply block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 px-1;
   }
   .form-input {
-    @apply w-full px-5 py-4 text-sm font-semibold text-slate-800 bg-white
-           border-2 border-slate-100 rounded-2xl outline-none
-           transition-all duration-300 placeholder-slate-300;
+    @apply w-full px-5 py-4 text-sm font-medium text-[var(--text-main)] bg-white
+           border border-[var(--primary-light)] rounded-[var(--radius-md)] outline-none
+           transition-all duration-300 placeholder-[var(--text-light)];
+    font-family: 'Inter', sans-serif;
   }
   .form-input:hover {
-    @apply border-blue-100 bg-blue-50/10;
+    border-color: rgba(90, 122, 140, 0.3);
+    @apply bg-[var(--background)];
   }
   .form-input:focus {
-    @apply border-blue-500/50 bg-white ring-[6px] ring-blue-500/5 shadow-2xl shadow-blue-500/10;
+    border-color: rgba(90, 122, 140, 0.5);
+    @apply bg-white outline-none;
+    box-shadow: 0 0 0 4px rgba(90, 122, 140, 0.05);
   }
   .form-input:disabled {
     @apply bg-slate-50 text-slate-400 cursor-not-allowed opacity-60 border-slate-100;
@@ -75,50 +113,48 @@
 
   /* ── Buttons (Legacy styles, mainly used by components I haven't reached) ────────────────────── */
   .btn {
-    @apply inline-flex items-center justify-center gap-3
-           font-black uppercase tracking-widest rounded-2xl px-6 py-4 text-[10px]
+    @apply inline-flex items-center justify-center gap-2.5
+           font-bold tracking-tight rounded-[var(--radius-md)] px-6 py-3.5 text-[13px]
            transition-all duration-300 cursor-pointer
            select-none whitespace-nowrap border-0 outline-none active:scale-95;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
-  .btn-primary { @apply bg-blue-600 text-white shadow-lg shadow-blue-500/20; }
-  .btn-primary:hover { @apply bg-blue-700 shadow-xl shadow-blue-500/30 -translate-y-0.5; }
+  .btn-primary { @apply bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/10; }
+  .btn-primary:hover { @apply bg-[var(--primary-dark)] -translate-y-0.5 shadow-lg shadow-[var(--primary)]/20; }
 
-  .btn-secondary { @apply bg-slate-100 text-slate-900; }
-  .btn-secondary:hover { @apply bg-slate-200; }
+  .btn-secondary { @apply bg-[var(--primary-light)] text-[var(--primary)]; }
+  .btn-secondary:hover { @apply bg-[var(--primary)]/10; }
 
-  .btn-sm   { @apply px-4 py-2 text-[9px] rounded-xl; }
-  .btn-lg   { @apply px-10 py-5 text-xs rounded-[1.5rem]; }
+  .btn-sm   { @apply px-4 py-2 text-[11px] rounded-[var(--radius-sm)]; }
+  .btn-lg   { @apply px-8 py-4 text-sm rounded-[var(--radius-lg)]; }
 
   .btn-icon { @apply p-2 w-9 h-9 rounded-lg; }
 
   /* ── Badges ────────────────────────────────────────────── */
   .badge {
-    @apply inline-flex items-center gap-1 px-2.5 py-0.5
-           rounded-full text-[11px] font-bold;
+    @apply inline-flex items-center gap-1.5 px-3 py-1
+           rounded-full text-[10px] font-bold uppercase tracking-wider;
+    font-family: 'Inter', sans-serif;
   }
-  .badge-blue   { @apply bg-blue-100 text-blue-700; }
-  .badge-green  { @apply bg-green-100 text-green-700; }
-  .badge-purple { @apply bg-violet-100 text-violet-700; }
-  .badge-amber  { @apply bg-amber-100 text-amber-700; }
-  .badge-gray   { @apply bg-slate-100 text-slate-600; }
+  .badge-blue   { @apply bg-[var(--primary-light)] text-[var(--primary)]; }
+  .badge-green  { @apply bg-[var(--secondary)]/10 text-[var(--secondary)]; }
+  .badge-taupe  { @apply bg-[var(--accent)]/10 text-[var(--accent)]; }
+  .badge-gray   { @apply bg-slate-100 text-slate-500; }
 
   /* ── Entry card (Premium Evolution) ────────────────────────── */
   .entry-card {
-    @apply p-5 border border-slate-100 rounded-[2rem] bg-white
-           transition-all duration-300 relative overflow-hidden flex gap-4 items-start;
-    box-shadow: 
-      0 0 0 1px rgba(0, 0, 0, 0.01),
-      0 2px 4px 0 rgba(0, 0, 0, 0.02);
+    @apply p-6 border border-[var(--primary-light)] rounded-[var(--radius-lg)] bg-white
+           transition-all duration-300 relative overflow-hidden flex gap-5 items-start;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
   }
   .entry-card:hover {
-    @apply border-blue-200/60 shadow-indigo translate-x-1;
-    background: linear-gradient(to right, #ffffff 0%, #f8fbff 100%);
+    border-color: rgba(90, 122, 140, 0.2);
+    @apply shadow-lg translate-x-1;
+    background: linear-gradient(to right, #ffffff 0%, var(--primary-light) 100%);
   }
   .entry-card::before {
     content: '';
-    @apply absolute left-0 top-0 bottom-0 w-1.5 bg-blue-600 opacity-0 transition-opacity duration-300;
-    box-shadow: 4px 0 12px rgba(37, 99, 235, 0.2);
+    @apply absolute left-0 top-0 bottom-0 w-1 bg-[var(--primary)] opacity-0 transition-opacity duration-300;
   }
   .entry-card:hover::before {
     @apply opacity-100;
@@ -180,11 +216,10 @@
   /* ── Modern Premium Effects ─────────────────────────── */
   .bg-mesh {
     background:
-        radial-gradient(at 0% 0%, rgba(0, 82, 255, 0.05) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.03) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(30, 64, 185, 0.05) 0px, transparent 50%),
-        radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.03) 0px, transparent 50%),
-        #F8FAFC;
+        radial-gradient(at 0% 0%, rgba(90, 122, 140, 0.03) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(108, 158, 124, 0.02) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(162, 139, 114, 0.03) 0px, transparent 50%),
+        var(--background);
     position: relative;
   }
   .bg-mesh::after {

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Wand2, X, Check, RefreshCw } from 'lucide-react';
 import { useGroq } from '../../hooks/useGroq';
 import useCVStore from '../../store/useCVStore';
+import useAuthStore from '../../store/useAuthStore';
+import { Lock } from 'lucide-react';
 
 /**
  * MagicWriter Component
@@ -14,6 +16,9 @@ export default function MagicWriter({ type, content, onApply, className = "" }) 
   const [improvedContent, setImprovedContent] = useState('');
   const { improveContentAI } = useGroq();
   const { cvData, showToast } = useCVStore();
+  const { user, setShowUpgradeModal } = useAuthStore();
+  
+  const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
 
   const handleImprove = async (mode = 'standard') => {
     if (!content || content.trim().length < 10) {
@@ -46,32 +51,40 @@ export default function MagicWriter({ type, content, onApply, className = "" }) 
           type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => handleImprove('standard')}
+          onClick={() => isPremium ? handleImprove('standard') : setShowUpgradeModal(true)}
           disabled={isImproving}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-600 transition-all text-[9.5px] font-black uppercase tracking-wider disabled:opacity-50"
-          title="Polish & Professionalism"
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[9.5px] font-black uppercase tracking-wider disabled:opacity-50 transition-all ${
+            isPremium 
+              ? 'bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-600' 
+              : 'bg-slate-100 text-slate-400 opacity-80'
+          }`}
+          title={isPremium ? "Polish & Professionalism" : "Premium Feature"}
         >
-          <Sparkles className="w-3 h-3" />
-          <span>Polish</span>
+          {isPremium ? <Sparkles className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+          <span>{isPremium ? 'Polish' : 'Premium'}</span>
         </motion.button>
 
         <motion.button
           type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => handleImprove('xyz')}
+          onClick={() => isPremium ? handleImprove('xyz') : setShowUpgradeModal(true)}
           disabled={isImproving}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg shadow-orange-500/20 text-[9.5px] font-black uppercase tracking-wider disabled:opacity-50 group overflow-hidden relative"
-          title="XYZ Formula (Accomplished [X] as measured by [Y], by doing [Z])"
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-white shadow-lg text-[9.5px] font-black uppercase tracking-wider disabled:opacity-50 group overflow-hidden relative transition-all ${
+            isPremium 
+              ? 'bg-gradient-to-r from-amber-400 to-orange-500 shadow-orange-500/20' 
+              : 'bg-slate-300 shadow-none'
+          }`}
+          title={isPremium ? "XYZ Formula" : "Premium Feature"}
         >
           <motion.div
              animate={isImproving ? { rotate: 360 } : {}}
              transition={isImproving ? { repeat: Infinity, duration: 1, ease: "linear" } : {}}
           >
-            {isImproving ? <RefreshCw className="w-3.5 h-3.5" /> : <Wand2 className="w-3.5 h-3.5" />}
+            {isImproving ? <RefreshCw className="w-3.5 h-3.5" /> : (isPremium ? <Wand2 className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />)}
           </motion.div>
-          <span>{isImproving ? 'Conjuring...' : 'XYZ Impact'}</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none"></div>
+          <span>{isImproving ? 'Conjuring...' : (isPremium ? 'XYZ Impact' : 'Royal Writer')}</span>
+          {isPremium && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none"></div>}
         </motion.button>
       </div>
 

@@ -47,6 +47,7 @@ var DriveDB = (function() {
       var blob = Utilities.newBlob(decodedData, contentType, fileName);
       
       var file = folder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       
       return {
         id: file.getId(),

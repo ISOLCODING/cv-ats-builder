@@ -1,6 +1,7 @@
 // src/hooks/useGroq.js
 import { useCallback } from 'react';
 import { useGAS } from './useGAS';
+import useAuthStore from '../store/useAuthStore';
 
 /**
  * useGroq Hook
@@ -13,6 +14,13 @@ export function useGroq() {
    * callAIProxy — Proxy pemanggilan AI ke backend
    */
   const callAIProxy = useCallback(async (prompt, isJson = false) => {
+    const { user } = useAuthStore.getState();
+    const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
+
+    if (!isPremium) {
+      throw new Error('Premium Required: Fitur AI ini khusus untuk pengguna Premium.');
+    }
+
     try {
       const res = await callGAS('callAI', { prompt, isJson });
       
@@ -186,10 +194,52 @@ export function useGroq() {
     return await callAIProxy(prompt);
   }, [callAIProxy]);
 
+  /**
+   * getSmartSkillsAI — Rekomendasi skills berdasarkan profil, pengalaman, & pendidikan
+   */
+  const getSmartSkillsAI = useCallback(async ({ cvData }) => {
+    const prompt = `
+      Tugas: Berikan rekomendasi SKILL (Hard Skills & Soft Skills) yang sangat spesifik dan relevan berdasarkan data profil pengguna berikut.
+      
+      KONTEKS PENGGUNA:
+      Profile Summary: ${cvData.summary || 'Belum diisi'}
+      Pendidikan: ${JSON.stringify(cvData.education.map(e => ({ inst: e.institution, field: e.field || e.degree })))}
+      Pengalaman: ${JSON.stringify(cvData.experiences.map(e => ({ pos: e.position, desc: e.description })))}
+      
+      INSTRUKSI:
+      1. Tampilkan dalam gaya bahasa MANUSIA yang profesional dan industri-sentris. 
+      2. HINDARI kata-kata "AI-ish" seperti: "Optimalisasi", "Adaptasi", "Pengembangan Strategis", "Kolaborasi Lintas Fungsi".
+      3. GUNAKAN istilah langsung yang dipakai di lapangan. Contoh: "Servis Mesin", "Mengajar Kelas", "Closing Sales", "Desain UI/UX", "Adobe Photoshop".
+      4. PISAHKAN antara skill Teknis (Hard Skills) dan kemampuan Interpersonal (Soft Skills).
+      5. Jika latar belakang Otomotif, fokus ke alat/teknik bengkel. Jika Guru, fokus ke metode ajar.
+      6. Bahasa: Indonesia.
+      7. OUTPUT HANYA JSON MURNI sesuai format di bawah.
+      
+      FORMAT JSON WAJIB:
+      {
+        "technical": ["Skill Teknis 1", "Skill Teknis 2", ...],
+        "softSkills": ["Soft Skill 1", "Soft Skill 2", ...]
+      }
+    `;
+
+    try {
+      const response = await callAIProxy(prompt, true);
+      const parsed = JSON.parse(response);
+      return {
+        technical: parsed.technical || [],
+        softSkills: parsed.softSkills || []
+      };
+    } catch (e) {
+      console.error('Error generating smart skills:', e);
+      return { technical: [], softSkills: [] };
+    }
+  }, [callAIProxy]);
+
   return {
     generateCoverLetterAI,
     analyzeATSAI,
     optimizeCVAI,
-    improveContentAI
+    improveContentAI,
+    getSmartSkillsAI
   };
 }

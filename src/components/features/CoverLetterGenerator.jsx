@@ -1,14 +1,18 @@
 // src/components/features/CoverLetterGenerator.jsx
 import React, { useState, useEffect } from 'react';
-import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Upload, X, Fingerprint } from 'lucide-react';
+import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Upload, X, Fingerprint, Lock } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
+import useAuthStore from '../../store/useAuthStore';
 import Button from '../ui/Button';
 import { useGroq } from '../../hooks/useGroq';
 import RichEditor from '../ui/RichEditor';
 
 export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   const { cvData, coverLetter, updateCoverLetter, setCoverLetterContent, updatePersonalInfo, showToast } = useCVStore();
+  const { user, setShowUpgradeModal } = useAuthStore();
   const { generateCoverLetterAI } = useGroq();
+  
+  const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
   const [generating, setGenerating] = useState(false);
 
   // Otomatis pindah preview ke 'Surat Lamaran' saat masuk step ini
@@ -37,6 +41,10 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   };
 
   const handleGenerate = async () => {
+    if (!isPremium) {
+      return setShowUpgradeModal(true);
+    }
+
     if (!coverLetter.jobPosition) {
       return showToast('error', 'Masukkan posisi yang dilamar terlebih dahulu');
     }
@@ -61,13 +69,24 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
 
   return (
     <div className="space-y-6 animate-fade-in pb-10">
-      <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-        <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-          <FileText className="w-5 h-5" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">Surat Lamaran (AI Powered)</h2>
-          <p className="text-sm text-slate-500">Auto-generate dari data CV Anda</p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 pb-12 border-b border-slate-100">
+        <div className="space-y-6">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center shadow-premium group relative overflow-hidden">
+               <Fingerprint size={28} className="group-hover:scale-110 transition-transform relative z-10" />
+               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+             </div>
+             <div className="space-y-1">
+               <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Tahap 10</span>
+               <h2 className="text-4xl md:text-5xl font-display font-light text-slate-900 tracking-tight italic text-left">
+                 Intelegensia <span className="text-slate-400">Surat Lamaran</span>
+               </h2>
+             </div>
+          </div>
+          <p className="text-sm font-medium text-slate-400 max-w-xl leading-relaxed italic px-2">
+            Generasi otomatis narasi berdampak tinggi yang disesuaikan dengan tolok ukur karier prospektif Anda.
+          </p>
         </div>
       </div>
 
@@ -118,8 +137,8 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
               value={coverLetter.tone}
               onChange={(e) => updateCoverLetter({ tone: e.target.value })}
             >
-              <option value="formal">Formal & Profesional (Standard)</option>
-              <option value="semi-formal">Semi-Formal & Friendly</option>
+              <option value="formal">Formal & Profesional (Standar)</option>
+              <option value="semi-formal">Semi-Formal & Ramah</option>
             </select>
           </div>
           
@@ -142,8 +161,8 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 hover:border-blue-400 transition-all group">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="w-8 h-8 text-slate-400 group-hover:text-blue-500 mb-2 transition-colors" />
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Upload Tanda Tangan</p>
-                  <p className="text-[10px] text-slate-400 mt-1">PNG Transparan / JPG (Max 2MB)</p>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Unggah Tanda Tangan</p>
+                  <p className="text-[10px] text-slate-400 mt-1">PNG Transparan / JPG (Maks 2MB)</p>
                 </div>
                 <input type="file" className="hidden" accept="image/*" onChange={handleSignatureUpload} />
               </label>
@@ -165,25 +184,31 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
             <Button
               onClick={handleGenerate}
               loading={generating}
-              variant="primary"
-              leftIcon={<Wand2 className="w-4 h-4" />}
+              variant={!isPremium ? "outline" : "primary"}
+              leftIcon={!isPremium ? <Lock className="w-4 h-4 text-amber-500" /> : <Wand2 className="w-4 h-4" />}
               className="w-full shadow-lg shadow-blue-200"
             >
-              {coverLetter.status === 'generated' ? 'Regenerate Surat Baru' : 'Generate dengan AI'}
+              {!isPremium ? 'Upgrade Premium untuk Akses AI' : coverLetter.status === 'generated' ? 'Generasi Ulang Narasi' : 'Inisialisasi Narasi AI'}
             </Button>
           </div>
         </div>
 
-        <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-center">
+        <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-center relative overflow-hidden">
+          {!isPremium && (
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-10 flex-col gap-2 rounded-2xl">
+              <Lock className="w-8 h-8 text-amber-500 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-500">Khusus Premium</span>
+            </div>
+          )}
            <h3 className="font-bold flex items-center gap-2 mb-2">
              <AlertTriangle className="w-5 h-5 text-blue-200" />
-             Tips AI Generator
+             Panduan Generator AI
            </h3>
            <ul className="text-sm text-blue-100 space-y-2 list-disc ml-5">
-             <li>Pastikan Summary di langkah sebelumnya sudah lengkap.</li>
-             <li>AI akan otomatis menyisipkan Pendidikan & Skill Anda.</li>
-             <li>Hasil di bawah bisa Anda edit secara manual.</li>
-             <li>Cek <strong>Live Preview</strong> di panel sebelah kanan →</li>
+             <li>Pastikan Ringkasan pada langkah sebelumnya telah optimal.</li>
+             <li>AI akan mensintesis data Pendidikan & Keahlian Anda secara otomatis.</li>
+             <li>Hasil di bawah dapat dikalibrasi secara manual.</li>
+             <li>Tinjau <strong>Pratinjau Langsung</strong> di panel sebelah kanan →</li>
            </ul>
         </div>
       </div>
@@ -209,22 +234,25 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
       )}
 
       {/* Navigation */}
-      <div className="flex items-center justify-between pt-8 border-t border-slate-100">
+      <div className="flex items-center justify-between pt-12 border-t border-slate-100 mt-16 px-4">
         <Button
           variant="ghost"
           onClick={onBack}
+          className="rounded-full px-8 h-14 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900"
           leftIcon={<ChevronLeft className="w-4 h-4" />}
         >
           Kembali
         </Button>
-        <Button
-          variant="primary"
+        
+        <button
           onClick={onNext}
-          rightIcon={<ChevronRight className="w-4 h-4" />}
-          className="px-8"
+          className="group flex items-center gap-8 px-10 py-5 rounded-full bg-slate-900 text-white shadow-premium hover:bg-black transition-all active:scale-[0.98]"
         >
-          Lanjut ke Simpan & Kirim
-        </Button>
+          <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/90 group-hover:text-white transition-colors">Inisialisasi Tahap 11</span>
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </div>
+        </button>
       </div>
     </div>
   );

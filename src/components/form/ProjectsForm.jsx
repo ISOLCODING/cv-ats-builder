@@ -4,7 +4,7 @@ import {
   Rocket, Plus, Trash2, Pencil, ChevronRight,
   ChevronLeft, LayoutGrid, Terminal, GripVertical,
   CheckCircle2, ChevronUp, ChevronDown, Link as LinkIcon,
-  Sparkles, ExternalLink, Code2
+  Sparkles, ExternalLink, Code2, Briefcase, Layers, Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
@@ -12,21 +12,28 @@ import RichEditor from '../ui/RichEditor';
 import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
 
-function EmptyProjects() {
+function EmptyProjects({ onAdd }) {
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center py-20 px-6 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-slate-200"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center py-24 px-10 text-center bg-white border border-dashed border-slate-200 rounded-[3rem] hover:border-slate-400 transition-colors duration-700"
     >
-      <div className="w-24 h-24 bg-white rounded-full shadow-xl flex items-center justify-center mb-6 relative group">
-        <div className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-full group-hover:scale-110 transition-transform duration-700" />
-        <Rocket className="w-12 h-12 text-blue-500 relative z-10" />
+      <div className="w-24 h-24 rounded-[2.5rem] bg-slate-50 flex items-center justify-center mb-10 relative group-hover:scale-110 transition-transform duration-700">
+        <Layers className="w-10 h-10 text-slate-300" />
+        <div className="absolute inset-x-0 -bottom-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
       </div>
-      <h3 className="text-2xl font-display font-black text-slate-800 mb-2">Portfolio Showcase</h3>
-      <p className="text-slate-500 text-center max-w-sm text-sm leading-relaxed mb-8 font-medium">
-        Highlight your best work, side projects, or open-source contributions to demonstrate your hands-on expertise.
+      <h3 className="text-3xl font-bold text-slate-900 tracking-tight font-display mb-4 italic">Belum Ada Inisiatif Strategis</h3>
+      <p className="text-base font-medium text-slate-400 max-w-sm mb-12 leading-relaxed">
+        Soroti karya terbaik, solusi inovatif, atau inisiatif strategis yang mendefinisikan kapabilitas dan keahlian Anda.
       </p>
+      <button 
+        onClick={onAdd} 
+        className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-slate-200 hover:bg-black transition-all font-bold text-[11px] uppercase tracking-[0.3em] active:scale-95"
+      >
+        <Plus size={18} />
+        Inisialisasi Proyek
+      </button>
     </motion.div>
   );
 }
@@ -35,72 +42,74 @@ function ProjectCard({ project, onEdit, onDelete }) {
   return (
     <motion.div 
       layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4 }}
-      className="group bg-white border border-slate-100 p-6 sm:p-8 rounded-[2.5rem] shadow-soft hover:shadow-2xl hover:border-blue-200 transition-all duration-500 relative overflow-hidden"
+      className="group relative pl-12 md:pl-20 pb-16 last:pb-0"
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full translate-x-10 -translate-y-10 group-hover:translate-x-5 transition-transform duration-700" />
-      
-      <div className="flex flex-col sm:flex-row gap-6">
-        <div className="flex-shrink-0 w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform duration-500">
-          <Rocket className="w-8 h-8 text-white" />
-        </div>
+      {/* Vertical Timeline Line */}
+      <div className="absolute left-[23px] md:left-[43px] top-0 bottom-0 w-px bg-slate-100 group-last:bg-gradient-to-b group-last:from-slate-100 group-last:to-transparent"></div>
 
-        <div className="flex-1 min-w-0 space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h4 className="text-xl font-display font-black text-slate-800 tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
-                {project.name || 'Untitled Masterpiece'}
+      {/* Timeline Node Icon (Rocket/Project) */}
+      <div className={`absolute left-0 md:left-5 top-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 z-10 border-4 border-white shadow-premium bg-slate-50 text-slate-300 group-hover:bg-slate-900 group-hover:text-white group-hover:scale-110 group-active:scale-95`}>
+        <Rocket size={20} />
+      </div>
+
+      {/* Content Container */}
+      <div className="relative pt-1">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 group-hover:translate-x-2 transition-transform duration-500">
+          <div className="space-y-4 flex-1">
+            <div className="space-y-3">
+              <h4 className="font-display font-bold text-slate-900 text-3xl tracking-tight leading-tight italic">
+                {project.name || 'Inisiatif Tanpa Judul'}
               </h4>
-              <div className="flex flex-wrap items-center gap-3 mt-2">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/80 text-slate-600 border border-slate-200">
-                  <Code2 className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">{project.techStack || 'Various Technologies'}</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-50 border border-slate-100 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                  <Code2 size={12} />
+                  {project.techStack || 'Teknologi Terpilih'}
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2 flex-shrink-0">
-              <motion.button 
-                whileHover={{ scale: 1.1, backgroundColor: '#eff6ff', color: '#2563eb' }}
-                whileTap={{ scale: 0.9 }}
-                onClick={onEdit}
-                className="p-3 rounded-2xl bg-slate-50 text-slate-400 transition-all duration-300"
+            {project.description && (
+              <div 
+                className="text-sm text-slate-400 line-clamp-3 leading-relaxed font-medium opacity-80 italic max-w-2xl prose-slate"
+                dangerouslySetInnerHTML={{ __html: project.description }}
+              />
+            )}
+
+            {project.link && (
+               <a 
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 hover:bg-white hover:border-slate-200 transition-all group/link"
               >
-                <Pencil className="w-4 h-4" />
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.1, backgroundColor: '#fff1f2', color: '#e11d48' }}
-                whileTap={{ scale: 0.9 }}
-                onClick={onDelete}
-                className="p-3 rounded-2xl bg-slate-50 text-slate-400 transition-all duration-300"
-              >
-                <Trash2 className="w-4 h-4" />
-              </motion.button>
-            </div>
+                <LinkIcon size={12} className="group-hover/link:rotate-45 transition-transform" />
+                Studi Kasus & Tautan Langsung
+              </a>
+            )}
           </div>
 
-          {project.description && (
-            <div 
-              className="text-sm text-slate-500 leading-relaxed font-medium line-clamp-3 prose prose-slate prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: project.description }}
-            />
-          )}
-
-          {project.link && (
-            <motion.a 
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ x: 5 }}
-              className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-600 font-display font-black text-[10px] uppercase tracking-widest pt-2"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              View Project Live
-            </motion.a>
-          )}
+          {/* Action HUD - Appears on Hover */}
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
+            <div className="flex items-center bg-white border border-slate-100 rounded-2xl p-1.5 shadow-premium">
+              <button 
+                type="button" 
+                onClick={onEdit}
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
+              >
+                <Pencil size={18} />
+              </button>
+              <button 
+                type="button" 
+                onClick={onDelete}
+                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-all"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -117,84 +126,116 @@ function ProjectEntryForm({ initial = null, onSave, onCancel }) {
     onSave({ ...data, description: desc, id: initial?.id || Date.now().toString() });
   };
 
+  const inputCls = (hasErr) => 
+    `w-full px-6 py-4.5 rounded-2xl bg-white border transition-all outline-none font-semibold text-slate-700 text-sm placeholder:text-slate-300 placeholder:font-medium
+     ${hasErr ? 'border-rose-100 bg-rose-50/10 focus:border-rose-300' : 'border-slate-50 focus:border-slate-900 focus:shadow-premium'}`;
+
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-blue-50/40 border border-blue-100 rounded-[3rem] p-6 sm:p-10 space-y-8 shadow-sm relative overflow-hidden"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-slate-50/50 border border-slate-100 rounded-[3rem] p-10 sm:p-14 space-y-12 relative overflow-hidden"
     >
-      <div className="absolute bottom-0 right-0 p-12 opacity-5">
-        <LayoutGrid className="w-32 h-32 text-blue-500" />
-      </div>
-
-      <div className="relative">
-        <h3 className="text-xl font-display font-black text-blue-950 flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center">
-            <Rocket className="w-6 h-6 text-blue-600" />
-          </div>
-          {initial ? 'Edit Masterpiece' : 'Launch New Project'}
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project Name</label>
-            <input 
-              {...register('name', { required: 'Required' })} 
-              className="form-input text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-14 rounded-2xl" 
-              placeholder="e.g. AI-Powered CRM Dashboard" 
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tech Stack</label>
-            <input 
-              {...register('techStack', { required: 'Required' })} 
-              className="form-input text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-14 rounded-2xl" 
-              placeholder="e.g. Next.js, TypeScript, PostgreSQL" 
-            />
-          </div>
-          <div className="col-span-1 md:col-span-2 space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Project URL / GitHub</label>
-            <div className="relative group">
-              <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-              <input 
-                {...register('link')} 
-                className="form-input pl-12 text-sm font-bold bg-white/70 backdrop-blur-sm focus:bg-white transition-all border-none shadow-sm h-14 rounded-2xl" 
-                placeholder="https://github.com/username/project" 
-              />
+      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-900 shadow-sm relative overflow-hidden group/rocket">
+               <Rocket size={26} className="z-10 group-hover/rocket:scale-110 transition-transform duration-500" />
+               <div className="absolute inset-x-0 -bottom-1 h-1 bg-slate-900/10" />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-slate-900 text-3xl tracking-tight italic">
+                {initial ? 'Kalibrasi Inisiatif' : 'Inisialisasi Proyek Baru'}
+              </h3>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 mt-2">
+                {initial ? 'Menyesuaikan spesifikasi proyek' : 'Menyusun narasi teknis'}
+              </p>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-8 space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Project Narrative</label>
-            <MagicWriter 
-              type="Project"
-              content={desc}
-              onApply={setDesc}
-            />
-          </div>
-          <div className="bg-white/70 backdrop-blur-sm rounded-[2rem] border border-blue-100 overflow-hidden focus-within:border-blue-400 transition-all shadow-sm">
-            <RichEditor
-              label={null}
-              value={desc}
-              onChange={setDesc}
-              placeholder="Architected the frontend using React 19 and implemented full-text search with..."
-              minHeight={180}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Identitas Proyek</label>
+          <input 
+            {...register('name', { required: 'Required' })} 
+            className={inputCls(errors.name)} 
+            placeholder="e.g. Distributed Neural Gateway" 
+          />
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Palet Teknologi</label>
+          <div className="relative group/field">
+            <Terminal className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
+            <input 
+              {...register('techStack', { required: 'Required' })} 
+              className={`${inputCls(errors.techStack)} pl-14`}
+              placeholder="e.g. Next.js, Go, Redis" 
             />
           </div>
         </div>
-
-        <div className="flex items-center justify-end gap-3 mt-10 pt-8 border-t border-blue-100">
-          <Button variant="secondary" onClick={onCancel} className="px-8">Discard</Button>
-          <Button 
-            onClick={handleSubmit(onSubmit)} 
-            className="px-10 shadow-xl shadow-blue-500/20"
-            leftIcon={<CheckCircle2 className="w-4 h-4" />}
-          >
-            Deploy Changes
-          </Button>
+        <div className="md:col-span-2 space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 ml-2">Kehadiran Digital (URL/GitHub)</label>
+          <div className="relative group/field">
+            <LinkIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within/field:text-slate-900 transition-colors" />
+            <input 
+              {...register('link')} 
+              className={`${inputCls(false)} pl-14`}
+              placeholder="https://github.com/voyage/nexus" 
+            />
+          </div>
         </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <label className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">Sintesis Proyek</label>
+          <MagicWriter 
+            type="Project"
+            content={desc}
+            onApply={setDesc}
+          />
+        </div>
+        <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden focus-within:border-slate-900 transition-all shadow-sm hover:shadow-md duration-500">
+          <RichEditor
+            label={null}
+            value={desc}
+            onChange={setDesc}
+            placeholder={`• Architected a high-concurrency event bus handling 10k eps.\n• Optimized rendering performance by 40% using advanced memoization.\n• Implemented secure multi-tenant authentication patterns.`}
+            minHeight={200}
+            maxLength={2000}
+          />
+        </div>
+
+        <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm flex items-start gap-6">
+           <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-800 border border-slate-100 shrink-0">
+             <Zap size={20} className="fill-slate-900 opacity-20" />
+           </div>
+           <div className="space-y-1">
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-900">Portfolio Impact</p>
+             <p className="text-sm text-slate-400 font-medium leading-relaxed italic">
+               Gunakan poin-poin yang berorientasi pada hasil (quantifiable results) untuk mendemonstrasikan efektivitas solusi yang Anda bangun.
+             </p>
+           </div>
+        </div>
+      </div>
+
+      <div className="flex gap-6 justify-end pt-10 border-t border-slate-100">
+        <button 
+          type="button"
+          onClick={onCancel}
+          className="px-8 py-4 rounded-xl text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-slate-900 transition-colors"
+        >
+          Batalkan
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit(onSubmit)}
+          className="flex items-center gap-4 px-10 py-5 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-slate-300 hover:bg-black transition-all active:scale-95 text-[11px] font-bold uppercase tracking-[0.3em]"
+        >
+          {initial ? 'Perbarui Proyek' : 'Simpan Inisiatif'}
+        </button>
       </div>
     </motion.div>
   );
@@ -212,31 +253,43 @@ export default function ProjectsForm({ onNext, onBack }) {
     setShowForm(false); setEditTarget(null);
   };
 
+  const handleEdit = (p) => {
+    setEditTarget(p);
+    setShowForm(false);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+  };
+
   return (
-    <div className="space-y-10 max-w-4xl mx-auto">
-      <div className="relative">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-[2rem] bg-slate-900 shadow-2xl flex items-center justify-center rotate-6 hover:rotate-0 transition-transform duration-500 group">
-              <Rocket className="w-8 h-8 text-white group-hover:animate-bounce" />
-            </div>
-            <div>
-              <h2 className="text-4xl font-display font-black text-slate-800 tracking-tight leading-none">Projects</h2>
-              <p className="text-slate-500 font-medium font-display uppercase tracking-[0.3em] text-[10px] mt-2">Engineering excellence showcase</p>
-            </div>
+    <div className="animate-fade-up space-y-16">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 pb-12 border-b border-slate-100">
+        <div className="space-y-6">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center shadow-premium group relative overflow-hidden">
+               <Layers size={28} className="group-hover:scale-110 transition-transform relative z-10" />
+               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+             </div>
+             <div className="space-y-1">
+               <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Step 07</span>
+               <h2 className="text-4xl md:text-5xl font-display font-light text-slate-900 tracking-tight italic text-left">
+                 Proyek <span className="text-slate-400">Strategis</span>
+               </h2>
+             </div>
           </div>
-          
-          {!showForm && !editTarget && (
-            <Button 
-              onClick={() => setShowForm(true)} 
-              variant="primary"
-              className="hidden sm:flex shadow-2xl shadow-blue-500/20 px-8"
-              leftIcon={<Plus className="w-5 h-5" />}
-            >
-              New Project
-            </Button>
-          )}
+          <p className="text-sm font-medium text-slate-400 max-w-xl leading-relaxed italic px-2">
+            Soroti karya terbaik, solusi inovatif, atau inisiatif strategis yang mendefinisikan kapabilitas Anda.
+          </p>
         </div>
+
+        {!showForm && !editTarget && (
+          <button 
+            onClick={() => setShowForm(true)} 
+            className="flex items-center gap-4 px-8 py-4 rounded-2xl border border-slate-100 hover:border-slate-900 hover:bg-slate-50 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 transition-all shadow-sm group shrink-0"
+          >
+            <Plus size={16} className="text-slate-900 group-hover:rotate-90 transition-transform" />
+            Tambah Arsip
+          </button>
+        )}
       </div>
 
       <AnimatePresence mode="wait">
@@ -252,53 +305,60 @@ export default function ProjectsForm({ onNext, onBack }) {
             key="list"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-6"
+            className="space-y-8"
           >
             {projects.length === 0 ? (
-              <EmptyProjects />
+              <EmptyProjects onAdd={() => setShowForm(true)} />
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-12">
                 {projects.map((p) => (
                   <ProjectCard 
                     key={p.id} 
                     project={p} 
-                    onEdit={() => setEditTarget(p)} 
+                    onEdit={() => handleEdit(p)} 
                     onDelete={() => removeProject(p.id)} 
                   />
                 ))}
+                
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  className="w-full py-16 border border-dashed border-slate-200 rounded-[3rem] bg-slate-50/30 text-slate-400 hover:border-slate-900 hover:text-slate-900 hover:bg-white transition-all flex flex-col items-center justify-center gap-4 group shadow-sm hover:shadow-premium duration-700"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 group-hover:border-slate-300 flex items-center justify-center transition-all shadow-sm">
+                    <Plus size={24} className="group-hover:rotate-90 transition-transform duration-500" />
+                  </div>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-60 group-hover:opacity-100">Tambah Pencapaian Berikutnya</span>
+                </button>
               </div>
             )}
-            
-            <motion.button 
-              whileHover={{ scale: 1.01, backgroundColor: 'rgba(255,255,255,1)', borderColor: '#2563eb' }}
-              whileTap={{ scale: 0.99 }}
-              onClick={() => setShowForm(true)}
-              className="w-full flex items-center justify-center gap-4 py-8 rounded-[3rem] border-[3px] border-dashed border-slate-200 text-slate-400 font-display font-black uppercase tracking-[0.2em] text-[11px] hover:text-blue-600 transition-all duration-300"
-            >
-              <Plus className="w-6 h-6 animate-pulse" />
-              Add Another Project Venture
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between pt-10 border-t border-slate-100">
-        <Button 
-          variant="secondary" 
-          onClick={onBack} 
-          className="px-10 h-14 rounded-2xl"
-          leftIcon={<ChevronLeft className="w-5 h-5" />}
-        >
-          Go Back
-        </Button>
-        <Button 
-          onClick={onNext} 
-          className="px-12 h-14 rounded-2xl shadow-xl shadow-blue-500/20"
-          rightIcon={<ChevronRight className="w-5 h-5" />}
-        >
-          Continue: Organizations
-        </Button>
-      </div>
+      {/* Navigation */}
+      {!showForm && !editTarget && (
+        <div className="flex justify-between items-center pt-12 border-t border-slate-100 mt-8">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            className="rounded-full px-8 h-14 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900"
+            leftIcon={<ChevronLeft className="w-4 h-4" />}
+          >
+            Kembali
+          </Button>
+          
+          <button
+            onClick={onNext}
+            className="group flex items-center gap-8 px-10 py-5 rounded-full bg-slate-900 text-white shadow-premium hover:bg-black transition-all active:scale-[0.98]"
+          >
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/90 group-hover:text-white transition-colors">Inisialisasi Tahap 08</span>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
