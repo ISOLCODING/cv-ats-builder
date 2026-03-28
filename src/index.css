@@ -94,7 +94,7 @@
   }
   .form-input:hover {
     border-color: rgba(90, 122, 140, 0.3);
-    @apply bg-[v ar(--background)];
+    @apply bg-[var(--background)];
   }
   .form-input:focus {
     border-color: rgba(90, 122, 140, 0.5);
