@@ -27,9 +27,6 @@ import CVPreview        from './components/preview/CVPreview';
 import LetterPreview from './components/preview/LetterPreview';
 import useCVStore       from './store/useCVStore';
 import useAuthStore     from './store/useAuthStore';
-import AuthPage         from './components/ui/AuthPage';
-import AdminDashboard   from './components/admin/AdminDashboard';
-import UpgradeModal     from './components/ui/UpgradeModal';
 import { useGAS }       from './hooks/useGAS';
 import { exportCVtoPDF, exportLetterToPDF } from './utils/exportPDF';
 
@@ -160,27 +157,7 @@ export default function App() {
   const [previewType, setPreviewType] = useState('cv'); 
   const [showLoadModal, setShowLoadModal]   = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const { user, logout } = useAuthStore();
-
-  const isAdmin = user?.role?.toLowerCase() === 'admin';
-
-  // ── Protected Route Wrapper ───────────────────────────
-  const ProtectedRoute = ({ children, roleRequired }) => {
-    if (!user) return <AuthPage />;
-    if (roleRequired && user.role?.toLowerCase() !== roleRequired.toLowerCase()) {
-      return (
-        <div className="min-h-[400px] flex flex-col items-center justify-center text-center p-8 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
-          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6">
-            <ShieldCheck className="w-8 h-8" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-800">Akses Ditolak</h2>
-          <p className="text-slate-500 mt-2 max-w-xs">Halaman ini hanya dapat diakses oleh Administrator Sistem.</p>
-          <Button onClick={() => setActiveTab('editor')} className="mt-8 px-8">Kembali ke Penyusun</Button>
-        </div>
-      );
-    }
-    return children;
-  };
+  const { user } = useAuthStore();
 
   const {
     currentStep, nextStep, prevStep, setCurrentStep,
@@ -290,14 +267,9 @@ export default function App() {
     }
   };
 
-  // ── Authentication Lock Guard ──────────────────────────────
-  if (!user) {
-    return <AuthPage />;
-  }
 
   return (
     <div className="min-h-screen bg-mesh overflow-x-hidden">
-      <UpgradeModal />
       <AnimatePresence>
         {toast && <Toast toast={toast} onClose={clearToast} />}
       </AnimatePresence>
@@ -343,8 +315,7 @@ export default function App() {
             {[
               { id: 'editor', icon: <LayoutDashboard className="w-4 h-4" />, label: 'RUANG KERJA', show: true },
               { id: 'history', icon: <History className="w-4 h-4" />, label: 'ARSIP', show: true },
-              { id: 'settings', icon: <Settings className="w-4 h-4" />, label: 'SISTEM', show: true },
-              { id: 'admin', icon: <Users className="w-4 h-4" />, label: 'ADMIN', show: isAdmin }
+              { id: 'settings', icon: <Settings className="w-4 h-4" />, label: 'SISTEM', show: true }
              ].filter(tab => tab.show).map((tab) => (
               <button
                 key={tab.id}
@@ -389,17 +360,6 @@ export default function App() {
               </span>
             </button>
             
-            <div className="hidden lg:flex items-center gap-4 border-l border-slate-100 pl-6">
-              <div className="text-right">
-                <div className="text-[13px] font-bold text-slate-800 truncate max-w-[120px]">{user.name}</div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--accent)]">
-                  Level {user.role}
-                </div>
-              </div>
-              <button onClick={() => { logout(); setCVData(defaultCVData); }} className="w-10 h-10 rounded-2xl bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all border border-slate-100">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
              {/* Mobile Menu Toggle */}
              <button
@@ -424,8 +384,7 @@ export default function App() {
                 {[
                   { id: 'editor', icon: <LayoutDashboard className="w-5 h-5" />, label: 'PENYUSUN', show: true },
                   { id: 'history', icon: <History className="w-5 h-5" />, label: 'ARSIP', show: true },
-                  { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'SISTEM', show: true },
-                  { id: 'admin', icon: <Users className="w-5 h-5" />, label: 'ADMIN', show: isAdmin }
+                  { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'SISTEM', show: true }
                 ].filter(tab => tab.show).map((tab) => (
                   <button
                     key={tab.id}
@@ -438,21 +397,6 @@ export default function App() {
                 ))}
               </div>
               
-              <div className="mt-4 p-4 bg-slate-50 rounded-3xl flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                    {user.name?.[0]}
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-800">{user.name}</div>
-                    <div className="text-[10px] text-slate-400">Anggota {user.role}</div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                   <button onClick={() => setShowLoadModal(true)} className="p-2 bg-white rounded-xl text-slate-400 shadow-sm"><Cloud className="w-4 h-4" /></button>
-                   <button onClick={() => { logout(); setCVData(defaultCVData); }} className="p-2 bg-red-50 rounded-xl text-red-500 shadow-sm"><X className="w-4 h-4" /></button>
-                </div>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -500,15 +444,6 @@ export default function App() {
                 </motion.div>
               )}
 
-              {activeTab === 'admin' && (
-                <motion.div key="admin" {...pageTransition}>
-                  <ProtectedRoute roleRequired="Admin">
-                    <div className="card !p-8 !rounded-[2.5rem]">
-                      <AdminDashboard onClose={() => setActiveTab('editor')} />
-                    </div>
-                  </ProtectedRoute>
-                </motion.div>
-              )}
             </AnimatePresence>
           </div>
 
