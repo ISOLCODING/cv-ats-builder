@@ -10,6 +10,17 @@ export default function AdminDashboard({ onClose }) {
   const [message, setMessage] = useState('');
   const [selectedProof, setSelectedProof] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  if (user?.role?.toLowerCase() !== 'admin') {
+    return (
+      <div className="p-20 text-center space-y-4">
+        <ShieldCheck className="w-16 h-16 text-rose-500 mx-auto" />
+        <h2 className="text-2xl font-bold">Akses Terlarang</h2>
+        <p className="text-slate-500">Anda tidak memiliki kredensial untuk mengakses pusat kontrol.</p>
+        <button onClick={onClose} className="btn-primary px-8 mt-4">Keluar</button>
+      </div>
+    );
+  }
 
   const fetchUsers = async () => {
     setLoading(true);

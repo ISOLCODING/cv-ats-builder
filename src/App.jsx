@@ -160,9 +160,27 @@ export default function App() {
   const [previewType, setPreviewType] = useState('cv'); 
   const [showLoadModal, setShowLoadModal]   = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-
-  // Authentication State
   const { user, logout } = useAuthStore();
+
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
+
+  // ── Protected Route Wrapper ───────────────────────────
+  const ProtectedRoute = ({ children, roleRequired }) => {
+    if (!user) return <AuthPage />;
+    if (roleRequired && user.role?.toLowerCase() !== roleRequired.toLowerCase()) {
+      return (
+        <div className="min-h-[400px] flex flex-col items-center justify-center text-center p-8 bg-white rounded-[3rem] border border-slate-100 shadow-sm">
+          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6">
+            <ShieldCheck className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800">Akses Ditolak</h2>
+          <p className="text-slate-500 mt-2 max-w-xs">Halaman ini hanya dapat diakses oleh Administrator Sistem.</p>
+          <Button onClick={() => setActiveTab('editor')} className="mt-8 px-8">Kembali ke Penyusun</Button>
+        </div>
+      );
+    }
+    return children;
+  };
 
   const {
     currentStep, nextStep, prevStep, setCurrentStep,
@@ -326,7 +344,7 @@ export default function App() {
               { id: 'editor', icon: <LayoutDashboard className="w-4 h-4" />, label: 'RUANG KERJA', show: true },
               { id: 'history', icon: <History className="w-4 h-4" />, label: 'ARSIP', show: true },
               { id: 'settings', icon: <Settings className="w-4 h-4" />, label: 'SISTEM', show: true },
-              { id: 'admin', icon: <Users className="w-4 h-4" />, label: 'ADMIN', show: user?.role === 'Admin' }
+              { id: 'admin', icon: <Users className="w-4 h-4" />, label: 'ADMIN', show: isAdmin }
              ].filter(tab => tab.show).map((tab) => (
               <button
                 key={tab.id}
@@ -407,7 +425,7 @@ export default function App() {
                   { id: 'editor', icon: <LayoutDashboard className="w-5 h-5" />, label: 'PENYUSUN', show: true },
                   { id: 'history', icon: <History className="w-5 h-5" />, label: 'ARSIP', show: true },
                   { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'SISTEM', show: true },
-                  { id: 'admin', icon: <Users className="w-5 h-5" />, label: 'ADMIN', show: user?.role === 'Admin' }
+                  { id: 'admin', icon: <Users className="w-5 h-5" />, label: 'ADMIN', show: isAdmin }
                 ].filter(tab => tab.show).map((tab) => (
                   <button
                     key={tab.id}
@@ -482,11 +500,13 @@ export default function App() {
                 </motion.div>
               )}
 
-              {activeTab === 'admin' && user?.role === 'Admin' && (
+              {activeTab === 'admin' && (
                 <motion.div key="admin" {...pageTransition}>
-                  <div className="card !p-8 !rounded-[2.5rem]">
-                    <AdminDashboard onClose={() => setActiveTab('editor')} />
-                  </div>
+                  <ProtectedRoute roleRequired="Admin">
+                    <div className="card !p-8 !rounded-[2.5rem]">
+                      <AdminDashboard onClose={() => setActiveTab('editor')} />
+                    </div>
+                  </ProtectedRoute>
                 </motion.div>
               )}
             </AnimatePresence>
