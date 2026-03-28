@@ -1,0 +1,22 @@
+
+> my-cv-ats@1.0.0 build:vercel
+> cross-env VITE_BUILD_TARGET=vercel vite build --outDir dist
+
+[36m📡 GAS Endpoint:[0m https://script.google.com/macros/s/AKfycbx2ujOUQYFyarAuhp12022yMacMOAsk7Vwit0c9U5ZE6knX-pWh1RHt4ST0E6WBV2HH/exec
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1526 modules transformed.
+[31mx[39m Build failed in 1.87s
+[31merror during build:
+[31m[vite:css] [postcss] E:/bismillah youtube/Projects/PROJECTS CV ATS/src/index.css:97:5: The `bg-[v` class does not exist. If `bg-[v` is a custom class, make sure it is defined within a `@layer` directive.[31m
+file: [36mE:/bismillah youtube/Projects/PROJECTS CV ATS/src/index.css:97:4[31m
+    at Input.error (E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\postcss\lib\input.js:135:16)
+    at AtRule.error (E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\postcss\lib\node.js:146:32)
+    at processApply (E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\tailwindcss\lib\lib\expandApplyAtRules.js:380:29)
+    at E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\tailwindcss\lib\lib\expandApplyAtRules.js:551:9
+    at E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\tailwindcss\lib\processTailwindFeatures.js:55:50
+    at async plugins (E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\tailwindcss\lib\plugin.js:38:17)
+    at async LazyResult.runAsync (E:\bismillah youtube\Projects\PROJECTS CV ATS\node_modules\postcss\lib\lazy-result.js:293:11)
+    at async compileCSS (file:///E:/bismillah%20youtube/Projects/PROJECTS%20CV%20ATS/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:36898:21)
+    at async Object.transform (file:///E:/bismillah%20youtube/Projects/PROJECTS%20CV%20ATS/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:36171:11)
+    at async transform (file:///E:/bismillah%20youtube/Projects/PROJECTS%20CV%20ATS/node_modules/rollup/dist/es/shared/node-entry.js:21269:16)[39m

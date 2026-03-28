@@ -169,7 +169,7 @@ export default function App() {
 
   const appSettings = useCVStore(state => state.appSettings);
   const appLogo = appSettings?.appLogo;
-  const appName = appSettings?.appName || 'CV ATS Builder';
+  const appName = appSettings?.appName || 'CV ATS Builder Premium';
   const favicon = appSettings?.favicon;
   const language = appSettings?.language || 'id';
 
