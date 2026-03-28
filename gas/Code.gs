@@ -61,12 +61,24 @@ function doPost(e) {
   try {
     // Parse request body
     var requestBody = JSON.parse(e.postData.contents);
-    var action = requestBody.action;
+    var action = (requestBody.action || '').toString().trim();
     
-    Utils.log('doPost called with action: ' + action);
+    // Tracking version untuk mempermudah debugging
+    response.version = '1.0.86-STABLE'; 
+    response.debug_received_action = action;
 
     // Route ke handler yang sesuai
     switch (action) {
+      case 'login':
+        response = SheetsDB.authenticateUser(SPREADSHEET_ID, requestBody.email, requestBody.password);
+        if (response.version === undefined) response.version = '1.0.86-STABLE';
+        break;
+      
+      case 'register':
+        response = SheetsDB.registerUser(SPREADSHEET_ID, requestBody.name, requestBody.email, requestBody.password);
+        if (response.version === undefined) response.version = '1.0.86-STABLE';
+        break;
+
       case 'saveCV':
         response = handleSaveCV(requestBody);
         break;
@@ -107,15 +119,6 @@ function doPost(e) {
         response = handleResetHistory(requestBody);
         break;
 
-      // -- Authentication & Admin System --
-      case 'register':
-        response = SheetsDB.registerUser(SPREADSHEET_ID, requestBody.name, requestBody.email, requestBody.password);
-        break;
-      
-      case 'login':
-        response = SheetsDB.authenticateUser(SPREADSHEET_ID, requestBody.email, requestBody.password);
-        break;
-      
       case 'requestPremium':
         response = SheetsDB.requestPremium(SPREADSHEET_ID, requestBody.email, requestBody.paymentProof);
         break;
@@ -139,7 +142,9 @@ function doPost(e) {
       case 'getUserProfile':
         response = SheetsDB.getUserProfile(SPREADSHEET_ID, requestBody.email);
         break;
+
       default:
+        response.success = false;
         response.message = 'Action tidak dikenal: ' + action;
     }
 
