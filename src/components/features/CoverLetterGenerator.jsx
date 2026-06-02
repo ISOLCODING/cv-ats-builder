@@ -1,18 +1,15 @@
 // src/components/features/CoverLetterGenerator.jsx
 import React, { useState, useEffect } from 'react';
-import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Upload, X, Fingerprint, Lock } from 'lucide-react';
+import { Wand2, FileText, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Upload, X, Fingerprint } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
-import useAuthStore from '../../store/useAuthStore';
 import Button from '../ui/Button';
 import { useGroq } from '../../hooks/useGroq';
 import RichEditor from '../ui/RichEditor';
 
 export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   const { cvData, coverLetter, updateCoverLetter, setCoverLetterContent, updatePersonalInfo, showToast } = useCVStore();
-  const { user, setShowUpgradeModal } = useAuthStore();
   const { generateCoverLetterAI } = useGroq();
   
-  const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
   const [generating, setGenerating] = useState(false);
 
   // Otomatis pindah preview ke 'Surat Lamaran' saat masuk step ini
@@ -41,10 +38,6 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
   };
 
   const handleGenerate = async () => {
-    if (!isPremium) {
-      return setShowUpgradeModal(true);
-    }
-
     if (!coverLetter.jobPosition) {
       return showToast('error', 'Masukkan posisi yang dilamar terlebih dahulu');
     }
@@ -94,7 +87,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-blue-500" /> Posisi yang Dilamar
+              <span className="w-4 h-4 text-blue-500"><CheckCircle2 size={16} /></span> Posisi yang Dilamar
             </label>
             <input
               type="text"
@@ -106,7 +99,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-blue-500" /> Nama Perusahaan
+              <span className="w-4 h-4 text-blue-500"><CheckCircle2 size={16} /></span> Nama Perusahaan
             </label>
             <input
               type="text"
@@ -118,7 +111,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-blue-500" /> Nama HRD (Jika Ada)
+              <span className="w-4 h-4 text-blue-500"><CheckCircle2 size={16} /></span> Nama HRD (Jika Ada)
             </label>
             <input
               type="text"
@@ -130,7 +123,7 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-blue-500" /> Tone Gaya Bahasa
+              <span className="w-4 h-4 text-blue-500"><CheckCircle2 size={16} /></span> Tone Gaya Bahasa
             </label>
             <select
               className="form-input bg-white shadow-sm"
@@ -182,24 +175,18 @@ export default function CoverLetterGenerator({ onBack, onNext, onReady }) {
           
           <div className="pt-4">
             <Button
-              onClick={handleGenerate}
+              onClick={() => handleGenerate()}
               loading={generating}
-              variant={!isPremium ? "outline" : "primary"}
-              leftIcon={!isPremium ? <Lock className="w-4 h-4 text-amber-500" /> : <Wand2 className="w-4 h-4" />}
-              className="w-full shadow-lg shadow-blue-200"
+              variant="primary"
+              leftIcon={<Wand2 className="w-4 h-4" />}
+              className="w-full h-16 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] shadow-premium hover:shadow-2xl transition-all"
             >
-              {!isPremium ? 'Upgrade Premium untuk Akses AI' : coverLetter.status === 'generated' ? 'Generasi Ulang Narasi' : 'Inisialisasi Narasi AI'}
+              {coverLetter.status === 'generated' ? 'Generasi Ulang Narasi' : 'Inisialisasi Narasi AI'}
             </Button>
           </div>
         </div>
 
         <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-center relative overflow-hidden">
-          {!isPremium && (
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-10 flex-col gap-2 rounded-2xl">
-              <Lock className="w-8 h-8 text-amber-500 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-500">Khusus Premium</span>
-            </div>
-          )}
            <h3 className="font-bold flex items-center gap-2 mb-2">
              <AlertTriangle className="w-5 h-5 text-blue-200" />
              Panduan Generator AI

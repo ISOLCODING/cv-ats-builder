@@ -1,8 +1,8 @@
 // src/components/features/ATSChecker.jsx
 import React, { useState } from 'react';
-import { Target, Search, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, BarChart3, Info, Sparkles, RefreshCw, Lock, Cpu, Zap, Microscope } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Target, Search, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, BarChart3, Info, Sparkles, RefreshCw, Cpu, Zap, Microscope } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
-import useAuthStore from '../../store/useAuthStore';
 import Button from '../ui/Button';
 import { useGroq } from '../../hooks/useGroq';
 
@@ -12,10 +12,8 @@ export default function ATSChecker({ onBack, onNext }) {
     atsResult, setATSResult, showToast,
     updateSummary, updateSkills, coverLetter 
   } = useCVStore();
-  const { user, setShowUpgradeModal } = useAuthStore();
   const { analyzeATSAI, optimizeCVAI } = useGroq();
   
-  const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
   const [analyzing, setAnalyzing] = useState(false);
   const [optimizing, setOptimizing] = useState(false);
 
@@ -64,7 +62,6 @@ export default function ATSChecker({ onBack, onNext }) {
   return (
     <div className="space-y-12 animate-fade-in pb-10">
       {/* Header Section */}
-      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10 pb-12 border-b border-slate-100">
         <div className="space-y-6">
           <div className="flex items-center gap-6">
@@ -99,14 +96,12 @@ export default function ATSChecker({ onBack, onNext }) {
               </div>
               
               <Button
-                onClick={() => isPremium ? handleAnalyze() : setShowUpgradeModal(true)}
+                onClick={handleAnalyze}
                 loading={analyzing}
-                className={`h-14 px-10 rounded-[1.25rem] font-medium tracking-wide transition-all shadow-premium active:scale-95 ${
-                  isPremium ? 'bg-slate-900 text-white hover:bg-black' : 'bg-slate-50 text-slate-400 border border-slate-100 hover:bg-slate-100'
-                }`}
-                leftIcon={isPremium ? <Search className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                className="h-14 px-10 rounded-[1.25rem] font-medium tracking-wide transition-all shadow-premium active:scale-95 bg-slate-900 text-white hover:bg-black"
+                leftIcon={<Search className="w-4 h-4" />}
               >
-                {isPremium ? 'Eksekusi Analisis AI' : 'Buka Intelegensia'}
+                Eksekusi Analisis AI
               </Button>
             </div>
 
@@ -204,14 +199,12 @@ export default function ATSChecker({ onBack, onNext }) {
                   </div>
 
                   <Button
-                    onClick={() => isPremium ? handleOptimize() : setShowUpgradeModal(true)}
+                    onClick={handleOptimize}
                     loading={optimizing}
-                    className={`h-16 px-10 rounded-2xl font-bold tracking-[0.1em] uppercase transition-all shadow-premium active:scale-95 ${
-                      isPremium ? 'bg-slate-900 text-white hover:bg-black' : 'bg-slate-50 text-slate-300 border border-slate-100'
-                    }`}
-                    leftIcon={isPremium ? <Sparkles className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                    className="h-16 px-10 rounded-2xl font-bold tracking-[0.1em] uppercase transition-all shadow-premium active:scale-95 bg-slate-900 text-white hover:bg-black"
+                    leftIcon={<Sparkles className="w-4 h-4" />}
                   >
-                    {isPremium ? 'Optimasi Kuantum' : 'Khusus Premium'}
+                    Optimasi Kuantum
                   </Button>
                 </div>
               </div>

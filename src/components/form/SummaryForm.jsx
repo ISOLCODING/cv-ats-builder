@@ -5,14 +5,13 @@ import React, { useEffect, useCallback, useState } from 'react';
 import {
   FileText, Target, CheckCircle2, XCircle, AlertCircle,
   Lightbulb, RefreshCw, ChevronLeft, Zap, BarChart3,
-  Sparkles, Info, Lock
+  Sparkles, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import RichEditor from '../ui/RichEditor';
 import MagicWriter from '../ui/MagicWriter';
 import useCVStore from '../../store/useCVStore';
-import useAuthStore from '../../store/useAuthStore';
 import { calculateATSScore, getScoreLabel } from '../../utils/atsScore';
 import { optimizeCV } from '../../services/groq';
 
@@ -72,7 +71,7 @@ const TEMPLATES = [
   {
     emoji: '💻',
     label: 'Spesialis Rekayasa',
-    html: '<p>Insinyur perangkat lunak berpengalaman <strong>3+ tahun</strong> dengan fokus pada arsitektur web & mobile yang skalabel. Ahli dalam ekosistem <strong>React, Node.js, dan Cloud</strong>. Terbukti unggul dalam pengiriman Agile dan optimasi sistem.</p>',
+    html: '<p>Insinyur perangkat lunak berpengalaman <strong>3+ tahun</strong> dengan fokus pada arsitektur web & mobile yang skalabel. Ahli dalam ekosistem <strong>React, Node.js, dan Cloud</strong>. Terbukti unggul dalam pengiriman Agile and optimasi sistem.</p>',
   },
   {
     emoji: '📊',
@@ -121,9 +120,7 @@ export default function SummaryForm({ onBack, onNext }) {
     cvData, updateSummary, jobDescription, setJobDescription,
     atsResult, setATSResult, updateSkills, showToast
   } = useCVStore();
-  const { user, setShowUpgradeModal } = useAuthStore();
 
-  const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
   const [optimizing, setOptimizing] = useState(false);
 
   // ATS analysis (debounced)
@@ -371,17 +368,14 @@ export default function SummaryForm({ onBack, onNext }) {
                        </div>
 
                       <button
-                        onClick={() => isPremium ? handleOptimize() : setShowUpgradeModal(true)}
+                        onClick={handleOptimize}
                         disabled={optimizing}
-                        className={`group relative flex items-center gap-4 px-10 py-5 rounded-2xl transition-all duration-500 overflow-hidden ${isPremium
-                            ? 'bg-slate-900 text-white hover:bg-black shadow-xl shadow-slate-200'
-                            : 'bg-slate-50 text-slate-400 border border-slate-100'
-                          }`}
+                        className="group relative flex items-center gap-4 px-10 py-5 rounded-2xl transition-all duration-500 overflow-hidden bg-slate-900 text-white hover:bg-black shadow-xl shadow-slate-200"
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                        {isPremium ? <Sparkles size={16} className="text-slate-300" /> : <Lock size={16} />}
+                        <Sparkles size={16} className="text-slate-300" />
                          <span className="text-[11px] font-bold uppercase tracking-widest relative z-10 transition-all group-hover:tracking-[0.2em]">
-                           {isPremium ? (optimizing ? 'Menyinkronkan...' : 'Sinkronisasi AI') : 'Buka Sinkronisasi Cerdas'}
+                           {optimizing ? 'Menyinkronkan...' : 'Sinkronisasi AI'}
                          </span>
                       </button>
                     </div>

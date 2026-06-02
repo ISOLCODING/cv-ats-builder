@@ -1,7 +1,6 @@
 // src/hooks/useGroq.js
 import { useCallback } from 'react';
 import { useGAS } from './useGAS';
-import useAuthStore from '../store/useAuthStore';
 
 /**
  * useGroq Hook
@@ -14,12 +13,6 @@ export function useGroq() {
    * callAIProxy — Proxy pemanggilan AI ke backend
    */
   const callAIProxy = useCallback(async (prompt, isJson = false) => {
-    const { user } = useAuthStore.getState();
-    const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
-
-    if (!isPremium) {
-      throw new Error('Premium Required: Fitur AI ini khusus untuk pengguna Premium.');
-    }
 
     try {
       const res = await callGAS('callAI', { prompt, isJson });

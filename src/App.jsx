@@ -26,7 +26,6 @@ import KeywordHeatmap from './components/features/KeywordHeatmap';
 import CVPreview        from './components/preview/CVPreview';
 import LetterPreview from './components/preview/LetterPreview';
 import useCVStore       from './store/useCVStore';
-import useAuthStore     from './store/useAuthStore';
 import { useGAS }       from './hooks/useGAS';
 import { exportCVtoPDF, exportLetterToPDF } from './utils/exportPDF';
 
@@ -157,7 +156,6 @@ export default function App() {
   const [previewType, setPreviewType] = useState('cv'); 
   const [showLoadModal, setShowLoadModal]   = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const { user } = useAuthStore();
 
   const {
     currentStep, nextStep, prevStep, setCurrentStep,
@@ -169,7 +167,7 @@ export default function App() {
 
   const appSettings = useCVStore(state => state.appSettings);
   const appLogo = appSettings?.appLogo;
-  const appName = appSettings?.appName || 'CV ATS Builder Premium';
+  const appName = appSettings?.appName || 'CV ATS Builder';
   const favicon = appSettings?.favicon;
   const language = appSettings?.language || 'id';
 

@@ -2,7 +2,6 @@
 import React from 'react';
 import { Layout, Check, Sparkles, FileText, AlignLeft, ChevronRight } from 'lucide-react';
 import useCVStore from '../../store/useCVStore';
-import useAuthStore from '../../store/useAuthStore';
 import Button from '../ui/Button';
 
 const TEMPLATES = [
@@ -38,7 +37,6 @@ const FONTS = [
 
 export default function TemplateSelector({ onNext }) {
   const { cvData, setTemplate, appSettings, setFontFamily } = useCVStore();
-  const { user, setShowUpgradeModal } = useAuthStore();
   const selected = cvData?.selectedTemplate || 'standard_ats';
   const selectedFont = appSettings?.fontFamily || 'serif';
 
@@ -63,19 +61,15 @@ export default function TemplateSelector({ onNext }) {
         {TEMPLATES.map((t) => {
           const Icon = t.icon;
           const isSelected = selected === t.id;
-          const isPremium = t.id !== 'standard_ats';
-          const isLocked = isPremium && user?.role === 'Basic';
           
           return (
             <button
               type="button"
               key={t.id}
-              onClick={() => isLocked ? setShowUpgradeModal(true) : setTemplate(t.id)}
+              onClick={() => setTemplate(t.id)}
               className={`relative text-left p-10 rounded-[3rem] border-2 transition-all duration-500 group overflow-hidden ${
                 isSelected 
                   ? 'border-[var(--primary)] bg-white shadow-premium translate-y-[-8px]' 
-                  : isLocked
-                  ? 'border-slate-100 bg-slate-50/50 opacity-60 hover:opacity-100 cursor-pointer'
                   : 'border-slate-100 bg-white hover:border-slate-200 hover:shadow-soft'
               }`}
             >
@@ -98,7 +92,6 @@ export default function TemplateSelector({ onNext }) {
                 {t.name}
               </h3>
 
-              {/* Blueprint Preview - Visual instead of list */}
               <div className="space-y-3 opacity-40 group-hover:opacity-100 transition-opacity duration-500">
                 {t.id === 'standard_ats' && (
                   <div className="space-y-1.5">

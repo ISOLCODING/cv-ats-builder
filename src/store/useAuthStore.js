@@ -1,43 +1,17 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 /**
- * useAuthStore
- * ============================================================
- * Simplified version: No login/register/premium required.
- * Always returns a default 'Guest' user with 'Premium' role 
- * to ensure all features are accessible by default.
+ * useAuthStore — Stub kosong.
+ * Auth sistem telah dihapus. Semua fitur bebas diakses tanpa login.
+ * File ini dipertahankan agar tidak terjadi import error.
  */
-const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user: { 
-        id: 'guest_user', 
-        name: 'Guest User', 
-        email: '', 
-        role: 'Premium', 
-        paymentStatus: 'Approved' 
-      },
-      isLoading: false,
-      error: null,
-      showUpgradeModal: false,
-
-      // -- Actions (Disabled/Simplified) --
-      setShowUpgradeModal: (show) => set({ showUpgradeModal: false }), // Always false
-      login: async () => true, // Bypass
-      register: async () => true, // Bypass
-      logout: () => {
-        // No-op or reset to guest if needed, but we want it to stay guest
-      },
-      requestUpgrade: async () => true,
-      refreshUserStatus: async () => get().user
-    }),
-    {
-      name: 'cv-auth-storage',
-      partialize: (state) => ({ user: state.user }),
-    }
-  )
-);
+const useAuthStore = create(() => ({
+  user: null,
+  setShowUpgradeModal: () => {},
+  login: async () => true,
+  logout: () => {},
+  register: async () => true,
+  refreshUserStatus: async () => null,
+}));
 
 export default useAuthStore;
-

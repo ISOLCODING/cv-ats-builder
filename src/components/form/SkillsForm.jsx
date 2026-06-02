@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Cpu, Heart, Languages, X, Plus, Sparkles, ChevronLeft, ChevronRight, Info, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Cpu, Heart, Languages, X, Plus, Sparkles, ChevronLeft, ChevronRight, Info, RefreshCw, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import useCVStore from '../../store/useCVStore';
-import useAuthStore from '../../store/useAuthStore';
 import { useGroq } from '../../hooks/useGroq';
 
 // ── Skill suggestions ─────────────────────────────────────────
@@ -207,18 +206,20 @@ function SkillTagInput({ category, skills = [], onAdd, onRemove }) {
 // ── Main export ───────────────────────────────────────────────
 export default function SkillsForm({ onNext, onBack }) {
   const { cvData, addSkill, removeSkill, atsResult, aiSuggestions, setAISuggestions } = useCVStore();
-  const { user, setShowUpgradeModal } = useAuthStore();
   const { getSmartSkillsAI } = useGroq();
   const { skills } = cvData;
   const { missingKeywords = [] } = atsResult;
 
   const [isLoadingSmart, setIsLoadingSmart] = useState(false);
   
-  const isPremium = user?.role === 'Premium' || user?.role === 'Admin';
+  // Smart Skills Analysis
+  useEffect(() => {
+    fetchSmartSkills();
+  }, []);
+
   const hasAISuggestions = aiSuggestions.technical?.length > 0 || aiSuggestions.softSkills?.length > 0;
 
   const fetchSmartSkills = async (force = false) => {
-    if (!isPremium) return;
     if (!force && hasAISuggestions) return; 
     
     const hasSummary = cvData.summary && cvData.summary.length > 20;
@@ -238,10 +239,6 @@ export default function SkillsForm({ onNext, onBack }) {
     }
   };
 
-  React.useEffect(() => {
-    fetchSmartSkills();
-  }, [isPremium]); 
-
   const nudges = missingKeywords.filter(kw => !skills.technical?.includes(kw));
 
   const total = ['technical','softSkills','languages'].reduce(
@@ -259,7 +256,7 @@ export default function SkillsForm({ onNext, onBack }) {
                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
              </div>
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Step 05</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-400">Tahap 05</span>
                 <h2 className="text-4xl md:text-5xl font-display font-light text-slate-900 tracking-tight italic text-left">
                   Keahlian & <span className="text-slate-400">Spesialisasi</span>
                 </h2>
@@ -303,7 +300,7 @@ export default function SkillsForm({ onNext, onBack }) {
               </div>
             </div>
             
-            {isPremium && !isLoadingSmart && (
+            {!isLoadingSmart && (
                <button 
                  onClick={() => fetchSmartSkills(true)}
                  className="flex items-center gap-3 px-6 py-3 rounded-2xl border border-slate-100 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all shadow-sm group"
@@ -314,87 +311,71 @@ export default function SkillsForm({ onNext, onBack }) {
             )}
           </div>
 
-          {!isPremium ? (
-            <div className="bg-slate-50/50 rounded-[3rem] p-12 text-center border border-slate-100 border-dashed">
-              <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mx-auto mb-8 shadow-sm">
-                <Sparkles size={32} className="text-slate-200" />
+          <div className="space-y-12">
+            {isLoadingSmart ? (
+              <div className="flex flex-wrap gap-4 px-2">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                  <div key={i} className="h-12 w-36 bg-slate-50 rounded-2xl animate-pulse" />
+                ))}
               </div>
-              <h4 className="text-2xl font-bold text-slate-900 font-display mb-4 tracking-tight italic">Buka Pemetaan AI</h4>
-              <p className="text-sm text-slate-400 font-medium max-w-sm mx-auto mb-10 leading-relaxed">Tingkatkan ke Premium untuk memetakan kompetensi tersembunyi berdasarkan semantik unik dari riwayat profesional Anda.</p>
-              <button 
-                onClick={() => setShowUpgradeModal(true)}
-                className="px-12 py-5 rounded-[2rem] bg-slate-900 text-white font-bold text-[11px] uppercase tracking-[0.4em] shadow-2xl shadow-slate-400 hover:bg-black transition-all active:scale-95"
-              >
-                Akses Kecerdasan Premium
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-12">
-              {isLoadingSmart ? (
-                <div className="flex flex-wrap gap-4 px-2">
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                    <div key={i} className="h-12 w-36 bg-slate-50 rounded-2xl animate-pulse" />
-                  ))}
-                </div>
-              ) : hasAISuggestions ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  {aiSuggestions.technical?.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4 ml-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Technical tokens</span>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {aiSuggestions.technical
-                          .filter(s => !skills.technical?.includes(s))
-                          .map((s) => (
-                          <motion.button
-                            key={s}
-                            whileHover={{ scale: 1.03, y: -2 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => addSkill('technical', s)}
-                            className="group flex items-center gap-3 px-6 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-medium text-slate-700 hover:border-slate-900 hover:bg-white hover:text-slate-900 transition-all"
-                          >
-                            <Plus size={14} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                            {s}
-                          </motion.button>
-                        ))}
-                      </div>
+            ) : hasAISuggestions ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {aiSuggestions.technical?.length > 0 && (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4 ml-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Technical tokens</span>
                     </div>
-                  )}
+                    <div className="flex flex-wrap gap-3">
+                      {aiSuggestions.technical
+                        .filter(s => !skills.technical?.includes(s))
+                        .map((s) => (
+                        <motion.button
+                          key={s}
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => addSkill('technical', s)}
+                          className="group flex items-center gap-3 px-6 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-medium text-slate-700 hover:border-slate-900 hover:bg-white hover:text-slate-900 transition-all"
+                        >
+                          <Plus size={14} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+                          {s}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                  {aiSuggestions.softSkills?.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4 ml-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Behavioral tokens</span>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {aiSuggestions.softSkills
-                          .filter(s => !skills.softSkills?.includes(s))
-                          .map((s) => (
-                          <motion.button
-                            key={s}
-                            whileHover={{ scale: 1.03, y: -2 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => addSkill('softSkills', s)}
-                            className="group flex items-center gap-3 px-6 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-medium text-slate-700 hover:border-slate-900 hover:bg-white hover:text-slate-900 transition-all"
-                          >
-                            <Plus size={14} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                            {s}
-                          </motion.button>
-                        ))}
-                      </div>
+                {aiSuggestions.softSkills?.length > 0 && (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4 ml-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Behavioral tokens</span>
                     </div>
-                  )}
-                </div>
-              ) : (
-                 <div className="py-12 text-center">
-                   <p className="text-slate-300 text-sm font-medium italic">Sinkronisasikan riwayat profesional Anda untuk memulai pemetaan kompetensi AI.</p>
-                </div>
-              )}
-            </div>
-          )}
+                    <div className="flex flex-wrap gap-3">
+                      {aiSuggestions.softSkills
+                        .filter(s => !skills.softSkills?.includes(s))
+                        .map((s) => (
+                        <motion.button
+                          key={s}
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => addSkill('softSkills', s)}
+                          className="group flex items-center gap-3 px-6 py-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-medium text-slate-700 hover:border-slate-900 hover:bg-white hover:text-slate-900 transition-all"
+                        >
+                          <Plus size={14} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+                          {s}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+               <div className="py-12 text-center">
+                 <p className="text-slate-300 text-sm font-medium italic">Sinkronisasikan riwayat profesional Anda untuk memulai pemetaan kompetensi AI.</p>
+              </div>
+            )}
+          </div>
         </motion.div>
       </div>
 
